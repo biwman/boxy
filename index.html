@@ -41,17 +41,17 @@ fetch('export.csv')
   .then(csv => {
     csv = csv.replace(/^\uFEFF/, ''); // usuń BOM
     const rows = csv.trim().split('\n').map(r => r.split(';').map(c => c.trim()));
-    
     const headers = rows[0].map(h => ({ title: h }));
     const colCount = headers.length;
 
-    // Zamiana przecinka na kropkę tylko w kolumnie ceny (ostatnia kolumna)
+    // Wypełnij brakujące komórki pustym stringiem i zamień przecinek w cenach na kropkę
     const data = rows.slice(1).map(r => {
+      while (r.length < colCount) r.push('');
       return r.map((val, i) => {
         if (i === colCount - 1 && val !== '') {
           return parseFloat(val.replace(',', '.')); // liczba do sortowania
         }
-        return val || '';
+        return val;
       });
     });
 
@@ -64,20 +64,20 @@ fetch('export.csv')
           targets: colCount - 1,
           render: function(data, type, row) {
             if (type === 'display' || type === 'filter') {
+              // Wyświetl w polskim formacie: przecinek dziesiętny i separator tysięcy
               return data.toLocaleString('pl-PL', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
             }
-            return data; // do sortowania liczba
+            return data; // do sortowania
           }
         }
       ]
     });
 
-    // Wypełnianie filtrów
+    // Filtry
     function fillFilter(colIndex, selectId) {
       const values = [...new Set(data.map(r => r[colIndex]))].sort();
       values.forEach(v => $(selectId).append(`<option value="${v}">${v}</option>`));
     }
-
     fillFilter(4, '#filter-sklep');   // Sklep
     fillFilter(6, '#filter-sezon');   // Sezon
     fillFilter(10, '#filter-team');   // Team
@@ -86,6 +86,7 @@ fetch('export.csv')
       table.draw();
     });
 
+    // Własny filtr DataTables
     $.fn.dataTable.ext.search.push(function(settings, row) {
       const sklep = $('#filter-sklep').val();
       const sezon = $('#filter-sezon').val();
