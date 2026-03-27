@@ -85,8 +85,8 @@
 fetch('export.csv')
   .then(response => response.text())
   .then(csv => {
-    const separator = csv.includes(';') ? ';' : ',';
-    const rows = csv.trim().split('\n').map(r => r.split(separator));
+    // Używamy średnika jako separatora zawsze
+    const rows = csv.trim().split('\n').map(r => r.split(';'));
 
     const headers = rows[0].map(h => ({ title: h }));
     const data = rows.slice(1);
