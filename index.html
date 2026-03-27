@@ -4,7 +4,6 @@
   <meta charset="UTF-8">
   <title>Moja tabela – sklep style</title>
 
-  <!-- DataTables CSS -->
   <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
   <style>
     body { font-family: Arial, sans-serif; margin: 20px; background: #f5f5f5; }
@@ -21,11 +20,9 @@
     .dataTables_wrapper .dataTables_filter input { border-radius: 5px; border: 1px solid #ccc; padding: 5px 8px; }
   </style>
 
-  <!-- jQuery i DataTables JS -->
   <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
   <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
 </head>
-
 <body>
 
 <h1>📊 Moje dane – sklep style</h1>
@@ -42,62 +39,53 @@
 fetch('export.csv')
   .then(response => response.text())
   .then(csv => {
-    // Usuń BOM jeśli występuje
-    csv = csv.replace(/^\uFEFF/, '');
-    
-    // Podział po średniku i trim
+    csv = csv.replace(/^\uFEFF/, ''); // usuń BOM
     const rows = csv.trim().split('\n').map(r => r.split(';').map(c => c.trim()));
     
     const headers = rows[0].map(h => ({ title: h }));
     const colCount = headers.length;
-    
-    // Wypełnianie wierszy i konwersja ceny na liczbę
+
+    // Zamiana przecinka na kropkę tylko w kolumnie ceny (ostatnia kolumna)
     const data = rows.slice(1).map(r => {
-      const newRow = [];
-      for (let i = 0; i < colCount; i++) {
-        let val = r[i] || '';
-        // Jeśli to kolumna cena_box_PLN (ostatnia), zamień przecinek na kropkę i konwertuj na liczbę
+      return r.map((val, i) => {
         if (i === colCount - 1 && val !== '') {
-          val = parseFloat(val.replace(',', '.'));
+          return parseFloat(val.replace(',', '.')); // liczba do sortowania
         }
-        newRow.push(val);
-      }
-      return newRow;
+        return val || '';
+      });
     });
-    
-    // DataTable z sortowaniem kolumny ceny jako liczba
+
     const table = $('#myTable').DataTable({
       data: data,
       columns: headers,
       pageLength: 25,
       columnDefs: [
         {
-          targets: colCount - 1, // ostatnia kolumna
+          targets: colCount - 1,
           render: function(data, type, row) {
             if (type === 'display' || type === 'filter') {
-              return data.toFixed(2).replace('.', ','); // wyświetl z przecinkiem
+              return data.toLocaleString('pl-PL', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
             }
-            return data; // do sortowania użyj liczby
+            return data; // do sortowania liczba
           }
         }
       ]
     });
-    
-    // Wypełnianie filtrów dropdown
-    function fillFilter(columnIndex, selectId) {
-      const values = [...new Set(data.map(row => row[columnIndex]))].sort();
+
+    // Wypełnianie filtrów
+    function fillFilter(colIndex, selectId) {
+      const values = [...new Set(data.map(r => r[colIndex]))].sort();
       values.forEach(v => $(selectId).append(`<option value="${v}">${v}</option>`));
     }
-    
+
     fillFilter(4, '#filter-sklep');   // Sklep
     fillFilter(6, '#filter-sezon');   // Sezon
     fillFilter(10, '#filter-team');   // Team
-    
+
     $('#filter-sklep, #filter-sezon, #filter-team').on('change', function() {
       table.draw();
     });
-    
-    // Filtr DataTables
+
     $.fn.dataTable.ext.search.push(function(settings, row) {
       const sklep = $('#filter-sklep').val();
       const sezon = $('#filter-sezon').val();
@@ -106,7 +94,6 @@ fetch('export.csv')
              (sezon === "" || row[6] === sezon) &&
              (team === "" || row[10] === team);
     });
-    
   })
   .catch(err => console.error('Błąd wczytywania CSV:', err));
 </script>
