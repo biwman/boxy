@@ -2,73 +2,27 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>Moja tabela – wizualnie ulepszona</title>
+  <title>Moja tabela – sklep style</title>
 
-  <!-- Style DataTables -->
   <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
   <style>
     body { font-family: Arial, sans-serif; margin: 20px; background: #f5f5f5; }
     h1 { text-align: center; margin-bottom: 20px; color: #333; }
-
-    /* Filtry */
     .filter-container { margin-bottom: 15px; text-align: center; }
-    .filter-container select {
-      margin: 0 10px;
-      padding: 5px 8px;
-      border-radius: 5px;
-      border: 1px solid #ccc;
-      background: #fff;
-    }
-
-    /* Tabela */
-    table.dataTable { 
-      border-collapse: separate !important;
-      border-spacing: 0 5px;
-      width: 100% !important;
-      background: #fff;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-    }
-
-    table.dataTable thead th {
-      background-color: #4CAF50;
-      color: #fff;
-      text-align: center;
-      padding: 10px;
-    }
-
-    table.dataTable tbody td {
-      padding: 8px;
-      text-align: center;
-    }
-
+    .filter-container select { margin: 0 10px; padding: 5px 8px; border-radius: 5px; border: 1px solid #ccc; background: #fff; }
+    table.dataTable { border-collapse: separate !important; border-spacing: 0 5px; width: 100% !important; background: #fff; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+    table.dataTable thead th { background-color: #4CAF50; color: #fff; text-align: center; padding: 10px; }
+    table.dataTable tbody td { padding: 8px; text-align: center; }
     table.dataTable tbody tr:nth-child(odd) { background-color: #f9f9f9; }
     table.dataTable tbody tr:hover { background-color: #e0f7fa; }
-
-    /* Paginacja */
-    .dataTables_wrapper .dataTables_paginate .paginate_button {
-      background: #4CAF50;
-      color: white !important;
-      border-radius: 4px;
-      margin: 0 2px;
-      padding: 5px 10px;
-    }
-
-    .dataTables_wrapper .dataTables_paginate .paginate_button.current {
-      background: #45a049 !important;
-    }
-
-    .dataTables_wrapper .dataTables_filter input {
-      border-radius: 5px;
-      border: 1px solid #ccc;
-      padding: 5px 8px;
-    }
+    .dataTables_wrapper .dataTables_paginate .paginate_button { background: #4CAF50; color: white !important; border-radius: 4px; margin: 0 2px; padding: 5px 10px; }
+    .dataTables_wrapper .dataTables_paginate .paginate_button.current { background: #45a049 !important; }
+    .dataTables_wrapper .dataTables_filter input { border-radius: 5px; border: 1px solid #ccc; padding: 5px 8px; }
   </style>
 
-  <!-- Skrypty -->
   <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
   <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
 </head>
-
 <body>
 
 <h1>📊 Moje dane – sklep style</h1>
@@ -85,11 +39,20 @@
 fetch('export.csv')
   .then(response => response.text())
   .then(csv => {
-    // Używamy średnika jako separatora zawsze
-    const rows = csv.trim().split('\n').map(r => r.split(';'));
+    // Podział po średniku i trim każdej komórki
+    const rows = csv.trim().split('\n').map(r => r.split(';').map(c => c.trim()));
 
     const headers = rows[0].map(h => ({ title: h }));
-    const data = rows.slice(1);
+
+    // Wypełniamy wiersze, pusty string jeśli brak kolumny
+    const colCount = headers.length;
+    const data = rows.slice(1).map(r => {
+      const newRow = [];
+      for (let i = 0; i < colCount; i++) {
+        newRow.push(r[i] || '');
+      }
+      return newRow;
+    });
 
     const table = $('#myTable').DataTable({
       data: data,
@@ -97,17 +60,16 @@ fetch('export.csv')
       pageLength: 25
     });
 
-    // Wypełnianie filtrów dropdown
+    // Filtry dropdown
     function fillFilter(columnIndex, selectId) {
       const values = [...new Set(data.map(row => row[columnIndex]))].sort();
       values.forEach(v => $(selectId).append(`<option value="${v}">${v}</option>`));
     }
 
-    fillFilter(4, '#filter-sklep');   // Sklep
-    fillFilter(6, '#filter-sezon');   // Sezon
-    fillFilter(10, '#filter-team');   // Team
+    fillFilter(4, '#filter-sklep');
+    fillFilter(6, '#filter-sezon');
+    fillFilter(10, '#filter-team');
 
-    // Obsługa zmiany filtrów
     $('#filter-sklep, #filter-sezon, #filter-team').on('change', function() {
       table.draw();
     });
@@ -117,12 +79,10 @@ fetch('export.csv')
       const sklep = $('#filter-sklep').val();
       const sezon = $('#filter-sezon').val();
       const team = $('#filter-team').val();
-
       return (sklep === "" || row[4] === sklep) &&
              (sezon === "" || row[6] === sezon) &&
              (team === "" || row[10] === team);
     });
-
   })
   .catch(err => console.error('Błąd wczytywania CSV:', err));
 </script>
