@@ -44,51 +44,59 @@ fetch('export.csv')
   .then(csv => {
     // Usuń BOM jeśli występuje
     csv = csv.replace(/^\uFEFF/, '');
-
+    
     // Podział po średniku i trim
     const rows = csv.trim().split('\n').map(r => r.split(';').map(c => c.trim()));
-
+    
     const headers = rows[0].map(h => ({ title: h }));
     const colCount = headers.length;
-
+    
     // Wypełnianie wierszy i konwersja ceny na liczbę
     const data = rows.slice(1).map(r => {
       const newRow = [];
       for (let i = 0; i < colCount; i++) {
         let val = r[i] || '';
-        // Konwersja kolumny cena_box_PLN (ostatnia kolumna) na liczbę dla sortowania
+        // Jeśli to kolumna cena_box_PLN (ostatnia), zamień przecinek na kropkę i konwertuj na liczbę
         if (i === colCount - 1 && val !== '') {
-          val = val.replace(',', '.'); // zamień przecinek na kropkę
+          val = parseFloat(val.replace(',', '.'));
         }
         newRow.push(val);
       }
       return newRow;
     });
-
-    // DataTables z sortowaniem kolumny ceny jako liczby
+    
+    // DataTable z sortowaniem kolumny ceny jako liczba
     const table = $('#myTable').DataTable({
       data: data,
       columns: headers,
       pageLength: 25,
       columnDefs: [
-        { targets: colCount - 1, render: $.fn.dataTable.render.number('.', ',', 2, '') } // ostatnia kolumna jako liczba
+        {
+          targets: colCount - 1, // ostatnia kolumna
+          render: function(data, type, row) {
+            if (type === 'display' || type === 'filter') {
+              return data.toFixed(2).replace('.', ','); // wyświetl z przecinkiem
+            }
+            return data; // do sortowania użyj liczby
+          }
+        }
       ]
     });
-
+    
     // Wypełnianie filtrów dropdown
     function fillFilter(columnIndex, selectId) {
       const values = [...new Set(data.map(row => row[columnIndex]))].sort();
       values.forEach(v => $(selectId).append(`<option value="${v}">${v}</option>`));
     }
-
+    
     fillFilter(4, '#filter-sklep');   // Sklep
     fillFilter(6, '#filter-sezon');   // Sezon
     fillFilter(10, '#filter-team');   // Team
-
+    
     $('#filter-sklep, #filter-sezon, #filter-team').on('change', function() {
       table.draw();
     });
-
+    
     // Filtr DataTables
     $.fn.dataTable.ext.search.push(function(settings, row) {
       const sklep = $('#filter-sklep').val();
@@ -98,7 +106,7 @@ fetch('export.csv')
              (sezon === "" || row[6] === sezon) &&
              (team === "" || row[10] === team);
     });
-
+    
   })
   .catch(err => console.error('Błąd wczytywania CSV:', err));
 </script>
