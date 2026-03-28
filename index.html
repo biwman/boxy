@@ -116,7 +116,7 @@
         }
 
         .select2-container {
-            min-width: 150px;
+            min-width: 200px;
         }
 
         @media (max-width: 768px) {
@@ -143,7 +143,7 @@
             <strong>Orientacyjne kursy walut:</strong><br>
             EUR/PLN: <span id="eurpln">ładowanie...</span> |
             USD/PLN: <span id="usdpln">ładowanie...</span> |
-            GBP Tax: <span id="gbptax">ładowanie...</span>
+            UK Tax: <span id="gbptax">ładowanie...</span>
         </div>
 
         <div class="creator">
@@ -153,7 +153,7 @@
         </div>
 
         <div class="update">
-            <strong>Aktualizacja danych (CSV):</strong>
+            <strong>Aktualizacja danych:</strong>
             <span id="last-update">ładowanie...</span>
         </div>
     </div>
@@ -228,17 +228,28 @@ $(document).ready(function() {
             }
 
             // data ostatniego uruchomienia (Excel date float)
-            if(config.OSTATNIE_URUCHOMIENIE) {
-                const excelDate = parseFloat(config.OSTATNIE_URUCHOMIENIE.replace(",", "."));
-                const jsDate = new Date((excelDate - 25569) * 86400 * 1000);
-                document.getElementById("last-update").innerText = jsDate.toLocaleDateString("pl-PL") + " " + jsDate.toLocaleTimeString("pl-PL");
-            } else {
-                document.getElementById("last-update").innerText = "brak informacji";
-            }
+     		if(config.OSTATNIE_URUCHOMIENIE) {
+    		const excelDate = parseFloat(config.OSTATNIE_URUCHOMIENIE.replace(",", "."));
+   		 const jsDate = new Date((excelDate - 25569) * 86400 * 1000);
+
+    		const options = { 
+       		 day: "2-digit", month: "2-digit", year: "numeric",
+        	hour: "2-digit", minute: "2-digit", second: "2-digit",
+        	hour12: false,
+        	timeZone: "Europe/Warsaw"  // CET/CEST
+    		};
+
+   		 document.getElementById("last-update").innerText = jsDate.toLocaleString("pl-PL", options);
+
+		} else {
+   		 document.getElementById("last-update").innerText = "brak informacji";
+		}
         }
     });
 
     // 🔥 2️⃣ Wczytanie danych CSV z produktami
+const nocache = new Date().getTime(); // unikalny timestamp
+
     Papa.parse("export.csv", {
         download: true,
         header: true,
@@ -281,25 +292,28 @@ $(document).ready(function() {
                 allowClear: true
             });
 
-            function fillFilter(columnIndex, selectId) {
-                var column = table.column(columnIndex);
-                var select = $(selectId);
+            function fillFilter(columnIndex, selectId, reverse=false) {
+    var column = table.column(columnIndex);
+    var select = $(selectId);
 
-                column.data().unique().sort().each(function(d) {
-                    if (d) select.append('<option value="'+d+'">'+d+'</option>');
-                });
+    let dataArray = column.data().unique().sort();
+    if(reverse) dataArray = dataArray.reverse();
 
-                select.on('change', function() {
-                    var values = $(this).val();
-                    column.search(values ? values.join('|') : "", true, false).draw();
-                });
-            }
+    dataArray.forEach(function(d) {
+        if (d) select.append('<option value="'+d+'">'+d+'</option>');
+    });
 
-            fillFilter(2, '#filter-sklep');
-            fillFilter(4, '#filter-sezon');
-            fillFilter(8, '#filter-team');
-            fillFilter(5, '#filter-producent');
-            fillFilter(7, '#filter-typboxa');
+    select.on('change', function() {
+        var values = $(this).val();
+        column.search(values ? values.join('|') : "", true, false).draw();
+    });
+}
+
+		fillFilter(2, '#filter-sklep');              // sklep – normalnie A→Z
+		fillFilter(4, '#filter-sezon', true);       // sezon – Z→A
+		fillFilter(8, '#filter-team');              // team – normalnie A→Z
+		fillFilter(5, '#filter-producent', true);   // producent – Z→A
+		fillFilter(7, '#filter-typboxa');           // typ boxa – normalnie A→Z
         }
     });
 
