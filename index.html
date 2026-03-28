@@ -39,23 +39,22 @@
 fetch('export.csv')
   .then(response => response.text())
   .then(csv => {
-    csv = csv.replace(/^\uFEFF/, '');
+    csv = csv.replace(/^\uFEFF/, ''); // usuń BOM
     const rows = csv.trim().split('\n').map(r => r.split(';').map(c => c.trim()));
     const headers = rows[0].map(h => ({ title: h }));
     const colCount = headers.length;
 
+    // Przygotowanie danych
     const data = rows.slice(1).map(r => {
       while (r.length < colCount) r.push('');
       return r.map((val, i) => {
-        if (i === colCount - 1) {
-		// kolumna ostatnia = cena_box_PLN
-		if (i === colCount - 1) {
-		    // usuń wszystkie spacje i niewidoczne znaki
-		    val = val.replace(/\s/g, '').replace(',', '.'); 
-		    const num = parseFloat(val);
-		    return isNaN(num) ? val : num; // jeśli coś się nie uda, wyświetl oryginalną wartość
-	}
-	}
+        val = val.trim();
+        // ostatnia kolumna = cena_box_PLN
+        if (i === colCount - 1 && val !== '') {
+          val = val.replace(/\s/g, '').replace(',', '.'); // usuń spacje, zamień przecinek
+          const num = parseFloat(val);
+          return isNaN(num) ? null : num; // przechowuj jako Number
+        }
         return val;
       });
     });
@@ -67,8 +66,9 @@ fetch('export.csv')
       columnDefs: [
         {
           targets: colCount - 1,
-          render: function(data, type) {
-            if (type === 'display' || type === 'filter') {
+          render: function(data, type, row) {
+            if (type === 'display' && data != null) {
+              // Wyświetl w polskim formacie: przecinek dziesiętny, separator tysięcy
               return data.toLocaleString('pl-PL', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
             }
             return data;
@@ -77,25 +77,25 @@ fetch('export.csv')
       ]
     });
 
-    // 🔥 POPRAWIONE INDEKSY
-    fillFilter(2, '#filter-sklep');   // Sklep
-    fillFilter(4, '#filter-sezon');   // Sezon
-    fillFilter(8, '#filter-team');    // Team
-
+    // Wypełnianie filtrów
     function fillFilter(colIndex, selectId) {
       const values = [...new Set(data.map(r => r[colIndex]))].sort();
       values.forEach(v => $(selectId).append(`<option value="${v}">${v}</option>`));
     }
+    fillFilter(2, '#filter-sklep');   // Sklep
+    fillFilter(4, '#filter-sezon');   // Sezon
+    fillFilter(8, '#filter-team');    // Team
 
+    // Obsługa zmiany filtrów
     $('#filter-sklep, #filter-sezon, #filter-team').on('change', function() {
       table.draw();
     });
 
+    // Własny filtr DataTables
     $.fn.dataTable.ext.search.push(function(settings, row) {
       const sklep = $('#filter-sklep').val();
       const sezon = $('#filter-sezon').val();
       const team = $('#filter-team').val();
-
       return (sklep === "" || row[2] === sklep) &&
              (sezon === "" || row[4] === sezon) &&
              (team === "" || row[8] === team);
