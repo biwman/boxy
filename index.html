@@ -66,44 +66,77 @@
 <!-- ===========================
      SEKCJA INFORMACYJNA (EDYTOWALNA)
      =========================== -->
-<div style="background:#ffffff; padding:20px; border-radius:10px; margin-bottom:20px; box-shadow:0 2px 6px rgba(0,0,0,0.1);">
 
-    <h1>📦 Lista boxów</h1>
+<div style="
+    background:#ffffff;
+    padding:20px;
+    border-radius:10px;
+    margin-bottom:20px;
+    box-shadow:0 2px 6px rgba(0,0,0,0.1);
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    gap:20px;
+">
 
-    <!-- KURSY WALUT – EDYTUJ TUTAJ -->
-    <div style="font-size:18px; margin-bottom:15px;">
-        <strong>Kursy walut:</strong><br>
-        EUR/PLN: <span id="eurpln">4.30</span><br>
-        USD/PLN: <span id="usdpln">3.72</span><br>
-        GBP Tax: <span id="gbptax">30%</span>
+    <!-- LEWA KOLUMNA -->
+    <div style="flex:1;">
+
+        <h1 style="margin-top:0; color:#005bbb;">📦 Lista boxów</h1>
+
+        <!-- KURSY WALUT – EDYTUJ TUTAJ -->
+        <div style="font-size:18px; margin-bottom:15px;">
+            <strong>Kursy walut:</strong><br>
+            EUR/PLN: <span id="eurpln">4.30</span><br>
+            USD/PLN: <span id="usdpln">3.72</span><br>
+            GBP Tax: <span id="gbptax">30%</span>
+        </div>
+
+        <!-- INFORMACJE O TWÓRCY – EDYTUJ TUTAJ -->
+        <div style="margin-bottom:15px; line-height:1.5;">
+            <strong>Twórcą strony jest Biwekson & Friends.</strong><br>
+            Obejrzyj mój kanał na TikTok – też kolekcjonuję karty piłkarskie!<br>
+
+            TikTok:
+            <a id="tiktok-link"
+               href="https://www.tiktok.com/@biwekson/video/7619650676280364320"
+               target="_blank">
+               https://www.tiktok.com/@biwekson/video/7619650676280364320
+            </a><br>
+
+            Instagram:
+            <a id="instagram-link"
+               href="https://www.instagram.com/biweksoncards/"
+               target="_blank">
+               https://www.instagram.com/biweksoncards/
+            </a><br><br>
+
+            Jeśli widzisz bugi na stronie – napisz do mnie na priv przez TikToka.<br>
+            Niniejsza strona jest niekomercyjna. Nie otrzymuję wynagrodzenia za promowanie sklepów.
+        </div>
+
+        <!-- DATA OSTATNIEGO ZAŁADOWANIA CSV -->
+        <div style="font-size:14px; color:#444;">
+            <strong>Ostatnia aktualizacja danych:</strong>
+            <span id="last-update">ładowanie...</span>
+        </div>
+
     </div>
 
-    <!-- INFORMACJE O TWÓRCY – EDYTUJ TUTAJ -->
-    <div style="margin-bottom:15px; line-height:1.5;">
-        <strong>Twórcą strony jest Biwekson & Friends.</strong><br>
-        Obejrzyj mój kanał na TikTok – też kolekcjonuję karty piłkarskie!<br>
-
-        TikTok:
-        <a href="https://www.tiktok.com/@biwekson/video/7619650676280364320" target="_blank">
-            https://www.tiktok.com/@biwekson/video/7619650676280364320
-        </a><br>
-
-        Instagram:
-        <a href="https://www.instagram.com/biweksoncards/" target="_blank">
-            https://www.instagram.com/biweksoncards/
-        </a><br><br>
-
-        Jeśli widzisz bugi na stronie – napisz do mnie na priv przez TikToka.<br>
-        Niniejsza strona jest niekomercyjna. Nie otrzymuję wynagrodzenia za promowanie sklepów.
-    </div>
-
-    <!-- DATA OSTATNIEGO ZAŁADOWANIA CSV -->
-    <div style="font-size:14px; color:#444;">
-        <strong>Ostatnia aktualizacja danych:</strong>
-        <span id="last-update">ładowanie...</span>
+    <!-- PRAWA KOLUMNA – LOGO -->
+    <div style="flex:0 0 auto; text-align:right;">
+        <!-- LOGO – EDYTUJ LINK TUTAJ -->
+        <a id="logo-link"
+           href="https://www.tiktok.com/@biwekson/video/7619650676280364320"
+           target="_blank">
+            <img src="logo_biwekson.jpg"
+                 alt="Biwekson Logo"
+                 style="width:120px; height:120px; object-fit:cover; border-radius:10px;">
+        </a>
     </div>
 
 </div>
+
 
 <div class="filters">
     <label>Sklep: <select id="filter-sklep" multiple></select></label>
