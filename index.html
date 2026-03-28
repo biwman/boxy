@@ -1,191 +1,42 @@
-<!DOCTYPE html>
-<html lang="pl">
-<head>
-    <meta charset="UTF-8">
-    <title>Boxy – Tabela produktów</title>
+<!-- ===========================
+     SEKCJA INFORMACYJNA (EDYTOWALNA)
+     =========================== -->
 
-    <!-- DataTables CSS -->
-    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
-    <link rel="stylesheet" href="https://cdn.datatables.net/fixedheader/3.4.0/css/fixedHeader.dataTables.min.css">
+<div style="background:#ffffff; padding:20px; border-radius:10px; margin-bottom:20px; box-shadow:0 2px 6px rgba(0,0,0,0.1);">
 
-    <!-- Select2 (multi-select filters) -->
-    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <h1 style="margin-top:0; color:#005bbb;">📦 Lista boxów</h1>
 
-    <!-- jQuery -->
-    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <!-- KURSY WALUT – EDYTUJ TUTAJ -->
+    <div style="font-size:18px; margin-bottom:15px;">
+        <strong>Kursy walut:</strong><br>
+        EUR/PLN: <span id="eurpln">4.30</span><br>
+        USD/PLN: <span id="usdpln">3.72</span><br>
+        GBP Tax: <span id="gbptax">30%</span>
+    </div>
 
-    <!-- DataTables JS -->
-    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
-    <script src="https://cdn.datatables.net/fixedheader/3.4.0/js/dataTables.fixedHeader.min.js"></script>
+    <!-- INFORMACJE O TWÓRCY – EDYTUJ TUTAJ -->
+    <div style="margin-bottom:15px; line-height:1.5;">
+        <strong>Twórcą strony jest Biwekson & Friends.</strong><br>
+        Obejrzyj mój kanał na TikTok – też kolekcjonuję karty piłkarskie!<br>
 
-    <!-- Select2 JS -->
-    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+        TikTok:  
+        <a href="https://www.tiktok.com/@biwekson/video/7619650676280364320" target="_blank">
+            https://www.tiktok.com/@biwekson/video/7619650676280364320
+        </a><br>
 
-    <!-- PapaParse -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+        Instagram:  
+        <a href="https://www.instagram.com/biweksoncards/" target="_blank">
+            https://www.instagram.com/biweksoncards/
+        </a><br><br>
 
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-            background: #f7f9fc;
-        }
-        h1 {
-            color: #005bbb;
-        }
-        .filters {
-            margin-bottom: 20px;
-            background: #ffffff;
-            padding: 15px;
-            border-radius: 8px;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-        }
-        .filters label {
-            margin-right: 15px;
-            font-weight: bold;
-        }
-        table.dataTable thead th {
-            background: #005bbb;
-            color: white;
-        }
-        .select2-container {
-            min-width: 150px;
-        }
-    </style>
-</head>
+        Jeśli widzisz bugi na stronie – napisz do mnie na priv przez TikToka.<br>
+        Niniejsza strona jest niekomercyjna. Nie otrzymuję wynagrodzenia za promowanie sklepów.
+    </div>
 
-<body>
+    <!-- DATA OSTATNIEGO ZAŁADOWANIA CSV -->
+    <div style="font-size:14px; color:#444;">
+        <strong>Ostatnia aktualizacja danych:</strong>
+        <span id="last-update">ładowanie...</span>
+    </div>
 
-<h1>📦 Lista boxów</h1>
-
-<div class="filters">
-    <label>Sklep: <select id="filter-sklep" multiple></select></label>
-    <label>Sezon: <select id="filter-sezon" multiple></select></label>
-    <label>Team: <select id="filter-team" multiple></select></label>
-    <label>Producent: <select id="filter-producent" multiple></select></label>
-    <label>Typ boxa: <select id="filter-typboxa" multiple></select></label>
 </div>
-
-<table id="produkty" class="display" style="width:100%">
-    <thead>
-        <tr>
-            <th>Produkt</th>
-            <th>Box</th>
-            <th>Sklep</th>
-            <th>Waluta</th>
-            <th>Sezon</th>
-            <th>Producent</th>
-            <th>Typ karty</th>
-            <th>Typ boxa</th>
-            <th>Team</th>
-            <th>Cena box (PLN)</th>
-        </tr>
-    </thead>
-    <tbody></tbody>
-</table>
-
-<script>
-$(document).ready(function() {
-
-    Papa.parse("export.csv", {
-        download: true,
-        header: true,
-        delimiter: ";",
-        complete: function(results) {
-
-            var data = results.data;
-
-            // Wstawianie wierszy do tabeli
-            data.forEach(function(row) {
-                if (row.Produkt) {
-                    let cena = row.cena_box_PLN ? row.cena_box_PLN.replace(",", ".") : "0";
-                    cena = parseFloat(cena).toFixed(2).replace(".", ",");
-
-                    $('#produkty tbody').append(`
-                        <tr>
-                            <td>${row.Produkt}</td>
-                            <td>${row.Box}</td>
-                            <td>${row.Sklep}</td>
-                            <td>${row.Waluta}</td>
-                            <td>${row.Sezon}</td>
-                            <td>${row.Producent}</td>
-                            <td>${row["Typ karty"]}</td>
-                            <td>${row["Typ boxa"]}</td>
-                            <td>${row.Team}</td>
-                            <td>${cena}</td>
-                        </tr>
-                    `);
-                }
-            });
-
-            // Inicjalizacja DataTables
-            var table = $('#produkty').DataTable({
-                pageLength: 25,
-                lengthMenu: [[25, 50, 100, 250, -1], [25, 50, 100, 250, "Wszystkie"]],
-                order: [],
-                fixedHeader: true,
-                columnDefs: [
-                    {
-                        targets: 1,
-                        type: 'num',
-                        render: function (data, type) {
-                            if (type === 'sort' || type === 'type') {
-                                return parseFloat(String(data).replace(",", "."));
-                            }
-                            return data;
-                        }
-                    },
-                    {
-                        targets: 9,
-                        type: 'num',
-                        render: function (data, type) {
-                            if (type === 'sort' || type === 'type') {
-                                return parseFloat(String(data).replace(",", "."));
-                            }
-                            return data;
-                        }
-                    }
-                ]
-            });
-
-            // Select2 (multi-select)
-            $("#filter-sklep, #filter-sezon, #filter-team, #filter-producent, #filter-typboxa").select2({
-                placeholder: "Wybierz...",
-                allowClear: true
-            });
-
-            // Funkcja do tworzenia filtrów wielokrotnych
-            function fillFilter(columnIndex, selectId) {
-                var column = table.column(columnIndex);
-                var select = $(selectId);
-
-                column.data().unique().sort().each(function(d) {
-                    if (d && d !== "brak danych") {
-                        select.append('<option value="'+d+'">'+d+'</option>');
-                    }
-                });
-
-                select.on('change', function() {
-                    var values = $(this).val();
-                    if (!values || values.length === 0) {
-                        column.search("").draw();
-                    } else {
-                        var regex = values.map(v => '^' + v + '$').join('|');
-                        column.search(regex, true, false).draw();
-                    }
-                });
-            }
-
-            fillFilter(2, '#filter-sklep');
-            fillFilter(4, '#filter-sezon');
-            fillFilter(8, '#filter-team');
-            fillFilter(5, '#filter-producent');
-            fillFilter(7, '#filter-typboxa');
-        }
-    });
-
-});
-</script>
-
-</body>
-</html>
