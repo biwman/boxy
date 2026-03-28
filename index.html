@@ -48,9 +48,13 @@ fetch('export.csv')
       while (r.length < colCount) r.push('');
       return r.map((val, i) => {
         if (i === colCount - 1) {
-  		val = val.replace(',', '.').trim();
-  		const num = parseFloat(val);
-  		return isNaN(num) ? 0 : num;
+		// kolumna ostatnia = cena_box_PLN
+		if (i === colCount - 1) {
+		    // usuń wszystkie spacje i niewidoczne znaki
+		    val = val.replace(/\s/g, '').replace(',', '.'); 
+		    const num = parseFloat(val);
+		    return isNaN(num) ? val : num; // jeśli coś się nie uda, wyświetl oryginalną wartość
+	}
 	}
         return val;
       });
