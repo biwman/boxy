@@ -1,119 +1,129 @@
 <!DOCTYPE html>
-<html>
+<html lang="pl">
 <head>
-  <meta charset="UTF-8">
-  <title>Moja tabela – sklep style</title>
+    <meta charset="UTF-8">
+    <title>Boxy – Tabela produktów</title>
 
-  <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
-  <style>
-    body { font-family: Arial, sans-serif; margin: 20px; background: #f5f5f5; }
-    h1 { text-align: center; margin-bottom: 20px; color: #333; }
-    .filter-container { margin-bottom: 15px; text-align: center; }
-    .filter-container select { margin: 0 10px; padding: 5px 8px; border-radius: 5px; border: 1px solid #ccc; background: #fff; }
-    table.dataTable { border-collapse: separate !important; border-spacing: 0 5px; width: 100% !important; background: #fff; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-    table.dataTable thead th { background-color: #4CAF50; color: #fff; text-align: center; padding: 10px; }
-    table.dataTable tbody td { padding: 8px; text-align: center; }
-    table.dataTable tbody tr:nth-child(odd) { background-color: #f9f9f9; }
-    table.dataTable tbody tr:hover { background-color: #e0f7fa; }
-    .dataTables_wrapper .dataTables_paginate .paginate_button { background: #4CAF50; color: white !important; border-radius: 4px; margin: 0 2px; padding: 5px 10px; }
-    .dataTables_wrapper .dataTables_paginate .paginate_button.current { background: #45a049 !important; }
-    .dataTables_wrapper .dataTables_filter input { border-radius: 5px; border: 1px solid #ccc; padding: 5px 8px; }
-  </style>
+    <!-- DataTables CSS -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
 
-  <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
-  <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
+    <!-- DataTables JS -->
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+
+    <!-- PapaParse (CSV loader) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        .filters {
+            margin-bottom: 20px;
+        }
+        .filters select {
+            margin-right: 10px;
+            padding: 5px;
+        }
+    </style>
 </head>
+
 <body>
 
-<h1>📊 Moje dane – sklep style</h1>
+<h1>📦 Lista boxów</h1>
 
-<div class="filter-container">
-  <label>Sklep: <select id="filter-sklep"><option value="">Wszystkie</option></select></label>
-  <label>Sezon: <select id="filter-sezon"><option value="">Wszystkie</option></select></label>
-  <label>Team: <select id="filter-team"><option value="">Wszystkie</option></select></label>
+<div class="filters">
+    <label>Sklep: <select id="filter-sklep"><option value="">Wszystkie</option></select></label>
+    <label>Sezon: <select id="filter-sezon"><option value="">Wszystkie</option></select></label>
+    <label>Team: <select id="filter-team"><option value="">Wszystkie</option></select></label>
+    <label>Producent: <select id="filter-producent"><option value="">Wszystkie</option></select></label>
+    <label>Typ boxa: <select id="filter-typboxa"><option value="">Wszystkie</option></select></label>
 </div>
 
-<table id="myTable" class="display"></table>
+<table id="produkty" class="display" style="width:100%">
+    <thead>
+        <tr>
+            <th>Produkt</th>
+            <th>Box</th>
+            <th>Sklep</th>
+            <th>Waluta</th>
+            <th>Sezon</th>
+            <th>Producent</th>
+            <th>Typ karty</th>
+            <th>Typ boxa</th>
+            <th>Team</th>
+            <th>Cena box (PLN)</th>
+        </tr>
+    </thead>
+    <tbody></tbody>
+</table>
 
 <script>
-fetch('export.csv')
-  .then(response => response.text())
-  .then(csv => {
-    csv = csv.replace(/^\uFEFF/, ''); // usuń BOM
-    const rows = csv.trim().split('\n').map(r => r.split(';').map(c => c.trim()));
-    const headers = rows[0].map(h => ({ title: h }));
-    const colCount = headers.length;
+$(document).ready(function() {
 
-    // przygotowanie danych: Box i cena_box_PLN jako liczby
-    const data = rows.slice(1).map(r => {
-      while (r.length < colCount) r.push('');
-      return r.map((val, i) => {
-        val = val.trim();
-        // Box (indeks 1)
-        if (i === 1 && val !== '') {
-          val = parseFloat(val.replace(',', '.'));
-          return isNaN(val) ? null : val;
-        }
-        // cena_box_PLN (indeks 9)
-        if (i === 9 && val !== '') {
-          val = parseFloat(val.replace(/\s/g, '').replace(',', '.'));
-          return isNaN(val) ? null : val;
-        }
-        return val;
-      });
-    });
+    Papa.parse("export.csv", {
+        download: true,
+        header: true,
+        delimiter: ";",
+        complete: function(results) {
 
-    const table = $('#myTable').DataTable({
-      data: data,
-      columns: headers,
-      pageLength: 25,
-      columnDefs: [
-        {
-          targets: 1, // Box
-          render: function(data, type) {
-            if (type === 'display' && data != null) {
-              return data.toLocaleString('pl-PL', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            var data = results.data;
+
+            // Wstawianie wierszy do tabeli
+            data.forEach(function(row) {
+                if (row.Produkt) { // pomija puste linie
+                    $('#produkty tbody').append(`
+                        <tr>
+                            <td>${row.Produkt}</td>
+                            <td>${row.Box}</td>
+                            <td>${row.Sklep}</td>
+                            <td>${row.Waluta}</td>
+                            <td>${row.Sezon}</td>
+                            <td>${row.Producent}</td>
+                            <td>${row["Typ karty"]}</td>
+                            <td>${row["Typ boxa"]}</td>
+                            <td>${row.Team}</td>
+                            <td>${row.cena_box_PLN}</td>
+                        </tr>
+                    `);
+                }
+            });
+
+            // Inicjalizacja DataTables
+            var table = $('#produkty').DataTable({
+                "pageLength": 25,
+                "order": []
+            });
+
+            // Funkcja do tworzenia filtrów
+            function fillFilter(columnIndex, selectId) {
+                var column = table.column(columnIndex);
+                var select = $(selectId);
+
+                column.data().unique().sort().each(function(d) {
+                    if (d && d !== "brak danych") {
+                        select.append('<option value="'+d+'">'+d+'</option>');
+                    }
+                });
+
+                select.on('change', function() {
+                    var val = $.fn.dataTable.util.escapeRegex($(this).val());
+                    column.search(val ? '^'+val+'$' : '', true, false).draw();
+                });
             }
-            return data;
-          }
-        },
-        {
-          targets: 9, // cena_box_PLN
-          render: function(data, type) {
-            if (type === 'display' && data != null) {
-              return data.toLocaleString('pl-PL', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-            }
-            return data;
-          }
+
+            fillFilter(2, '#filter-sklep');
+            fillFilter(4, '#filter-sezon');
+            fillFilter(8, '#filter-team');
+            fillFilter(5, '#filter-producent');
+            fillFilter(7, '#filter-typboxa');
         }
-      ]
     });
 
-    // Filtry
-    function fillFilter(colIndex, selectId) {
-      const values = [...new Set(data.map(r => r[colIndex]).filter(v => v != null))].sort();
-      values.forEach(v => $(selectId).append(`<option value="${v}">${v}</option>`));
-    }
-    fillFilter(2, '#filter-sklep');   // Sklep
-    fillFilter(4, '#filter-sezon');   // Sezon
-    fillFilter(8, '#filter-team');    // Team
-
-    $('#filter-sklep, #filter-sezon, #filter-team').on('change', function() {
-      table.draw();
-    });
-
-    // Własny filtr DataTables
-    $.fn.dataTable.ext.search.push(function(settings, row) {
-      const sklep = $('#filter-sklep').val();
-      const sezon = $('#filter-sezon').val();
-      const team = $('#filter-team').val();
-      return (sklep === "" || row[2] === sklep) &&
-             (sezon === "" || row[4] === sezon) &&
-             (team === "" || row[8] === team);
-    });
-
-  })
-  .catch(err => console.error('Błąd wczytywania CSV:', err));
+});
 </script>
 
 </body>
