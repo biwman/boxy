@@ -119,7 +119,6 @@
             min-width: 150px;
         }
 
-        /* responsywność tabeli */
         @media (max-width: 768px) {
             .top-section {
                 flex-direction: column;
@@ -148,9 +147,9 @@
         </div>
 
         <div class="creator">
-            <strong>ładowanie...</strong><br>
-            TikTok: <a href="#" target="_blank">link</a> |
-            Instagram: <a href="#" target="_blank">link</a>
+            <strong>Biwekson & Friends</strong><br>
+            TikTok: <a id="tiktok-link" href="#" target="_blank">link</a> |
+            Instagram: <a id="instagram-link" href="#" target="_blank">link</a>
         </div>
 
         <div class="update">
@@ -160,8 +159,8 @@
     </div>
 
     <div class="top-right">
-        <a href="#" target="_blank">
-            <img src="" alt="logo">
+        <a href="https://www.tiktok.com/@biwekson/video/7619650676280364320" target="_blank">
+            <img src="logo_biwekson.jpg" alt="logo">
         </a>
     </div>
 
@@ -201,10 +200,11 @@ $(document).ready(function() {
         download: true,
         header: false,
         delimiter: ";",
+        skipEmptyLines: true,
         complete: function(results) {
             const config = {};
             results.data.forEach(row => {
-                if(row[0] && row[1]) config[row[0]] = row[1];
+                if(row[0] && row[1]) config[row[0]] = row[1].trim();
             });
 
             // kursy walut i podatek
@@ -216,24 +216,20 @@ $(document).ready(function() {
             document.getElementById("usdpln").innerText = usd;
             document.getElementById("gbptax").innerText = gbp;
 
-            // linki do social media i nazwa autora
-            document.querySelector(".creator strong").innerText = "Biwekson & Friends";
-            document.querySelector(".creator a[href*='tiktok']").href = config.TIKTOK_LINK;
-            document.querySelector(".creator a[href*='instagram']").href = config.INSTAGRAM_LINK;
+            // linki do social media
+            if(config.TIKTOK_LINK) document.getElementById("tiktok-link").href = config.TIKTOK_LINK;
+            if(config.INSTAGRAM_LINK) document.getElementById("instagram-link").href = config.INSTAGRAM_LINK;
 
             // opis
-            document.querySelector(".creator").innerHTML += "<br><br>" + config.OPIS;
-
-            // logo
-            if(config.LOGO) {
-                document.querySelector(".top-right img").src = config.LOGO;
-            } else {
-                document.querySelector(".top-right img").src = "logo_biwekson.jpg";
+            if(config.OPIS) {
+                const opisElem = document.createElement("p");
+                opisElem.innerText = config.OPIS;
+                document.querySelector(".creator").appendChild(opisElem);
             }
 
             // data ostatniego uruchomienia (Excel date float)
             if(config.OSTATNIE_URUCHOMIENIE) {
-                const excelDate = parseFloat(config.OSTATNIE_URUCHOMIENIE.split(",")[0]);
+                const excelDate = parseFloat(config.OSTATNIE_URUCHOMIENIE.replace(",", "."));
                 const jsDate = new Date((excelDate - 25569) * 86400 * 1000);
                 document.getElementById("last-update").innerText = jsDate.toLocaleDateString("pl-PL") + " " + jsDate.toLocaleTimeString("pl-PL");
             } else {
