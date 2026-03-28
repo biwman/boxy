@@ -1,174 +1,169 @@
 <!DOCTYPE html>
-
 <html lang="pl">
 <head>
     <meta charset="UTF-8">
     <title>Boxy – Tabela produktów</title>
 
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- DataTables CSS -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/fixedheader/3.4.0/css/fixedHeader.dataTables.min.css">
 
-<!-- DataTables CSS -->
-<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
-<link rel="stylesheet" href="https://cdn.datatables.net/fixedheader/3.4.0/css/fixedHeader.dataTables.min.css">
+    <!-- Select2 -->
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 
-<!-- Select2 -->
-<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 
-<!-- jQuery -->
-<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <!-- DataTables JS -->
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/fixedheader/3.4.0/js/dataTables.fixedHeader.min.js"></script>
 
-<!-- DataTables JS -->
-<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
-<script src="https://cdn.datatables.net/fixedheader/3.4.0/js/dataTables.fixedHeader.min.js"></script>
+    <!-- Select2 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
-<!-- Select2 JS -->
-<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <!-- PapaParse -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
 
-<!-- PapaParse -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background: linear-gradient(135deg, #e3f2fd, #f7f9fc);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
 
-<style>
-    body {
-        font-family: Arial, sans-serif;
-        margin: 20px;
+        .top-section {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 60px;
+            background: #ffffff;
+            padding: 25px 40px;
+            border-radius: 12px;
+            margin: 0 auto 20px auto;
+            max-width: 1200px;
+            width: 100%;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+        }
 
-        /* 🔥 GRADIENT */
-        background: linear-gradient(135deg, #e3f2fd, #f7f9fc);
+        .top-left {
+            flex: 1.5;
+        }
 
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-    }
+        .top-left h1 {
+            margin-top: 0;
+            color: #005bbb;
+        }
 
-    .top-section {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 60px;
+        .rates {
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
 
-        background: #ffffff;
-        padding: 25px 40px;
-        border-radius: 12px;
-        margin: 0 auto 20px auto;
+        .creator {
+            font-size: 14px;
+            margin-bottom: 10px;
+            line-height: 1.4;
+        }
 
-        max-width: 1200px;
-        width: 100%;
+        .update {
+            font-size: 13px;
+            color: #444;
+        }
 
-        box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-    }
+        .top-right {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
 
-    .top-left {
-        flex: 1.5;
-    }
+        .top-right img {
+            width: 220px;
+            height: 220px;
+            object-fit: cover;
+            border-radius: 20px;
+            transition: 0.2s;
+        }
 
-    .top-left h1 {
-        margin-top: 0;
-        color: #005bbb;
-    }
+        .top-right img:hover {
+            transform: scale(1.08);
+        }
 
-    .rates {
-        font-size: 16px;
-        margin-bottom: 10px;
-    }
+        .filters {
+            margin-bottom: 20px;
+            background: #ffffff;
+            padding: 15px;
+            border-radius: 8px;
+            max-width: 1200px;
+            width: 100%;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+        }
 
-    .creator {
-        font-size: 14px;
-        margin-bottom: 10px;
-        line-height: 1.4;
-    }
+        table {
+            font-size: 14px;
+            max-width: 1200px;
+            width: 100%;
+        }
 
-    .update {
-        font-size: 13px;
-        color: #444;
-    }
+        table.dataTable thead th {
+            background: #005bbb;
+            color: white;
+        }
 
-    .top-right {
-        flex: 1;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-    }
+        .select2-container {
+            min-width: 150px;
+        }
 
-    .top-right img {
-        width: 220px;
-        height: 220px;
-        object-fit: cover;
-        border-radius: 20px;
-        transition: 0.2s;
-    }
-
-    .top-right img:hover {
-        transform: scale(1.08);
-    }
-
-    .filters {
-        margin-bottom: 20px;
-        background: #ffffff;
-        padding: 15px;
-        border-radius: 8px;
-        max-width: 1200px;
-        width: 100%;
-        box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-    }
-
-    table {
-        font-size: 14px;
-        max-width: 1200px;
-        width: 100%;
-    }
-
-    table.dataTable thead th {
-        background: #005bbb;
-        color: white;
-    }
-
-    .select2-container {
-        min-width: 150px;
-    }
-</style>
-
-
+        /* responsywność tabeli */
+        @media (max-width: 768px) {
+            .top-section {
+                flex-direction: column;
+                gap: 20px;
+            }
+            .top-right img {
+                width: 150px;
+                height: 150px;
+            }
+        }
+    </style>
 </head>
 
 <body>
 
 <div class="top-section">
 
+    <div class="top-left">
+        <h1>📦 Porównanie cen boxów z kartami piłkarskimi</h1>
 
-<div class="top-left">
-    <h1>📦 Porównanie cen boxów z kartami piłkarskimi</h1>
+        <div class="rates">
+            <strong>Orientacyjne kursy walut:</strong><br>
+            EUR/PLN: <span id="eurpln">ładowanie...</span> |
+            USD/PLN: <span id="usdpln">ładowanie...</span> |
+            GBP Tax: <span id="gbptax">ładowanie...</span>
+        </div>
 
-    <div class="rates">
-        <strong>Orientacyjne kursy walut:</strong><br>
-        EUR/PLN: <span id="eurpln">4.30</span> |
-        USD/PLN: <span id="usdpln">3.72</span> |
-        GBP Tax: <span id="gbptax">30%</span>
+        <div class="creator">
+            <strong>ładowanie...</strong><br>
+            TikTok: <a href="#" target="_blank">link</a> |
+            Instagram: <a href="#" target="_blank">link</a>
+        </div>
+
+        <div class="update">
+            <strong>Aktualizacja danych (CSV):</strong>
+            <span id="last-update">ładowanie...</span>
+        </div>
     </div>
 
-    <div class="creator">
-        <strong>Biwekson & Friends</strong><br>
-        TikTok:
-        <a href="https://www.tiktok.com/@biwekson/video/7619650676280364320" target="_blank">link</a> |
-        Instagram:
-        <a href="https://www.instagram.com/biweksoncards/" target="_blank">link</a>
-        <br><br>
-        To jest projekt niekomercyjny. Jeśli widzisz bugi – napisz na TikToka. Nie wspieram żadnego sklepu, ani żaden sklep nie wspiera mnie.
-
+    <div class="top-right">
+        <a href="#" target="_blank">
+            <img src="" alt="logo">
+        </a>
     </div>
-
-    <div class="update">
-        <strong>Aktualizacja danych (CSV):</strong>
-        <span id="last-update">ładowanie...</span>
-    </div>
-</div>
-
-<div class="top-right">
-    <a href="https://www.tiktok.com/@biwekson/video/7619650676280364320" target="_blank">
-        <img src="logo_biwekson.jpg" alt="logo">
-    </a>
-</div>
-
 
 </div>
 
@@ -201,29 +196,58 @@
 <script>
 $(document).ready(function() {
 
-    // 🔥 DATA Z PLIKU CSV (dokładna data modyfikacji)
-    fetch("export.csv", { method: "HEAD" })
-        .then(res => {
-            let last = res.headers.get("Last-Modified");
+    // 🔥 1️⃣ Wczytanie pliku konfiguracyjnego
+    Papa.parse("config.csv", {
+        download: true,
+        header: false,
+        delimiter: ";",
+        complete: function(results) {
+            const config = {};
+            results.data.forEach(row => {
+                if(row[0] && row[1]) config[row[0]] = row[1];
+            });
 
-            if (last) {
-                let d = new Date(last);
-                document.getElementById("last-update").innerText =
-                    d.toLocaleDateString("pl-PL") + " " + d.toLocaleTimeString("pl-PL");
+            // kursy walut i podatek
+            const eur = config.EUR.replace(",", ".");
+            const usd = config.USD.replace(",", ".");
+            const gbp = (parseFloat(config.GB_Tax.replace(",", ".")) * 100).toFixed(0) + "%";
+
+            document.getElementById("eurpln").innerText = eur;
+            document.getElementById("usdpln").innerText = usd;
+            document.getElementById("gbptax").innerText = gbp;
+
+            // linki do social media i nazwa autora
+            document.querySelector(".creator strong").innerText = "Biwekson & Friends";
+            document.querySelector(".creator a[href*='tiktok']").href = config.TIKTOK_LINK;
+            document.querySelector(".creator a[href*='instagram']").href = config.INSTAGRAM_LINK;
+
+            // opis
+            document.querySelector(".creator").innerHTML += "<br><br>" + config.OPIS;
+
+            // logo
+            if(config.LOGO) {
+                document.querySelector(".top-right img").src = config.LOGO;
+            } else {
+                document.querySelector(".top-right img").src = "logo_biwekson.jpg";
+            }
+
+            // data ostatniego uruchomienia (Excel date float)
+            if(config.OSTATNIE_URUCHOMIENIE) {
+                const excelDate = parseFloat(config.OSTATNIE_URUCHOMIENIE.split(",")[0]);
+                const jsDate = new Date((excelDate - 25569) * 86400 * 1000);
+                document.getElementById("last-update").innerText = jsDate.toLocaleDateString("pl-PL") + " " + jsDate.toLocaleTimeString("pl-PL");
             } else {
                 document.getElementById("last-update").innerText = "brak informacji";
             }
-        })
-        .catch(() => {
-            document.getElementById("last-update").innerText = "brak informacji";
-        });
+        }
+    });
 
+    // 🔥 2️⃣ Wczytanie danych CSV z produktami
     Papa.parse("export.csv", {
         download: true,
         header: true,
         delimiter: ";",
         complete: function(results) {
-
             var data = results.data;
 
             data.forEach(function(row) {
