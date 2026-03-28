@@ -1,142 +1,167 @@
 <!DOCTYPE html>
+
 <html lang="pl">
 <head>
     <meta charset="UTF-8">
     <title>Boxy – Tabela produktów</title>
 
-    <!-- DataTables CSS -->
-    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
-    <link rel="stylesheet" href="https://cdn.datatables.net/fixedheader/3.4.0/css/fixedHeader.dataTables.min.css">
+```
+<!-- RESPONSYWNOŚĆ -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <!-- Select2 (multi-select filters) -->
-    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<!-- DataTables CSS -->
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+<link rel="stylesheet" href="https://cdn.datatables.net/fixedheader/3.4.0/css/fixedHeader.dataTables.min.css">
 
-    <!-- jQuery -->
-    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<!-- Select2 -->
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 
-    <!-- DataTables JS -->
-    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
-    <script src="https://cdn.datatables.net/fixedheader/3.4.0/js/dataTables.fixedHeader.min.js"></script>
+<!-- jQuery -->
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 
-    <!-- Select2 JS -->
-    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<!-- DataTables JS -->
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/fixedheader/3.4.0/js/dataTables.fixedHeader.min.js"></script>
 
-    <!-- PapaParse -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+<!-- Select2 JS -->
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-            background: #f7f9fc;
-        }
-        h1 {
-            margin-top: 0;
-            color: #005bbb;
-        }
-        .filters {
-            margin-bottom: 20px;
-            background: #ffffff;
-            padding: 15px;
-            border-radius: 8px;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-        }
-        .filters label {
-            margin-right: 15px;
-            font-weight: bold;
-        }
-        table.dataTable thead th {
-            background: #005bbb;
-            color: white;
-        }
-        .select2-container {
-            min-width: 150px;
-        }
-        table.dataTable thead .sorting:after,
-        table.dataTable thead .sorting_asc:after,
-        table.dataTable thead .sorting_desc:after {
-            opacity: 1 !important;
-            color: #ffcc00 !important;
-        }
-    </style>
+<!-- PapaParse -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        margin: 20px;
+        background: #f7f9fc;
+    }
+
+    /* 🔥 NOWY LAYOUT */
+    .top-section {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 40px;
+
+        background: #ffffff;
+        padding: 20px;
+        border-radius: 10px;
+        margin-bottom: 20px;
+
+        box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+
+    .top-left {
+        flex: 2;
+        max-width: 700px;
+    }
+
+    .top-left h1 {
+        margin-top: 0;
+        color: #005bbb;
+    }
+
+    .rates {
+        font-size: 16px;
+        margin-bottom: 10px;
+    }
+
+    .creator {
+        font-size: 14px;
+        margin-bottom: 10px;
+        line-height: 1.4;
+    }
+
+    .update {
+        font-size: 13px;
+        color: #444;
+    }
+
+    .top-right {
+        flex: 1;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .top-right img {
+        width: 180px;
+        height: 180px;
+        object-fit: cover;
+        border-radius: 15px;
+        transition: 0.2s;
+    }
+
+    .top-right img:hover {
+        transform: scale(1.05);
+    }
+
+    .filters {
+        margin-bottom: 20px;
+        background: #ffffff;
+        padding: 15px;
+        border-radius: 8px;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+
+    table.dataTable thead th {
+        background: #005bbb;
+        color: white;
+    }
+
+    .select2-container {
+        min-width: 150px;
+    }
+
+    table {
+        font-size: 14px;
+    }
+</style>
+```
+
 </head>
 
 <body>
 
-<!-- ===========================
-     SEKCJA INFORMACYJNA (EDYTOWALNA)
-     =========================== -->
+<!-- 🔥 NOWA SEKCJA GÓRNA -->
 
-<div style="
-    background:#ffffff;
-    padding:20px;
-    border-radius:10px;
-    margin-bottom:20px;
-    box-shadow:0 2px 6px rgba(0,0,0,0.1);
-    display:flex;
-    justify-content:space-between;
-    align-items:flex-start;
-    gap:20px;
-">
+<div class="top-section">
 
-    <!-- LEWA KOLUMNA -->
-    <div style="flex:1;">
+```
+<div class="top-left">
+    <h1>📦 Porównanie cen boxów z kartami piłkarskimi</h1>
 
-        <h1 style="margin-top:0; color:#005bbb;">📦 Lista boxów</h1>
-
-        <!-- KURSY WALUT – EDYTUJ TUTAJ -->
-        <div style="font-size:18px; margin-bottom:15px;">
-            <strong>Kursy walut:</strong><br>
-            EUR/PLN: <span id="eurpln">4.30</span><br>
-            USD/PLN: <span id="usdpln">3.72</span><br>
-            GBP Tax: <span id="gbptax">30%</span>
-        </div>
-
-        <!-- INFORMACJE O TWÓRCY – EDYTUJ TUTAJ -->
-        <div style="margin-bottom:15px; line-height:1.5;">
-            <strong>Twórcą strony jest Biwekson & Friends.</strong><br>
-            Obejrzyj mój kanał na TikTok – też kolekcjonuję karty piłkarskie!<br>
-
-            TikTok:
-            <a id="tiktok-link"
-               href="https://www.tiktok.com/@biwekson/video/7619650676280364320"
-               target="_blank">
-               https://www.tiktok.com/@biwekson/video/7619650676280364320
-            </a><br>
-
-            Instagram:
-            <a id="instagram-link"
-               href="https://www.instagram.com/biweksoncards/"
-               target="_blank">
-               https://www.instagram.com/biweksoncards/
-            </a><br><br>
-
-            Jeśli widzisz bugi na stronie – napisz do mnie na priv przez TikToka.<br>
-            Niniejsza strona jest niekomercyjna. Nie otrzymuję wynagrodzenia za promowanie sklepów.
-        </div>
-
-        <!-- DATA OSTATNIEGO ZAŁADOWANIA CSV -->
-        <div style="font-size:14px; color:#444;">
-            <strong>Ostatnia aktualizacja danych:</strong>
-            <span id="last-update">ładowanie...</span>
-        </div>
-
+    <div class="rates">
+        <strong>Orientacyjne kursy walut:</strong><br>
+        EUR/PLN: <span id="eurpln">4.30</span> |
+        USD/PLN: <span id="usdpln">3.72</span> |
+        GBP Tax: <span id="gbptax">30%</span>
     </div>
 
-    <!-- PRAWA KOLUMNA – LOGO -->
-    <div style="flex:0 0 auto; text-align:right;">
-        <!-- LOGO – EDYTUJ LINK TUTAJ -->
-        <a id="logo-link"
-           href="https://www.tiktok.com/@biwekson/video/7619650676280364320"
-           target="_blank">
-            <img src="logo_biwekson.jpg"
-                 alt="Biwekson Logo"
-                 style="width:120px; height:120px; object-fit:cover; border-radius:10px;">
-        </a>
+    <div class="creator">
+        <strong>Biwekson & Friends</strong><br>
+        TikTok:
+        <a href="https://www.tiktok.com/@biwekson/video/7619650676280364320" target="_blank">link</a> |
+        Instagram:
+        <a href="https://www.instagram.com/biweksoncards/" target="_blank">link</a>
+        <br><br>
+        Jeśli widzisz bugi – napisz na TikToka.
     </div>
 
+    <div class="update">
+        <strong>Aktualizacja:</strong>
+        <span id="last-update">ładowanie...</span>
+    </div>
 </div>
 
+<div class="top-right">
+    <a href="https://www.tiktok.com/@biwekson/video/7619650676280364320" target="_blank">
+        <img src="logo_biwekson.jpg" alt="logo">
+    </a>
+</div>
+```
+
+</div>
 
 <div class="filters">
     <label>Sklep: <select id="filter-sklep" multiple></select></label>
@@ -167,22 +192,11 @@
 <script>
 $(document).ready(function() {
 
-    // Pobranie daty modyfikacji pliku export.csv
     fetch("export.csv", { method: "HEAD" })
         .then(res => {
             let last = res.headers.get("Last-Modified");
-            if (last) {
-                let d = new Date(last);
-                document.getElementById("last-update").innerText =
-                    d.toLocaleString("pl-PL");
-            } else {
-                document.getElementById("last-update").innerText =
-                    "brak informacji";
-            }
-        })
-        .catch(() => {
             document.getElementById("last-update").innerText =
-                "brak informacji";
+                last ? new Date(last).toLocaleString("pl-PL") : "brak informacji";
         });
 
     Papa.parse("export.csv", {
@@ -193,97 +207,52 @@ $(document).ready(function() {
 
             var data = results.data;
 
-            // Wstawianie wierszy do tabeli
             data.forEach(function(row) {
-                if (row.Produkt) {
-                    let cena = row.cena_box_PLN ? row.cena_box_PLN.replace(",", ".") : "0";
-                    cena = parseFloat(cena).toFixed(2).replace(".", ",");
+                if (!row.Produkt || row.Produkt.trim() === "") return;
 
-                    $('#produkty tbody').append(`
-                        <tr>
-                            <td>${row.Produkt}</td>
-                            <td>${row.Box}</td>
-                            <td>${row.Sklep}</td>
-                            <td>${row.Waluta}</td>
-                            <td>${row.Sezon}</td>
-                            <td>${row.Producent}</td>
-                            <td>${row["Typ karty"]}</td>
-                            <td>${row["Typ boxa"]}</td>
-                            <td>${row.Team}</td>
-                            <td>${cena}</td>
-                        </tr>
-                    `);
-                }
+                let cena = row.cena_box_PLN ? row.cena_box_PLN.replace(",", ".") : "0";
+                cena = parseFloat(cena).toFixed(2).replace(".", ",");
+
+                $('#produkty tbody').append(`
+                    <tr>
+                        <td>${row.Produkt}</td>
+                        <td>${row.Box}</td>
+                        <td>${row.Sklep}</td>
+                        <td>${row.Waluta}</td>
+                        <td>${row.Sezon}</td>
+                        <td>${row.Producent}</td>
+                        <td>${row["Typ karty"]}</td>
+                        <td>${row["Typ boxa"]}</td>
+                        <td>${row.Team}</td>
+                        <td>${cena}</td>
+                    </tr>
+                `);
             });
 
-            // Inicjalizacja DataTables
             var table = $('#produkty').DataTable({
                 pageLength: 25,
-                lengthMenu: [[25, 50, 100, 250, -1], [25, 50, 100, 250, "Wszystkie"]],
-                order: [],
+                deferRender: true,
+                processing: true,
                 fixedHeader: true,
-                language: {
-                    lengthMenu: "Pokaż _MENU_ boxów",
-                    search: "Wyszukaj:",
-                    info: "Pokazuję od _START_ do _END_ z _TOTAL_ boxów",
-                    infoEmpty: "Brak danych",
-                    zeroRecords: "Nic nie znaleziono",
-                    paginate: {
-                        first: "Pierwsza",
-                        last: "Ostatnia",
-                        next: "Następna",
-                        previous: "Poprzednia"
-                    }
-                },
-                columnDefs: [
-                    {
-                        targets: 1,
-                        type: 'num',
-                        render: function (data, type) {
-                            if (type === 'sort' || type === 'type') {
-                                return parseFloat(String(data).replace(",", "."));
-                            }
-                            return data;
-                        }
-                    },
-                    {
-                        targets: 9,
-                        type: 'num',
-                        render: function (data, type) {
-                            if (type === 'sort' || type === 'type') {
-                                return parseFloat(String(data).replace(",", "."));
-                            }
-                            return data;
-                        }
-                    }
-                ]
+                responsive: true
             });
 
-            // Select2 (multi-select)
             $("#filter-sklep, #filter-sezon, #filter-team, #filter-producent, #filter-typboxa").select2({
                 placeholder: "Wybierz...",
                 allowClear: true
             });
 
-            // Funkcja do tworzenia filtrów wielokrotnych
             function fillFilter(columnIndex, selectId) {
                 var column = table.column(columnIndex);
                 var select = $(selectId);
 
                 column.data().unique().sort().each(function(d) {
-                    if (d && d !== "brak danych") {
-                        select.append('<option value="'+d+'">'+d+'</option>');
-                    }
+                    if (d) select.append('<option value="'+d+'">'+d+'</option>');
                 });
 
                 select.on('change', function() {
                     var values = $(this).val();
-                    if (!values || values.length === 0) {
-                        column.search("").draw();
-                    } else {
-                        var regex = values.map(v => '^' + v + '$').join('|');
-                        column.search(regex, true, false).draw();
-                    }
+                    column.search(values ? values.join('|') : "", true, false).draw();
                 });
             }
 
