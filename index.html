@@ -44,16 +44,20 @@ fetch('export.csv')
     const headers = rows[0].map(h => ({ title: h }));
     const colCount = headers.length;
 
-    // Przygotowanie danych
+    // przygotowanie danych: Box i cena_box_PLN jako liczby
     const data = rows.slice(1).map(r => {
       while (r.length < colCount) r.push('');
       return r.map((val, i) => {
         val = val.trim();
-        // ostatnia kolumna = cena_box_PLN
-        if (i === colCount - 1 && val !== '') {
-          val = val.replace(/\s/g, '').replace(',', '.'); // usuń spacje, zamień przecinek
-          const num = parseFloat(val);
-          return isNaN(num) ? null : num; // przechowuj jako Number
+        // Box (indeks 1)
+        if (i === 1 && val !== '') {
+          val = parseFloat(val.replace(',', '.'));
+          return isNaN(val) ? null : val;
+        }
+        // cena_box_PLN (indeks 9)
+        if (i === 9 && val !== '') {
+          val = parseFloat(val.replace(/\s/g, '').replace(',', '.'));
+          return isNaN(val) ? null : val;
         }
         return val;
       });
@@ -65,10 +69,18 @@ fetch('export.csv')
       pageLength: 25,
       columnDefs: [
         {
-          targets: colCount - 1,
-          render: function(data, type, row) {
+          targets: 1, // Box
+          render: function(data, type) {
             if (type === 'display' && data != null) {
-              // Wyświetl w polskim formacie: przecinek dziesiętny, separator tysięcy
+              return data.toLocaleString('pl-PL', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            }
+            return data;
+          }
+        },
+        {
+          targets: 9, // cena_box_PLN
+          render: function(data, type) {
+            if (type === 'display' && data != null) {
               return data.toLocaleString('pl-PL', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
             }
             return data;
@@ -77,16 +89,15 @@ fetch('export.csv')
       ]
     });
 
-    // Wypełnianie filtrów
+    // Filtry
     function fillFilter(colIndex, selectId) {
-      const values = [...new Set(data.map(r => r[colIndex]))].sort();
+      const values = [...new Set(data.map(r => r[colIndex]).filter(v => v != null))].sort();
       values.forEach(v => $(selectId).append(`<option value="${v}">${v}</option>`));
     }
     fillFilter(2, '#filter-sklep');   // Sklep
     fillFilter(4, '#filter-sezon');   // Sezon
     fillFilter(8, '#filter-team');    // Team
 
-    // Obsługa zmiany filtrów
     $('#filter-sklep, #filter-sezon, #filter-team').on('change', function() {
       table.draw();
     });
