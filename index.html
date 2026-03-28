@@ -47,9 +47,11 @@ fetch('export.csv')
     const data = rows.slice(1).map(r => {
       while (r.length < colCount) r.push('');
       return r.map((val, i) => {
-        if (i === colCount - 1 && val !== '') {
-          return parseFloat(val.replace(',', '.'));
-        }
+        if (i === colCount - 1) {
+  		val = val.replace(',', '.').trim();
+  		const num = parseFloat(val);
+  		return isNaN(num) ? 0 : num;
+	}
         return val;
       });
     });
