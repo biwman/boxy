@@ -39,17 +39,16 @@
 fetch('export.csv')
   .then(response => response.text())
   .then(csv => {
-    csv = csv.replace(/^\uFEFF/, ''); // usuń BOM
+    csv = csv.replace(/^\uFEFF/, '');
     const rows = csv.trim().split('\n').map(r => r.split(';').map(c => c.trim()));
     const headers = rows[0].map(h => ({ title: h }));
     const colCount = headers.length;
 
-    // Wypełnij brakujące komórki pustym stringiem i zamień przecinek w cenach na kropkę
     const data = rows.slice(1).map(r => {
       while (r.length < colCount) r.push('');
       return r.map((val, i) => {
         if (i === colCount - 1 && val !== '') {
-          return parseFloat(val.replace(',', '.')); // liczba do sortowania
+          return parseFloat(val.replace(',', '.'));
         }
         return val;
       });
@@ -62,39 +61,40 @@ fetch('export.csv')
       columnDefs: [
         {
           targets: colCount - 1,
-          render: function(data, type, row) {
+          render: function(data, type) {
             if (type === 'display' || type === 'filter') {
-              // Wyświetl w polskim formacie: przecinek dziesiętny i separator tysięcy
               return data.toLocaleString('pl-PL', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
             }
-            return data; // do sortowania
+            return data;
           }
         }
       ]
     });
 
-    // Filtry
+    // 🔥 POPRAWIONE INDEKSY
+    fillFilter(2, '#filter-sklep');   // Sklep
+    fillFilter(4, '#filter-sezon');   // Sezon
+    fillFilter(8, '#filter-team');    // Team
+
     function fillFilter(colIndex, selectId) {
       const values = [...new Set(data.map(r => r[colIndex]))].sort();
       values.forEach(v => $(selectId).append(`<option value="${v}">${v}</option>`));
     }
-    fillFilter(4, '#filter-sklep');   // Sklep
-    fillFilter(6, '#filter-sezon');   // Sezon
-    fillFilter(10, '#filter-team');   // Team
 
     $('#filter-sklep, #filter-sezon, #filter-team').on('change', function() {
       table.draw();
     });
 
-    // Własny filtr DataTables
     $.fn.dataTable.ext.search.push(function(settings, row) {
       const sklep = $('#filter-sklep').val();
       const sezon = $('#filter-sezon').val();
       const team = $('#filter-team').val();
-      return (sklep === "" || row[4] === sklep) &&
-             (sezon === "" || row[6] === sezon) &&
-             (team === "" || row[10] === team);
+
+      return (sklep === "" || row[2] === sklep) &&
+             (sezon === "" || row[4] === sezon) &&
+             (team === "" || row[8] === team);
     });
+
   })
   .catch(err => console.error('Błąd wczytywania CSV:', err));
 </script>
