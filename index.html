@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <title>Boxy – Tabela produktów</title>
 
-<!-- RESPONSYWNOŚĆ -->
+```
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <!-- DataTables CSS -->
@@ -32,27 +32,34 @@
     body {
         font-family: Arial, sans-serif;
         margin: 20px;
-        background: #f7f9fc;
+
+        /* 🔥 GRADIENT */
+        background: linear-gradient(135deg, #e3f2fd, #f7f9fc);
+
+        display: flex;
+        flex-direction: column;
+        align-items: center;
     }
 
-    /* 🔥 NOWY LAYOUT */
     .top-section {
         display: flex;
         align-items: center;
-        justify-content: center;
-        gap: 40px;
+        justify-content: space-between;
+        gap: 60px;
 
         background: #ffffff;
-        padding: 20px;
-        border-radius: 10px;
-        margin-bottom: 20px;
+        padding: 25px 40px;
+        border-radius: 12px;
+        margin: 0 auto 20px auto;
+
+        max-width: 1200px;
+        width: 100%;
 
         box-shadow: 0 2px 6px rgba(0,0,0,0.1);
     }
 
     .top-left {
-        flex: 2;
-        max-width: 700px;
+        flex: 1.5;
     }
 
     .top-left h1 {
@@ -84,15 +91,15 @@
     }
 
     .top-right img {
-        width: 180px;
-        height: 180px;
+        width: 220px;
+        height: 220px;
         object-fit: cover;
-        border-radius: 15px;
+        border-radius: 20px;
         transition: 0.2s;
     }
 
     .top-right img:hover {
-        transform: scale(1.05);
+        transform: scale(1.08);
     }
 
     .filters {
@@ -100,7 +107,15 @@
         background: #ffffff;
         padding: 15px;
         border-radius: 8px;
+        max-width: 1200px;
+        width: 100%;
         box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+
+    table {
+        font-size: 14px;
+        max-width: 1200px;
+        width: 100%;
     }
 
     table.dataTable thead th {
@@ -111,22 +126,16 @@
     .select2-container {
         min-width: 150px;
     }
-
-    table {
-        font-size: 14px;
-    }
 </style>
-
+```
 
 </head>
 
 <body>
 
-<!-- 🔥 NOWA SEKCJA GÓRNA -->
-
 <div class="top-section">
 
-
+```
 <div class="top-left">
     <h1>📦 Porównanie cen boxów z kartami piłkarskimi</h1>
 
@@ -144,11 +153,11 @@
         Instagram:
         <a href="https://www.instagram.com/biweksoncards/" target="_blank">link</a>
         <br><br>
-        To jest projekt niekomercyjny. Jeśli widzisz bugi – napisz na TikToka. Nie wspieram żadnego sklepu, ani żaden sklep nie wspiera mnie.
+        To jest projekt niekomercyjny. Jeśli widzisz bugi – napisz na TikToka.
     </div>
 
     <div class="update">
-        <strong>Aktualizacja:</strong>
+        <strong>Aktualizacja danych (CSV):</strong>
         <span id="last-update">ładowanie...</span>
     </div>
 </div>
@@ -158,7 +167,7 @@
         <img src="logo_biwekson.jpg" alt="logo">
     </a>
 </div>
-
+```
 
 </div>
 
@@ -170,7 +179,7 @@
     <label>Typ boxa: <select id="filter-typboxa" multiple></select></label>
 </div>
 
-<table id="produkty" class="display" style="width:100%">
+<table id="produkty" class="display">
     <thead>
         <tr>
             <th>Produkt</th>
@@ -191,11 +200,21 @@
 <script>
 $(document).ready(function() {
 
+    // 🔥 DATA Z PLIKU CSV (dokładna data modyfikacji)
     fetch("export.csv", { method: "HEAD" })
         .then(res => {
             let last = res.headers.get("Last-Modified");
-            document.getElementById("last-update").innerText =
-                last ? new Date(last).toLocaleString("pl-PL") : "brak informacji";
+
+            if (last) {
+                let d = new Date(last);
+                document.getElementById("last-update").innerText =
+                    d.toLocaleDateString("pl-PL") + " " + d.toLocaleTimeString("pl-PL");
+            } else {
+                document.getElementById("last-update").innerText = "brak informacji";
+            }
+        })
+        .catch(() => {
+            document.getElementById("last-update").innerText = "brak informacji";
         });
 
     Papa.parse("export.csv", {
