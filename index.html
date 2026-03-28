@@ -6,27 +6,50 @@
 
     <!-- DataTables CSS -->
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/fixedheader/3.4.0/css/fixedHeader.dataTables.min.css">
+
+    <!-- Select2 (multi-select filters) -->
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 
     <!-- jQuery -->
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 
     <!-- DataTables JS -->
     <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/fixedheader/3.4.0/js/dataTables.fixedHeader.min.js"></script>
 
-    <!-- PapaParse (CSV loader) -->
+    <!-- Select2 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+    <!-- PapaParse -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
 
     <style>
         body {
             font-family: Arial, sans-serif;
             margin: 20px;
+            background: #f7f9fc;
+        }
+        h1 {
+            color: #005bbb;
         }
         .filters {
             margin-bottom: 20px;
+            background: #ffffff;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
         }
-        .filters select {
-            margin-right: 10px;
-            padding: 5px;
+        .filters label {
+            margin-right: 15px;
+            font-weight: bold;
+        }
+        table.dataTable thead th {
+            background: #005bbb;
+            color: white;
+        }
+        .select2-container {
+            min-width: 150px;
         }
     </style>
 </head>
@@ -36,11 +59,11 @@
 <h1>📦 Lista boxów</h1>
 
 <div class="filters">
-    <label>Sklep: <select id="filter-sklep"><option value="">Wszystkie</option></select></label>
-    <label>Sezon: <select id="filter-sezon"><option value="">Wszystkie</option></select></label>
-    <label>Team: <select id="filter-team"><option value="">Wszystkie</option></select></label>
-    <label>Producent: <select id="filter-producent"><option value="">Wszystkie</option></select></label>
-    <label>Typ boxa: <select id="filter-typboxa"><option value="">Wszystkie</option></select></label>
+    <label>Sklep: <select id="filter-sklep" multiple></select></label>
+    <label>Sezon: <select id="filter-sezon" multiple></select></label>
+    <label>Team: <select id="filter-team" multiple></select></label>
+    <label>Producent: <select id="filter-producent" multiple></select></label>
+    <label>Typ boxa: <select id="filter-typboxa" multiple></select></label>
 </div>
 
 <table id="produkty" class="display" style="width:100%">
@@ -74,7 +97,10 @@ $(document).ready(function() {
 
             // Wstawianie wierszy do tabeli
             data.forEach(function(row) {
-                if (row.Produkt) { // pomija puste linie
+                if (row.Produkt) {
+                    let cena = row.cena_box_PLN ? row.cena_box_PLN.replace(",", ".") : "0";
+                    cena = parseFloat(cena).toFixed(2).replace(".", ",");
+
                     $('#produkty tbody').append(`
                         <tr>
                             <td>${row.Produkt}</td>
@@ -86,7 +112,7 @@ $(document).ready(function() {
                             <td>${row["Typ karty"]}</td>
                             <td>${row["Typ boxa"]}</td>
                             <td>${row.Team}</td>
-                            <td>${row.cena_box_PLN}</td>
+                            <td>${cena}</td>
                         </tr>
                     `);
                 }
@@ -94,11 +120,41 @@ $(document).ready(function() {
 
             // Inicjalizacja DataTables
             var table = $('#produkty').DataTable({
-                "pageLength": 25,
-                "order": []
+                pageLength: 25,
+                lengthMenu: [[25, 50, 100, 250, -1], [25, 50, 100, 250, "Wszystkie"]],
+                order: [],
+                fixedHeader: true,
+                columnDefs: [
+                    {
+                        targets: 1,
+                        type: 'num',
+                        render: function (data, type) {
+                            if (type === 'sort' || type === 'type') {
+                                return parseFloat(String(data).replace(",", "."));
+                            }
+                            return data;
+                        }
+                    },
+                    {
+                        targets: 9,
+                        type: 'num',
+                        render: function (data, type) {
+                            if (type === 'sort' || type === 'type') {
+                                return parseFloat(String(data).replace(",", "."));
+                            }
+                            return data;
+                        }
+                    }
+                ]
             });
 
-            // Funkcja do tworzenia filtrów
+            // Select2 (multi-select)
+            $("#filter-sklep, #filter-sezon, #filter-team, #filter-producent, #filter-typboxa").select2({
+                placeholder: "Wybierz...",
+                allowClear: true
+            });
+
+            // Funkcja do tworzenia filtrów wielokrotnych
             function fillFilter(columnIndex, selectId) {
                 var column = table.column(columnIndex);
                 var select = $(selectId);
@@ -110,8 +166,13 @@ $(document).ready(function() {
                 });
 
                 select.on('change', function() {
-                    var val = $.fn.dataTable.util.escapeRegex($(this).val());
-                    column.search(val ? '^'+val+'$' : '', true, false).draw();
+                    var values = $(this).val();
+                    if (!values || values.length === 0) {
+                        column.search("").draw();
+                    } else {
+                        var regex = values.map(v => '^' + v + '$').join('|');
+                        column.search(regex, true, false).draw();
+                    }
                 });
             }
 
