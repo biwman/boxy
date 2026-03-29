@@ -184,6 +184,12 @@
             <strong>Aktualizacja danych:</strong>
             <span id="last-update">ładowanie...</span>
         </div>
+	<div style="margin-top: 10px;">
+    	🌍 Język:
+   	 <button id="lang-pl">PL</button>
+    	<button id="lang-en">EN</button>
+</div>
+
     </div>
 
     <div class="top-right">
@@ -223,7 +229,67 @@
 <script>
 $(document).ready(function() {
 
-    // 🔥 1️⃣ Wczytanie pliku konfiguracyjnego
+    // 🔹 1️⃣ Tłumaczenia
+    const translations = {
+        PL: {
+            lengthMenu: "Pokaż _MENU_ boxów",
+            info: "Pokazuję od _START_ do _END_ z _TOTAL_ boxów",
+            infoEmpty: "Brak boxów do wyświetlenia",
+            infoFiltered: "(przefiltrowano z _MAX_ wszystkich boxów)",
+            zeroRecords: "Brak wyników",
+            search: "Szukaj:",
+            first: "Pierwsza",
+            last: "Ostatnia",
+            next: "Następna",
+            previous: "Poprzednia"
+        },
+        EN: {
+            lengthMenu: "Show _MENU_ boxes",
+            info: "Showing _START_ to _END_ of _TOTAL_ boxes",
+            infoEmpty: "No boxes available",
+            infoFiltered: "(filtered from _MAX_ total boxes)",
+            zeroRecords: "No results found",
+            search: "Search:",
+            first: "First",
+            last: "Last",
+            next: "Next",
+            previous: "Previous"
+        }
+    };
+
+    // 🔹 2️⃣ Zmienna globalna dla tabeli
+    let table;
+
+    // 🔹 3️⃣ Funkcja inicjalizująca DataTable w wybranym języku
+    function initTable(lang) {
+        if ($.fn.DataTable.isDataTable('#produkty')) {
+            table.destroy();
+        }
+
+        table = $('#produkty').DataTable({
+            pageLength: 25,
+            deferRender: true,
+            processing: true,
+            fixedHeader: true,
+            responsive: true,
+            language: {
+                lengthMenu: translations[lang].lengthMenu,
+                info: translations[lang].info,
+                infoEmpty: translations[lang].infoEmpty,
+                infoFiltered: translations[lang].infoFiltered,
+                zeroRecords: translations[lang].zeroRecords,
+                search: translations[lang].search,
+                paginate: {
+                    first: translations[lang].first,
+                    last: translations[lang].last,
+                    next: translations[lang].next,
+                    previous: translations[lang].previous
+                }
+            }
+        });
+    }
+
+    // 🔹 4️⃣ Wczytanie config.csv
     Papa.parse("config.csv", {
         download: true,
         header: false,
@@ -256,28 +322,26 @@ $(document).ready(function() {
             }
 
             // data ostatniego uruchomienia (Excel date float)
-     		if(config.OSTATNIE_URUCHOMIENIE) {
-    		const excelDate = parseFloat(config.OSTATNIE_URUCHOMIENIE.replace(",", "."));
-   		 const jsDate = new Date((excelDate - 25569) * 86400 * 1000);
+            if(config.OSTATNIE_URUCHOMIENIE) {
+                const excelDate = parseFloat(config.OSTATNIE_URUCHOMIENIE.replace(",", "."));
+                const jsDate = new Date((excelDate - 25569) * 86400 * 1000);
 
-    		const options = { 
-       		 day: "2-digit", month: "2-digit", year: "numeric",
-        	hour: "2-digit", minute: "2-digit", second: "2-digit",
-        	hour12: false,
-        	timeZone: "Europe/Warsaw"  // CET/CEST
-    		};
+                const options = { 
+                    day: "2-digit", month: "2-digit", year: "numeric",
+                    hour: "2-digit", minute: "2-digit", second: "2-digit",
+                    hour12: false,
+                    timeZone: "Europe/Warsaw"
+                };
 
-   		 document.getElementById("last-update").innerText = jsDate.toLocaleString("pl-PL", options);
+                document.getElementById("last-update").innerText = jsDate.toLocaleString("pl-PL", options);
 
-		} else {
-   		 document.getElementById("last-update").innerText = "brak informacji";
-		}
+            } else {
+                document.getElementById("last-update").innerText = "brak informacji";
+            }
         }
     });
 
-    // 🔥 2️⃣ Wczytanie danych CSV z produktami
-const nocache = new Date().getTime(); // unikalny timestamp
-
+    // 🔹 5️⃣ Wczytanie danych CSV z produktami
     Papa.parse("export.csv", {
         download: true,
         header: true,
@@ -307,66 +371,57 @@ const nocache = new Date().getTime(); // unikalny timestamp
                 `);
             });
 
-            var table = $('#produkty').DataTable({
-                pageLength: 25,
-                deferRender: true,
-                processing: true,
-                fixedHeader: true,
-                responsive: true
+            // 🔹 6️⃣ Uruchomienie tabeli po wczytaniu danych
+            initTable('PL'); // startowy język
+
+            // 🔹 7️⃣ Eventy przycisków językowych
+            $('#lang-pl').on('click', function() {
+                initTable('PL');
             });
 
+            $('#lang-en').on('click', function() {
+                initTable('EN');
+            });
+
+            // 🔹 8️⃣ Inicjalizacja Select2
             $("#filter-sklep, #filter-sezon, #filter-team, #filter-producent, #filter-typboxa").select2({
                 placeholder: "Wybierz...",
                 allowClear: true
             });
 
+            // 🔹 9️⃣ Funkcja uzupełniająca filtry
             function fillFilter(columnIndex, selectId, reverse=false) {
-    var column = table.column(columnIndex);
-    var select = $(selectId);
+                var column = table.column(columnIndex);
+                var select = $(selectId);
 
-    // 🔥 KLUCZOWE: zamiana na normalną tablicę
-    let dataArray = column.data().toArray();
+                let dataArray = column.data().toArray();
+                dataArray = dataArray.filter(d => d && d.trim() !== "");
+                dataArray = [...new Set(dataArray)];
+                dataArray.sort((a, b) => a.localeCompare(b, 'pl'));
+                if(reverse) dataArray.reverse();
 
-    // usunięcie pustych
-    dataArray = dataArray.filter(d => d && d.trim() !== "");
+                select.empty();
+                dataArray.forEach(function(d) {
+                    select.append(new Option(d, d));
+                });
 
-    // unikalne wartości
-    dataArray = [...new Set(dataArray)];
+                select.on('change', function() {
+                    var values = $(this).val();
+                    if (!values || values.length === 0) {
+                        column.search("").draw();
+                        return;
+                    }
+                    var regex = values.map(v => v.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|');
+                    column.search(regex, true, false).draw();
+                });
+            }
 
-    // sortowanie
-    dataArray.sort((a, b) => a.localeCompare(b, 'pl'));
-
-    if(reverse) dataArray.reverse();
-
-    // czyszczenie selecta (ważne przy reloadach)
-    select.empty();
-
-    // dodanie opcji
-    dataArray.forEach(function(d) {
-        select.append(new Option(d, d));
-    });
-
-    // event filtrowania
-    select.on('change', function() {
-        var values = $(this).val();
-
-        if (!values || values.length === 0) {
-            column.search("").draw();
-            return;
-        }
-
-        // escape regex
-        var regex = values.map(v => v.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|');
-
-        column.search(regex, true, false).draw();
-    });
-}
-
-		fillFilter(2, '#filter-sklep');              // sklep – normalnie A→Z
-		fillFilter(4, '#filter-sezon', true);       // sezon – Z→A
-		fillFilter(8, '#filter-team');              // team – normalnie A→Z
-		fillFilter(5, '#filter-producent', true);   // producent – Z→A
-		fillFilter(7, '#filter-typboxa');           // typ boxa – normalnie A→Z
+            // 🔹 10️⃣ Wypełnienie filtrów
+            fillFilter(2, '#filter-sklep');
+            fillFilter(4, '#filter-sezon', true);
+            fillFilter(8, '#filter-team');
+            fillFilter(5, '#filter-producent', true);
+            fillFilter(7, '#filter-typboxa');
         }
     });
 
