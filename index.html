@@ -102,6 +102,26 @@
             max-width: 1200px;
             width: 100%;
             box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .filters label {
+            display: flex;
+            flex-direction: column;
+            font-size: 14px;
+        }
+
+        #filter-sklep + .select2-container,
+        #filter-team + .select2-container {
+            width: 260px !important;
+        }
+
+        #filter-sezon + .select2-container,
+        #filter-producent + .select2-container,
+        #filter-typboxa + .select2-container {
+            width: 160px !important;
         }
 
         table {
@@ -129,34 +149,6 @@
                 height: 150px;
             }
         }
-/* kontener filtrów */
-.filters {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 15px;
-}
-
-/* każdy filtr jako blok */
-.filters label {
-    display: flex;
-    flex-direction: column;
-    font-size: 14px;
-}
-
-/* 🔥 SZEROKIE */
-#filter-sklep + .select2-container,
-#filter-team + .select2-container {
-    width: 260px !important;
-}
-
-/* 🔥 WĄSKIE */
-#filter-sezon + .select2-container,
-#filter-producent + .select2-container,
-#filter-typboxa + .select2-container {
-    width: 160px !important;
-}
-
-
     </style>
 </head>
 
@@ -184,11 +176,12 @@
             <strong>Aktualizacja danych:</strong>
             <span id="last-update">ładowanie...</span>
         </div>
-	<div style="margin-top: 10px;">
-    	🌍 Język:
-   	 <button id="lang-pl">PL</button>
-    	<button id="lang-en">EN</button>
-</div>
+
+        <div style="margin-top: 10px;">
+            🌍 Język:
+            <button id="lang-pl">PL</button>
+            <button id="lang-en">EN</button>
+        </div>
 
     </div>
 
@@ -212,9 +205,9 @@
     <thead>
         <tr>
             <th>Produkt</th>
-            <th>Box</th>
-            <th>Sklep</th>
+            <th>Cena</th>
             <th>Waluta</th>
+            <th>Sklep</th>
             <th>Sezon</th>
             <th>Producent</th>
             <th>Typ karty</th>
@@ -301,7 +294,6 @@ $(document).ready(function() {
                 if(row[0] && row[1]) config[row[0]] = row[1].trim();
             });
 
-            // kursy walut i podatek
             const eur = config.EUR.replace(",", ".");
             const usd = config.USD.replace(",", ".");
             const gbp = (parseFloat(config.GB_Tax.replace(",", ".")) * 100).toFixed(0) + "%";
@@ -310,18 +302,15 @@ $(document).ready(function() {
             document.getElementById("usdpln").innerText = usd;
             document.getElementById("gbptax").innerText = gbp;
 
-            // linki do social media
             if(config.TIKTOK_LINK) document.getElementById("tiktok-link").href = config.TIKTOK_LINK;
             if(config.INSTAGRAM_LINK) document.getElementById("instagram-link").href = config.INSTAGRAM_LINK;
 
-            // opis
             if(config.OPIS) {
                 const opisElem = document.createElement("p");
                 opisElem.innerText = config.OPIS;
                 document.querySelector(".creator").appendChild(opisElem);
             }
 
-            // data ostatniego uruchomienia (Excel date float)
             if(config.OSTATNIE_URUCHOMIENIE) {
                 const excelDate = parseFloat(config.OSTATNIE_URUCHOMIENIE.replace(",", "."));
                 const jsDate = new Date((excelDate - 25569) * 86400 * 1000);
@@ -334,7 +323,6 @@ $(document).ready(function() {
                 };
 
                 document.getElementById("last-update").innerText = jsDate.toLocaleString("pl-PL", options);
-
             } else {
                 document.getElementById("last-update").innerText = "brak informacji";
             }
@@ -359,8 +347,8 @@ $(document).ready(function() {
                     <tr>
                         <td>${row.Produkt}</td>
                         <td>${row.Box}</td>
-                        <td>${row.Sklep}</td>
                         <td>${row.Waluta}</td>
+                        <td>${row.Sklep}</td>
                         <td>${row.Sezon}</td>
                         <td>${row.Producent}</td>
                         <td>${row["Typ karty"]}</td>
@@ -372,16 +360,11 @@ $(document).ready(function() {
             });
 
             // 🔹 6️⃣ Uruchomienie tabeli po wczytaniu danych
-            initTable('PL'); // startowy język
+            initTable('PL'); 
 
             // 🔹 7️⃣ Eventy przycisków językowych
-            $('#lang-pl').on('click', function() {
-                initTable('PL');
-            });
-
-            $('#lang-en').on('click', function() {
-                initTable('EN');
-            });
+            $('#lang-pl').on('click', function() { initTable('PL'); });
+            $('#lang-en').on('click', function() { initTable('EN'); });
 
             // 🔹 8️⃣ Inicjalizacja Select2
             $("#filter-sklep, #filter-sezon, #filter-team, #filter-producent, #filter-typboxa").select2({
@@ -416,12 +399,12 @@ $(document).ready(function() {
                 });
             }
 
-            // 🔹 10️⃣ Wypełnienie filtrów
-            fillFilter(2, '#filter-sklep');
-            fillFilter(4, '#filter-sezon', true);
-            fillFilter(8, '#filter-team');
-            fillFilter(5, '#filter-producent', true);
-            fillFilter(7, '#filter-typboxa');
+            // 🔹 10️⃣ Wypełnienie filtrów (zaktualizowane indeksy)
+            fillFilter(3, '#filter-sklep');      
+            fillFilter(4, '#filter-sezon', true); 
+            fillFilter(8, '#filter-team');        
+            fillFilter(5, '#filter-producent', true); 
+            fillFilter(7, '#filter-typboxa');     
         }
     });
 
