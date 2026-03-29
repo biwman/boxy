@@ -26,35 +26,57 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
 
 <style>
-body { font-family: Arial,sans-serif; margin:20px; background:linear-gradient(135deg,#e3f2fd,#f7f9fc); display:flex; flex-direction:column; align-items:center; }
-.top-section { display:flex; align-items:center; justify-content:space-between; gap:60px; background:#fff; padding:25px 40px; border-radius:12px; margin:0 auto 20px auto; max-width:1200px; width:100%; box-shadow:0 2px 6px rgba(0,0,0,0.1);}
-.top-left { flex:1.5;}
-.top-left h1 { margin-top:0; color:#005bbb; }
-.rates { font-size:16px; margin-bottom:10px; }
-.creator { font-size:14px; margin-bottom:10px; line-height:1.4; }
-.update { font-size:13px; color:#444; }
-.top-right { flex:1; display:flex; justify-content:center; align-items:center; }
-.top-right img { width:220px; height:220px; object-fit:cover; border-radius:20px; transition:0.2s;}
-.top-right img:hover { transform:scale(1.08);}
-.filters { margin-bottom:20px; background:#fff; padding:15px; border-radius:8px; max-width:1200px; width:100%; box-shadow:0 2px 6px rgba(0,0,0,0.1);}
-table { font-size:14px; max-width:1200px; width:100%; }
-table.dataTable thead th { background:#005bbb; color:white; }
-.select2-container { min-width:170px; }
-@media (max-width:768px){.top-section{flex-direction:column; gap:20px;}.top-right img{width:150px; height:150px;}}
-
+body {
+    font-family: Arial, sans-serif;
+    margin: 20px;
+    background: linear-gradient(135deg, #e3f2fd, #f7f9fc);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+.top-section {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 60px;
+    background: #ffffff;
+    padding: 25px 40px;
+    border-radius: 12px;
+    margin: 0 auto 20px auto;
+    max-width: 1200px;
+    width: 100%;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+.top-left { flex: 1.5; }
+.top-left h1 { margin-top: 0; color: #005bbb; }
+.rates { font-size: 16px; margin-bottom: 10px; }
+.creator { font-size: 14px; margin-bottom: 10px; line-height: 1.4; }
+.update { font-size: 13px; color: #444; }
+.top-right { flex: 1; display: flex; justify-content: center; align-items: center; }
+.top-right img { width: 220px; height: 220px; object-fit: cover; border-radius: 20px; transition: 0.2s; }
+.top-right img:hover { transform: scale(1.08); }
+.filters { margin-bottom: 20px; background: #ffffff; padding: 15px; border-radius: 8px; max-width: 1200px; width: 100%; box-shadow: 0 2px 6px rgba(0,0,0,0.1); }
+table { font-size: 14px; max-width: 1200px; width: 100%; }
+table.dataTable thead th { background: #005bbb; color: white; }
+.select2-container { min-width: 170px; }
+@media (max-width: 768px) {
+    .top-section { flex-direction: column; gap: 20px; }
+    .top-right img { width: 150px; height: 150px; }
+}
 /* kontener filtrów */
-.filters { display:flex; flex-wrap:wrap; gap:15px; }
-.filters label { display:flex; flex-direction:column; font-size:14px; }
-/* szerokie */
-#filter-sklep + .select2-container, #filter-team + .select2-container { width:260px !important; }
-/* wąskie */
-#filter-sezon + .select2-container, #filter-producent + .select2-container, #filter-typboxa + .select2-container { width:160px !important; }
+.filters { display: flex; flex-wrap: wrap; gap: 15px; }
+.filters label { display: flex; flex-direction: column; font-size: 14px; }
+/* 🔥 SZEROKIE */
+#filter-sklep + .select2-container, #filter-team + .select2-container { width: 260px !important; }
+/* 🔥 WĄSKIE */
+#filter-sezon + .select2-container, #filter-producent + .select2-container, #filter-typboxa + .select2-container { width: 160px !important; }
 </style>
 </head>
 
 <body>
 
 <div class="top-section">
+
     <div class="top-left">
         <h1>📦 Porównanie cen boxów z kartami piłkarskimi</h1>
 
@@ -69,6 +91,7 @@ table.dataTable thead th { background:#005bbb; color:white; }
             <strong>Biwekson & Friends</strong><br>
             TikTok: <a id="tiktok-link" href="#" target="_blank">link</a> |
             Instagram: <a id="instagram-link" href="#" target="_blank">link</a>
+            <p class="static-note">To jest projekt niekomercyjny. Jeśli widzisz bugi – napisz na TikToka. Nie wspieram żadnego sklepu, ani żaden sklep nie wspiera mnie.</p>
         </div>
 
         <div class="update">
@@ -76,7 +99,7 @@ table.dataTable thead th { background:#005bbb; color:white; }
             <span id="last-update">ładowanie...</span>
         </div>
 
-        <div style="margin-top:10px;">
+        <div style="margin-top: 10px;">
             🌍 Język:
             <button id="lang-pl">PL</button>
             <button id="lang-en">EN</button>
@@ -88,14 +111,15 @@ table.dataTable thead th { background:#005bbb; color:white; }
             <img src="logo_biwekson.jpg" alt="logo">
         </a>
     </div>
+
 </div>
 
 <div class="filters">
-    <label>Sklep: <select id="filter-sklep" multiple></select></label>
-    <label>Sezon: <select id="filter-sezon" multiple></select></label>
-    <label>Team: <select id="filter-team" multiple></select></label>
-    <label>Producent: <select id="filter-producent" multiple></select></label>
-    <label>Typ boxa: <select id="filter-typboxa" multiple></select></label>
+    <label id="label-sklep">Sklep: <select id="filter-sklep" multiple></select></label>
+    <label id="label-sezon">Sezon: <select id="filter-sezon" multiple></select></label>
+    <label id="label-team">Team: <select id="filter-team" multiple></select></label>
+    <label id="label-producent">Producent: <select id="filter-producent" multiple></select></label>
+    <label id="label-typboxa">Typ boxa: <select id="filter-typboxa" multiple></select></label>
 </div>
 
 <table id="produkty" class="display">
@@ -121,6 +145,8 @@ $(document).ready(function() {
 
 const translations = {
     PL: {
+        headerTitle: "📦 Porównanie cen boxów z kartami piłkarskimi",
+        projectNote: "To jest projekt niekomercyjny. Jeśli widzisz bugi – napisz na TikToka. Nie wspieram żadnego sklepu, ani żaden sklep nie wspiera mnie.",
         lengthMenu: "Pokaż _MENU_ boxów",
         info: "Pokazuję od _START_ do _END_ z _TOTAL_ boxów",
         infoEmpty: "Brak boxów do wyświetlenia",
@@ -131,21 +157,12 @@ const translations = {
         last: "Ostatnia",
         next: "Następna",
         previous: "Poprzednia",
-        columns: ["Produkt", "Box", "Sklep", "Waluta", "Sezon", "Producent", "Typ karty", "Typ boxa", "Team", "Cena box (PLN)"],
-        filters: {
-            '#filter-sklep': "Sklep",
-            '#filter-sezon': "Sezon",
-            '#filter-team': "Team",
-            '#filter-producent': "Producent",
-            '#filter-typboxa': "Typ boxa"
-        },
-        headerText: {
-            rates: "Orientacyjne kursy walut:",
-            creator: "Biwekson & Friends",
-            update: "Aktualizacja danych:"
-        }
+        columns: ["Produkt","Box","Sklep","Waluta","Sezon","Producent","Typ karty","Typ boxa","Team","Cena box (PLN)"],
+        filters: ["Sklep","Sezon","Team","Producent","Typ boxa"]
     },
     EN: {
+        headerTitle: "📦 Comparison of football card box prices",
+        projectNote: "This is a non-commercial project. If you see bugs – write to TikTok. I don't support any store, and no store supports me.",
         lengthMenu: "Show _MENU_ boxes",
         info: "Showing _START_ to _END_ of _TOTAL_ boxes",
         infoEmpty: "No boxes available",
@@ -156,23 +173,54 @@ const translations = {
         last: "Last",
         next: "Next",
         previous: "Next",
-        columns: ["Product","Box","Shop","Currency","Season","Producer","Card type","Box type","Team","Box price (PLN)"],
-        filters: {
-            '#filter-sklep': "Shop",
-            '#filter-sezon': "Season",
-            '#filter-team': "Team",
-            '#filter-producent': "Producer",
-            '#filter-typboxa': "Box type"
-        },
-        headerText: {
-            rates: "Approximate exchange rates:",
-            creator: "Biwekson & Friends",
-            update: "Data last updated:"
-        }
+        columns: ["Product","Box","Store","Currency","Season","Manufacturer","Card Type","Box Type","Team","Box Price (PLN)"],
+        filters: ["Store","Season","Team","Manufacturer","Box Type"]
     }
 };
 
-// 🔥 1️⃣ Wczytanie pliku konfiguracyjnego
+// 🔥 Funkcja do inicjalizacji tabeli
+let table;
+function initTable(lang) {
+    if ($.fn.DataTable.isDataTable('#produkty')) {
+        table.destroy();
+    }
+
+    table = $('#produkty').DataTable({
+        pageLength: 25,
+        deferRender: true,
+        processing: true,
+        fixedHeader: true,
+        responsive: true,
+        language: {
+            lengthMenu: translations[lang].lengthMenu,
+            info: translations[lang].info,
+            infoEmpty: translations[lang].infoEmpty,
+            infoFiltered: translations[lang].infoFiltered,
+            zeroRecords: translations[lang].zeroRecords,
+            search: translations[lang].search,
+            paginate: {
+                first: translations[lang].first,
+                last: translations[lang].last,
+                next: translations[lang].next,
+                previous: translations[lang].previous
+            }
+        },
+        columns: translations[lang].columns.map(title => ({ title }))
+    });
+}
+
+// 🔥 Funkcja do zmiany języka opisów i filtrów
+function updateLanguage(lang) {
+    $('h1').text(translations[lang].headerTitle);
+    $('.creator p.static-note').text(translations[lang].projectNote);
+
+    const filterIds = ['#label-sklep','#label-sezon','#label-team','#label-producent','#label-typboxa'];
+    filterIds.forEach((id,i) => {
+        $(id).contents().first()[0].textContent = translations[lang].filters[i]+": ";
+    });
+}
+
+// 🔥 Wczytanie CSV konfigu i kursów walut
 Papa.parse("config.csv", {
     download: true,
     header: false,
@@ -180,142 +228,90 @@ Papa.parse("config.csv", {
     skipEmptyLines: true,
     complete: function(results) {
         const config = {};
-        results.data.forEach(row => { if(row[0] && row[1]) config[row[0]] = row[1].trim(); });
-
-        const eur = config.EUR.replace(",", ".");
-        const usd = config.USD.replace(",", ".");
+        results.data.forEach(row => {
+            if(row[0] && row[1]) config[row[0]] = row[1].trim();
+        });
+        document.getElementById("eurpln").innerText = config.EUR.replace(",", ".");
+        document.getElementById("usdpln").innerText = config.USD.replace(",", ".");
         const gbp = (parseFloat(config.GB_Tax.replace(",", ".")) * 100).toFixed(0) + "%";
-
-        document.getElementById("eurpln").innerText = eur;
-        document.getElementById("usdpln").innerText = usd;
         document.getElementById("gbptax").innerText = gbp;
-
         if(config.TIKTOK_LINK) document.getElementById("tiktok-link").href = config.TIKTOK_LINK;
         if(config.INSTAGRAM_LINK) document.getElementById("instagram-link").href = config.INSTAGRAM_LINK;
-
-        if(config.OPIS) {
-            const opisElem = document.createElement("p");
-            opisElem.innerText = config.OPIS;
-            document.querySelector(".creator").appendChild(opisElem);
-        }
 
         if(config.OSTATNIE_URUCHOMIENIE) {
             const excelDate = parseFloat(config.OSTATNIE_URUCHOMIENIE.replace(",", "."));
             const jsDate = new Date((excelDate - 25569) * 86400 * 1000);
-            const options = { day:"2-digit", month:"2-digit", year:"numeric", hour:"2-digit", minute:"2-digit", second:"2-digit", hour12:false, timeZone:"Europe/Warsaw"};
+            const options = { day:"2-digit", month:"2-digit", year:"numeric",
+                              hour:"2-digit", minute:"2-digit", second:"2-digit",
+                              hour12:false, timeZone:"Europe/Warsaw" };
             document.getElementById("last-update").innerText = jsDate.toLocaleString("pl-PL", options);
-        } else {
-            document.getElementById("last-update").innerText = "brak informacji";
-        }
+        } else document.getElementById("last-update").innerText = "brak informacji";
     }
 });
 
-// 🔥 2️⃣ Wczytanie danych CSV z produktami
-Papa.parse("export.csv", { download:true, header:true, delimiter:";", complete: function(results){
-    const data = results.data;
-    data.forEach(row => {
-        if(!row.Produkt || row.Produkt.trim()==="") return;
-        let cena = row.cena_box_PLN ? row.cena_box_PLN.replace(",", ".") : "0";
-        cena = parseFloat(cena).toFixed(2).replace(".", ",");
-        $('#produkty tbody').append(`<tr>
-            <td>${row.Produkt}</td>
-            <td>${row.Box}</td>
-            <td>${row.Sklep}</td>
-            <td>${row.Waluta}</td>
-            <td>${row.Sezon}</td>
-            <td>${row.Producent}</td>
-            <td>${row["Typ karty"]}</td>
-            <td>${row["Typ boxa"]}</td>
-            <td>${row.Team}</td>
-            <td>${cena}</td>
-        </tr>`);
-    });
-
-    let table;
-
-    function initTable(lang) {
-        // 🔹 1. Zachowaj filtry
-        const filterValues = {
-            '#filter-sklep': $('#filter-sklep').val(),
-            '#filter-sezon': $('#filter-sezon').val(),
-            '#filter-team': $('#filter-team').val(),
-            '#filter-producent': $('#filter-producent').val(),
-            '#filter-typboxa': $('#filter-typboxa').val()
-        };
-
-        // 🔹 2. Zaktualizuj nagłówki kolumn
-        $('#produkty thead th').each(function(i){
-            $(this).text(translations[lang].columns[i]);
+// 🔥 Wczytanie CSV produktów i stworzenie tabeli + filtrów
+Papa.parse("export.csv", {
+    download: true,
+    header: true,
+    delimiter: ";",
+    complete: function(results) {
+        const data = results.data;
+        data.forEach(row => {
+            if(!row.Produkt || row.Produkt.trim()==="") return;
+            let cena = row.cena_box_PLN ? row.cena_box_PLN.replace(",", ".") : "0";
+            cena = parseFloat(cena).toFixed(2).replace(".", ",");
+            $('#produkty tbody').append(`
+                <tr>
+                    <td>${row.Produkt}</td>
+                    <td>${row.Box}</td>
+                    <td>${row.Sklep}</td>
+                    <td>${row.Waluta}</td>
+                    <td>${row.Sezon}</td>
+                    <td>${row.Producent}</td>
+                    <td>${row["Typ karty"]}</td>
+                    <td>${row["Typ boxa"]}</td>
+                    <td>${row.Team}</td>
+                    <td>${cena}</td>
+                </tr>
+            `);
         });
 
-        // 🔹 3. Zniszcz tabelę
-        if ($.fn.DataTable.isDataTable('#produkty')) table.destroy();
+        $("#filter-sklep, #filter-sezon, #filter-team, #filter-producent, #filter-typboxa").select2({placeholder:"Wybierz...", allowClear:true});
 
-        // 🔹 4. Stwórz tabelę
-        table = $('#produkty').DataTable({
-            pageLength:25, deferRender:true, processing:true, fixedHeader:true, responsive:true,
-            language:{
-                lengthMenu: translations[lang].lengthMenu,
-                info: translations[lang].info,
-                infoEmpty: translations[lang].infoEmpty,
-                infoFiltered: translations[lang].infoFiltered,
-                zeroRecords: translations[lang].zeroRecords,
-                search: translations[lang].search,
-                paginate:{
-                    first: translations[lang].first,
-                    last: translations[lang].last,
-                    next: translations[lang].next,
-                    previous: translations[lang].previous
-                }
-            }
-        });
-
-        // 🔹 5. Przywróć filtry
-        for(const sel in filterValues) $(sel).val(filterValues[sel]).trigger('change');
-
-        // 🔹 6. Zmień nagłówki filtrów
-        for(const sel in translations[lang].filters){
-            $(sel).parent('label').contents().filter(function(){ return this.nodeType===3; }).first().replaceWith(translations[lang].filters[sel]+": ");
+        function fillFilter(colIndex, selectId, reverse=false) {
+            const column = table.column(colIndex);
+            const select = $(selectId);
+            let dataArray = column.data().toArray().filter(d => d && d.trim()!=="");
+            dataArray = [...new Set(dataArray)];
+            dataArray.sort((a,b)=>a.localeCompare(b,'pl'));
+            if(reverse) dataArray.reverse();
+            select.empty();
+            dataArray.forEach(d=>select.append(new Option(d,d)));
+            select.on('change', function(){
+                const values = $(this).val();
+                if(!values || values.length===0){ column.search("").draw(); return; }
+                const regex = values.map(v => v.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|');
+                column.search(regex,true,false).draw();
+            });
         }
 
-        // 🔹 7. Zmień opisy nad tabelą
-        $('.rates strong').text(translations[lang].headerText.rates);
-        $('.creator strong').text(translations[lang].headerText.creator);
-        $('.update strong').text(translations[lang].headerText.update);
+        // 🔥 Stworzenie tabeli startowo w PL
+        initTable('PL');
+        updateLanguage('PL');
+
+        // 🔥 Wypełnianie filtrów po inicjalizacji tabeli
+        fillFilter(2,'#filter-sklep');
+        fillFilter(4,'#filter-sezon',true);
+        fillFilter(8,'#filter-team');
+        fillFilter(5,'#filter-producent',true);
+        fillFilter(7,'#filter-typboxa');
+
+        // 🔥 Przełączanie języków
+        $('#lang-pl').on('click', function(){ initTable('PL'); updateLanguage('PL'); });
+        $('#lang-en').on('click', function(){ initTable('EN'); updateLanguage('EN'); });
     }
+});
 
-    // 🔹 8. Inicjalizacja filtrów Select2
-    $("#filter-sklep,#filter-sezon,#filter-team,#filter-producent,#filter-typboxa").select2({placeholder:"Wybierz...", allowClear:true});
-
-    function fillFilter(columnIndex, selectId, reverse=false){
-        var column = table.column(columnIndex);
-        var select = $(selectId);
-        let dataArray = column.data().toArray().filter(d=>d && d.trim()!=="");
-        dataArray = [...new Set(dataArray)].sort((a,b)=>a.localeCompare(b,'pl'));
-        if(reverse) dataArray.reverse();
-        select.empty();
-        dataArray.forEach(d=>select.append(new Option(d,d)));
-        select.on('change', function(){
-            const values=$(this).val();
-            if(!values||values.length===0){ column.search("").draw(); return; }
-            const regex=values.map(v=>v.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')).join('|');
-            column.search(regex,true,false).draw();
-        });
-    }
-
-    // 🔹 9. Wypełnij filtry
-    initTable('PL'); // startowy język
-    fillFilter(2,'#filter-sklep');
-    fillFilter(4,'#filter-sezon',true);
-    fillFilter(8,'#filter-team');
-    fillFilter(5,'#filter-producent',true);
-    fillFilter(7,'#filter-typboxa');
-
-    // 🔹 10. Obsługa przycisków językowych
-    $('#lang-pl').on('click', ()=>initTable('PL'));
-    $('#lang-en').on('click', ()=>initTable('EN'));
-
-}});
 });
 </script>
 
