@@ -45,8 +45,9 @@
             box-shadow: 0 2px 10px rgba(0,0,0,0.08);
         }
 
-        .top-left h1 { margin: 0 0 15px 0; color: #005bbb; font-size: 24px; }
-        .rates, .creator, .update { font-size: 14px; margin-bottom: 8px; color: #333; }
+        .top-left h1 { margin: 0 0 15px 0; color: #005bbb; font-size: 22px; }
+        .rates, .creator, .update { font-size: 14px; margin-bottom: 8px; color: #333; line-height: 1.5; }
+        #ui-description { font-style: italic; color: #555; margin-top: 5px; display: block; }
 
         .top-right img {
             width: 180px; height: 180px;
@@ -68,7 +69,15 @@
             gap: 15px;
         }
 
-        .filters label { font-weight: bold; font-size: 13px; display: flex; flex-direction: column; }
+        /* Poprawka zawijania nagłówków filtrów */
+        .filters label { 
+            font-weight: bold; 
+            font-size: 13px; 
+            display: flex; 
+            flex-direction: column; 
+            gap: 4px;
+        }
+        .filters label span { white-space: nowrap; }
 
         /* Tabela - optymalizacja pod 10 kolumn */
         table.dataTable { width: 100% !important; font-size: 13px; }
@@ -76,11 +85,11 @@
             background: #005bbb; 
             color: white; 
             white-space: nowrap; 
-            padding: 10px 5px !important;
+            padding: 10px 8px !important;
         }
-        table.dataTable tbody td { padding: 8px 5px !important; }
+        table.dataTable tbody td { padding: 8px 8px !important; }
 
-        .select2-container { min-width: 150px; margin-top: 5px; }
+        .select2-container { min-width: 160px; }
 
         @media (max-width: 768px) {
             .top-section { flex-direction: column; text-align: center; }
@@ -93,23 +102,24 @@
 
 <div class="top-section">
     <div class="top-left">
-        <h1 id="ui-title">📦 Porównanie cen boxów z kartami</h1>
+        <h1 id="ui-title">📦 Porównanie cen boxów</h1>
 
         <div class="rates">
-            <strong id="ui-rates-label">Orientacyjne kursy walut:</strong><br>
-            EUR/PLN: <span id="eurpln">...</span> |
-            USD/PLN: <span id="usdpln">...</span> |
-            UK Tax: <span id="gbptax">...</span>
+            <strong id="ui-rates-label">Kursy walut:</strong><br>
+            EUR: <span id="eurpln">...</span> |
+            USD: <span id="usdpln">...</span> |
+            Tax: <span id="gbptax">...</span>
         </div>
 
         <div class="creator">
             <strong>Biwekson & Friends</strong><br>
             TikTok: <a id="tiktok-link" href="#" target="_blank">link</a> |
             Instagram: <a id="instagram-link" href="#" target="_blank">link</a>
+            <span id="ui-description"></span>
         </div>
 
         <div class="update">
-            <strong id="ui-update-label">Aktualizacja danych:</strong>
+            <strong id="ui-update-label">Aktualizacja:</strong>
             <span id="last-update">...</span>
         </div>
 
@@ -128,11 +138,11 @@
 </div>
 
 <div class="filters">
-    <label><span class="lbl-shop">Sklep</span>: <select id="filter-sklep" multiple></select></label>
-    <label><span class="lbl-season">Sezon</span>: <select id="filter-sezon" multiple></select></label>
-    <label><span class="lbl-team">Team</span>: <select id="filter-team" multiple></select></label>
-    <label><span class="lbl-brand">Brand</span>: <select id="filter-producent" multiple></select></label>
-    <label><span class="lbl-type">Typ boxa</span>: <select id="filter-typboxa" multiple></select></label>
+    <label><span class="lbl-shop">Sklep:</span> <select id="filter-sklep" multiple></select></label>
+    <label><span class="lbl-season">Sezon:</span> <select id="filter-sezon" multiple></select></label>
+    <label><span class="lbl-team">Team:</span> <select id="filter-team" multiple></select></label>
+    <label><span class="lbl-brand">Brand:</span> <select id="filter-producent" multiple></select></label>
+    <label><span class="lbl-type">Typ boxa:</span> <select id="filter-typboxa" multiple></select></label>
 </div>
 
 <table id="produkty" class="display nowrap" style="width:100%">
@@ -162,35 +172,33 @@ $(document).ready(function() {
             rates: "Orientacyjne kursy walut:",
             update: "Aktualizacja danych:",
             lang: "🌍 Język:",
-            loading: "ładowanie...",
-            f_shop: "Sklep", f_season: "Sezon", f_team: "Team", f_brand: "Producent", f_type: "Typ boxa",
-            h_item: "Produkt", h_price: "Cena", h_ccy: "Waluta", h_shop: "Sklep", h_season: "Sezon", 
-            h_brand: "Producent", h_card: "Typ karty", h_box: "Typ boxa", h_team: "Team", h_pln: "Cena PLN",
+            f_shop: "Sklep:", f_season: "Sezon:", f_team: "Team:", f_brand: "Producent:", f_type: "Typ boxa:",
+            h_item: "Produkt", h_price: "Cena", h_ccy: "CCY", h_shop: "Sklep", h_season: "Sezon", 
+            h_brand: "Brand", h_card: "Typ karty", h_box: "Box", h_team: "Team", h_pln: "Cena PLN",
             dt: {
-                lengthMenu: "Pokaż _MENU_ wierszy",
-                info: "Pokazuję od _START_ do _END_ z _TOTAL_ pozycji",
+                lengthMenu: "Pokaż _MENU_ pozycji",
+                info: "Widok _START_-_END_ z _TOTAL_",
                 infoEmpty: "Brak danych",
-                infoFiltered: "(przefiltrowano z _MAX_)",
-                zeroRecords: "Nie znaleziono boxów",
+                infoFiltered: "(z _MAX_)",
+                zeroRecords: "Nie znaleziono",
                 search: "Szukaj:",
-                paginate: { first: "Pierwsza", last: "Ostatnia", next: "Dalej", previous: "Wstecz" }
+                paginate: { first: "Pierwsza", last: "Ostatnia", next: ">>", previous: "<<" }
             }
         },
         EN: {
             title: "📦 Football Card Box Price Comparison",
-            rates: "Estimated Exchange Rates:",
-            update: "Last Data Update:",
+            rates: "Exchange Rates:",
+            update: "Last Update:",
             lang: "🌍 Language:",
-            loading: "loading...",
-            f_shop: "Shop", f_season: "Season", f_team: "Team", f_brand: "Brand", f_type: "Box Type",
+            f_shop: "Shop:", f_season: "Season:", f_team: "Team:", f_brand: "Brand:", f_type: "Box Type:",
             h_item: "Item", h_price: "Price", h_ccy: "CCY", h_shop: "Shop", h_season: "Season", 
-            h_brand: "Brand", h_card: "Card Type", h_box: "Box Type", h_team: "Team", h_pln: "Price PLN",
+            h_brand: "Brand", h_card: "Card Type", h_box: "Box", h_team: "Team", h_pln: "Price PLN",
             dt: {
                 lengthMenu: "Show _MENU_ entries",
-                info: "Showing _START_ to _END_ of _TOTAL_ items",
-                infoEmpty: "No items available",
-                infoFiltered: "(filtered from _MAX_ total)",
-                zeroRecords: "No matching boxes found",
+                info: "Showing _START_ to _END_ of _TOTAL_",
+                infoEmpty: "No items",
+                infoFiltered: "(from _MAX_)",
+                zeroRecords: "No results",
                 search: "Search:",
                 paginate: { first: "First", last: "Last", next: "Next", previous: "Prev" }
             }
@@ -198,6 +206,7 @@ $(document).ready(function() {
     };
 
     let table;
+    let configData = {};
 
     function updateStaticText(lang) {
         const t = translations[lang];
@@ -206,14 +215,16 @@ $(document).ready(function() {
         $("#ui-update-label").text(t.update);
         $("#ui-lang-label").text(t.lang);
         
-        // Filtry
         $(".lbl-shop").text(t.f_shop);
         $(".lbl-season").text(t.f_season);
         $(".lbl-team").text(t.f_team);
         $(".lbl-brand").text(t.f_brand);
         $(".lbl-type").text(t.f_type);
 
-        // Nagłówki tabeli
+        // Wyświetlanie opisu zależnie od języka
+        const opis = (lang === 'PL') ? configData.OPIS_PL : configData.OPIS_EN;
+        $("#ui-description").text(opis || configData.OPIS || "");
+
         const headers = [t.h_item, t.h_price, t.h_ccy, t.h_shop, t.h_season, t.h_brand, t.h_card, t.h_box, t.h_team, t.h_pln];
         $('#produkty thead th').each(function(i) {
             $(this).text(headers[i]);
@@ -230,9 +241,7 @@ $(document).ready(function() {
             responsive: true,
             fixedHeader: true,
             language: translations[lang].dt,
-            columnDefs: [
-                { targets: [1, 9], className: "dt-right" } // Wyrównanie cen do prawej
-            ]
+            columnDefs: [{ targets: [1, 9], className: "dt-right" }]
         });
         
         updateStaticText(lang);
@@ -245,21 +254,22 @@ $(document).ready(function() {
         delimiter: ";",
         skipEmptyLines: true,
         complete: function(results) {
-            const config = {};
-            results.data.forEach(row => { if(row[0] && row[1]) config[row[0]] = row[1].trim(); });
+            results.data.forEach(row => { if(row[0] && row[1]) configData[row[0]] = row[1].trim(); });
 
-            $("#eurpln").text(config.EUR || "---");
-            $("#usdpln").text(config.USD || "---");
-            $("#gbptax").text(config.GB_Tax ? (parseFloat(config.GB_Tax.replace(",",".")) * 100).toFixed(0) + "%" : "---");
+            $("#eurpln").text(configData.EUR || "---");
+            $("#usdpln").text(configData.USD || "---");
+            $("#gbptax").text(configData.GB_Tax ? (parseFloat(configData.GB_Tax.replace(",",".")) * 100).toFixed(0) + "%" : "---");
 
-            if(config.TIKTOK_LINK) $("#tiktok-link").attr("href", config.TIKTOK_LINK);
-            if(config.INSTAGRAM_LINK) $("#instagram-link").attr("href", config.INSTAGRAM_LINK);
+            if(configData.TIKTOK_LINK) $("#tiktok-link").attr("href", configData.TIKTOK_LINK);
+            if(configData.INSTAGRAM_LINK) $("#instagram-link").attr("href", configData.INSTAGRAM_LINK);
 
-            if(config.OSTATNIE_URUCHOMIENIE) {
-                const excelDate = parseFloat(config.OSTATNIE_URUCHOMIENIE.replace(",", "."));
+            if(configData.OSTATNIE_URUCHOMIENIE) {
+                const excelDate = parseFloat(configData.OSTATNIE_URUCHOMIENIE.replace(",", "."));
                 const jsDate = new Date((excelDate - 25569) * 86400 * 1000);
                 $("#last-update").text(jsDate.toLocaleString("pl-PL"));
             }
+            // Odśwież tekst po załadowaniu configa
+            if(table) updateStaticText($('#lang-en').hasClass('active') ? 'EN' : 'PL');
         }
     });
 
@@ -292,12 +302,11 @@ $(document).ready(function() {
 
             initTable('PL');
 
-            // Akcje przycisków
             $('#lang-pl').on('click', function() { initTable('PL'); fillAllFilters(); });
             $('#lang-en').on('click', function() { initTable('EN'); fillAllFilters(); });
 
             $("#filter-sklep, #filter-sezon, #filter-team, #filter-producent, #filter-typboxa").select2({
-                placeholder: "---",
+                placeholder: "",
                 allowClear: true
             });
 
