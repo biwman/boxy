@@ -129,6 +129,34 @@
                 height: 150px;
             }
         }
+/* kontener filtrów */
+.filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+/* każdy filtr jako blok */
+.filters label {
+    display: flex;
+    flex-direction: column;
+    font-size: 14px;
+}
+
+/* 🔥 SZEROKIE */
+#filter-sklep + .select2-container,
+#filter-team + .select2-container {
+    width: 260px !important;
+}
+
+/* 🔥 WĄSKIE */
+#filter-sezon + .select2-container,
+#filter-producent + .select2-container,
+#filter-typboxa + .select2-container {
+    width: 160px !important;
+}
+
+
     </style>
 </head>
 
