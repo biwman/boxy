@@ -14,8 +14,19 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
 
     <style>
-        :root { --main-blue: #005bbb; --bg-light: #f7f9fc; }
-        body { font-family: 'Segoe UI', Arial, sans-serif; margin: 20px; background: linear-gradient(135deg, #e3f2fd, #f7f9fc); display: flex; flex-direction: column; align-items: center; }
+        :root { --main-blue: #005bbb; --bg-light: #f0f4f8; }
+        
+        /* 1) NOWE CIEKAWE TŁO GRADIENTOWE */
+        body { 
+            font-family: 'Segoe UI', Arial, sans-serif; 
+            margin: 20px; 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #6B8DD6 100%);
+            background-attachment: fixed;
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            min-height: 100vh;
+        }
         
         .top-section, .filters-container, .table-holder { 
             max-width: 1600px; 
@@ -25,20 +36,20 @@
 
         .top-section { 
             display: flex; align-items: center; justify-content: space-between; gap: 30px; 
-            background: #ffffff; padding: 25px 40px; border-radius: 15px; margin-bottom: 20px; 
-            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            background: rgba(255, 255, 255, 0.95); padding: 25px 40px; border-radius: 15px; margin-bottom: 20px; 
+            box-shadow: 0 8px 32px rgba(0,0,0,0.15);
         }
         .top-left h1 { margin: 0 0 10px 0; color: var(--main-blue); font-size: 24px; }
         .info-row { font-size: 13px; margin-bottom: 5px; color: #333; line-height: 1.4; }
         #ui-description { display: block; margin-top: 10px; font-size: 12px; color: #666; font-style: italic; max-width: 800px; }
         
         .top-right a { display: block; cursor: pointer; transition: transform 0.2s; }
-        .top-right a:hover { transform: scale(1.02); }
+        .top-right a:hover { transform: scale(1.05); }
         .top-right img { width: 150px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); display: block; }
 
         .filters-container { 
-            margin-bottom: 20px; background: #ffffff; padding: 20px; border-radius: 12px; 
-            box-shadow: 0 4px 20px rgba(0,0,0,0.08); 
+            margin-bottom: 20px; background: rgba(255, 255, 255, 0.95); padding: 20px; border-radius: 12px; 
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1); 
             display: flex; flex-wrap: nowrap; gap: 10px;
         }
         .filter-group { display: flex; flex-direction: column; flex: 1; min-width: 0; }
@@ -49,12 +60,30 @@
             background-color: var(--main-blue) !important; color: #ffffff !important; border: none !important;
             padding: 2px 8px !important; margin-top: 5px !important; font-size: 12px !important;
         }
-        .select2-selection__choice__display { color: #ffffff !important; padding-left: 4px !important; }
 
-        .table-holder { background: #fff; padding: 20px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
-        table.dataTable { width: 100% !important; margin: 0 !important; border-collapse: collapse; }
-        table.dataTable thead th { background-color: var(--main-blue); color: white; border: none; padding: 12px; text-align: left; white-space: nowrap; }
+        /* 3) PRZYKLEJONE NAGŁÓWKI (STICKY HEADER) */
+        .table-holder { 
+            background: #fff; padding: 20px; border-radius: 12px; 
+            box-shadow: 0 8px 32px rgba(0,0,0,0.15); 
+            overflow: visible; /* ważne dla sticky */
+        }
+        table.dataTable { width: 100% !important; margin: 0 !important; border-collapse: separate; border-spacing: 0; }
+        
+        table.dataTable thead th { 
+            background-color: var(--main-blue); 
+            color: white; 
+            border: none; 
+            padding: 12px; 
+            text-align: left; 
+            white-space: nowrap;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            box-shadow: 0 2px 2px rgba(0,0,0,0.1);
+        }
+        
         .col-pln { font-weight: bold; color: var(--main-blue); text-align: right !important; }
+        .col-price { text-align: right !important; padding-right: 20px !important; }
 
         @media (max-width: 1100px) {
             .filters-container { flex-wrap: wrap; }
@@ -147,8 +176,6 @@ $(document).ready(function() {
     function fillFilter(columnIndex, selectId, desc = false) {
         const select = $(selectId);
         let uniqueData = table.column(columnIndex).data().unique().sort().toArray();
-        
-        // Jeśli desc jest true, odwracamy kolejność (Z do A)
         if (desc) { uniqueData.reverse(); }
 
         select.empty();
@@ -183,12 +210,21 @@ $(document).ready(function() {
         download: true, header: true, delimiter: ";", complete: function(results) {
             results.data.forEach(row => {
                 if(!row.Produkt) return;
+                
+                // 2) FORMATOWANIE CEN Z 2 MIEJSCAMI PO PRZECINKU
+                let cenaOryginalna = parseFloat(row.Box ? row.Box.replace(',','.') : 0);
                 let cenaPLN = parseFloat(row.cena_box_PLN ? row.cena_box_PLN.replace(',','.') : 0);
+                
                 $('#mainTable tbody').append(`
                     <tr>
-                        <td>${row.Produkt}</td><td>${row.Box}</td><td>${row.Waluta}</td>
-                        <td>${row.Sklep}</td><td>${row.Sezon}</td><td>${row.Producent}</td>
-                        <td>${row["Typ boxa"]}</td><td>${row.Team}</td>
+                        <td>${row.Produkt}</td>
+                        <td class="col-price" data-order="${cenaOryginalna}">${cenaOryginalna.toFixed(2)}</td>
+                        <td>${row.Waluta}</td>
+                        <td>${row.Sklep}</td>
+                        <td>${row.Sezon}</td>
+                        <td>${row.Producent}</td>
+                        <td>${row["Typ boxa"]}</td>
+                        <td>${row.Team}</td>
                         <td class="col-pln" data-order="${cenaPLN}">${cenaPLN.toFixed(2)}</td>
                     </tr>
                 `);
@@ -202,8 +238,6 @@ $(document).ready(function() {
 
             $('select').select2({ placeholder: "Wszystkie", allowClear: true, closeOnSelect: false, width: '100%' });
             
-            // Filtry: Sklep(3), Sezon(4), Drużyna(7), Marka(5), Typ(6)
-            // Dodano 'true' dla Sezonu i Marki, aby sortowały od Z do A
             fillFilter(3, '#f-shop'); 
             fillFilter(4, '#f-season', true); 
             fillFilter(7, '#f-team'); 
