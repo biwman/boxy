@@ -49,21 +49,20 @@
         .top-right img {
             width: 200px; height: 200px;
             object-fit: cover; border-radius: 20px;
-            transition: 0.2s;
         }
-        .top-right img:hover { transform: scale(1.05); }
 
+        /* Sekcja filtrów - kluczowe poprawki widoczności */
         .filters {
             margin-bottom: 20px;
             background: #ffffff;
-            padding: 15px;
+            padding: 20px;
             border-radius: 8px;
             max-width: 1200px;
             width: 100%;
             box-shadow: 0 2px 6px rgba(0,0,0,0.1);
             display: flex;
             flex-wrap: wrap;
-            gap: 15px;
+            gap: 20px;
             align-items: flex-start;
         }
 
@@ -72,35 +71,44 @@
             flex-direction: column; 
             font-size: 14px; 
             font-weight: bold;
-            min-width: 160px;
+            flex: 1; /* Pozwala filtrom rosnąć */
+            min-width: 200px; 
         }
 
-        .filters label span { margin-bottom: 5px; }
+        .filters label span { margin-bottom: 8px; color: #005bbb; }
 
-        /* Ustawienie szerokości kontenerów Select2 */
-        #filter-sklep + .select2-container,
-        #filter-team + .select2-container { width: 300px !important; min-width: 250px; }
-        #filter-sezon + .select2-container,
-        #filter-producent + .select2-container,
-        #filter-typboxa + .select2-container { width: 200px !important; min-width: 150px; }
-
-        /* Poprawka wizualna pigułek Select2 */
+        /* WYMUSZENIE WIDOCZNOŚCI WYBRANYCH ELEMENTÓW (TAGÓW) */
         .select2-container--default .select2-selection--multiple {
-            border: 1px solid #aaa;
-            border-radius: 4px;
-            min-height: 38px;
+            border: 1px solid #ccc !important;
+            min-height: 40px !important;
+            height: auto !important; /* Pozwala polu rosnąć w dół przy wielu tagach */
+            padding-bottom: 5px !important;
+        }
+
+        .select2-container .select2-selection--multiple .select2-selection__rendered {
+            display: block !important; /* Pigułki będą się zawijać w nowe linie */
+            padding: 0 5px !important;
+        }
+
+        .select2-container--default .select2-selection--multiple .select2-selection__choice {
+            background-color: #005bbb !important;
+            color: white !important;
+            border: none !important;
+            padding: 2px 8px !important;
+            font-size: 12px !important;
+            margin-top: 5px !important;
+        }
+
+        .select2-container--default .select2-selection--multiple .select2-selection__choice__remove {
+            color: white !important;
+            margin-right: 5px !important;
         }
 
         table.dataTable thead th { background: #005bbb; color: white; }
         
         @media (max-width: 768px) {
-            .top-section { flex-direction: column; gap: 20px; text-align: center; }
-            .top-right img { width: 150px; height: 150px; }
-            #filter-sklep + .select2-container,
-            #filter-team + .select2-container,
-            #filter-sezon + .select2-container,
-            #filter-producent + .select2-container,
-            #filter-typboxa + .select2-container { width: 100% !important; }
+            .top-section { flex-direction: column; text-align: center; }
+            .filters label { min-width: 100%; }
         }
     </style>
 </head>
@@ -155,16 +163,16 @@
 <table id="produkty" class="display" style="width:100%">
     <thead>
         <tr>
-            <th>Produkt</th>
-            <th>Cena</th>
+            <th>Item</th>
+            <th>Price</th>
             <th>CCY</th>
-            <th>Sklep</th>
-            <th>Sezon</th>
+            <th>Shop</th>
+            <th>Season</th>
             <th>Brand</th>
-            <th>Typ karty</th>
+            <th>Card Type</th>
             <th>Box</th>
             <th>Team</th>
-            <th>Cena PLN</th>
+            <th>Price PLN</th>
         </tr>
     </thead>
     <tbody></tbody>
@@ -179,17 +187,17 @@ $(document).ready(function() {
             rates: "Orientacyjne kursy walut:",
             update: "Aktualizacja danych:",
             lang: "🌍 Język:",
-            placeholder: "Wybierz...",
-            f_shop: "Sklep:", f_season: "Sezon:", f_team: "Team:", f_brand: "Marka:", f_type: "Typ boxa:",
+            placeholder: "Wszystkie",
+            f_shop: "Sklep:", f_season: "Sezon:", f_team: "Team:", f_brand: "Marka/Brand:", f_type: "Typ boxa:",
             h: ["Produkt", "Cena", "CCY", "Sklep", "Sezon", "Brand", "Typ karty", "Box", "Team", "Cena PLN"],
             dt: {
-                lengthMenu: "Pokaż _MENU_ boxów",
+                lengthMenu: "Pokaż _MENU_ pozycji",
                 info: "Widok _START_-_END_ z _TOTAL_",
                 infoEmpty: "Brak danych",
                 infoFiltered: "(z _MAX_)",
                 zeroRecords: "Brak wyników",
-                search: "Szukaj:",
-                paginate: { first: "Pierwsza", last: "Ostatnia", next: "Następna", previous: "Poprzednia" }
+                search: "Szukaj w tabeli:",
+                paginate: { first: "Pierwsza", last: "Ostatnia", next: "Dalej", previous: "Wstecz" }
             }
         },
         EN: {
@@ -197,17 +205,17 @@ $(document).ready(function() {
             rates: "Estimated Exchange Rates:",
             update: "Last Update:",
             lang: "🌍 Language:",
-            placeholder: "Select...",
+            placeholder: "All",
             f_shop: "Shop:", f_season: "Season:", f_team: "Team:", f_brand: "Brand:", f_type: "Box Type:",
             h: ["Item", "Price", "CCY", "Shop", "Season", "Brand", "Card Type", "Box", "Team", "Price PLN"],
             dt: {
-                lengthMenu: "Show _MENU_ boxes",
+                lengthMenu: "Show _MENU_ items",
                 info: "Showing _START_ to _END_ of _TOTAL_",
                 infoEmpty: "No data",
                 infoFiltered: "(from _MAX_)",
                 zeroRecords: "No results",
-                search: "Search:",
-                paginate: { first: "First", last: "Last", next: "Next", previous: "Previous" }
+                search: "Search table:",
+                paginate: { first: "First", last: "Last", next: "Next", previous: "Prev" }
             }
         }
     };
@@ -232,13 +240,18 @@ $(document).ready(function() {
         const opis = (lang === 'PL') ? configData.OPIS_PL : configData.OPIS_EN;
         $("#ui-description").text(opis || configData.OPIS || "");
 
+        // Nagłówki tabeli
         $('#produkty thead th').each(function(i) { $(this).text(t.h[i]); });
         
-        // Aktualizacja placeholderów w Select2
-        $("select").select2({
-            placeholder: t.placeholder,
-            allowClear: true,
-            closeOnSelect: false
+        // Re-inicjalizacja Select2 z nowym placeholderem, ale zachowaniem wartości
+        $("select").each(function() {
+            const selectedVals = $(this).val();
+            $(this).select2({
+                placeholder: t.placeholder,
+                allowClear: true,
+                closeOnSelect: false,
+                width: '100%'
+            }).val(selectedVals).trigger('change.select2');
         });
     }
 
