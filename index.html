@@ -3,118 +3,108 @@
 <head>
     <meta charset="UTF-8">
     <title id="page-title">Boxy – Tabela produktów</title>
-
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/fixedheader/3.4.0/css/fixedHeader.dataTables.min.css">
-
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-
     <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/fixedheader/3.4.0/js/dataTables.fixedHeader.min.js"></script>
-
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
-
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
 
     <style>
+        :root {
+            --primary-blue: #005bbb;
+            --light-blue: #e3f2fd;
+            --bg-gradient: linear-gradient(135deg, #f0f4f8, #dbeafe);
+        }
+
         body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-            background: linear-gradient(135deg, #e3f2fd, #f7f9fc);
+            font-family: 'Segoe UI', Tahoma, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: var(--bg-gradient);
             display: flex;
             flex-direction: column;
             align-items: center;
         }
 
-        .top-section {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 60px;
-            background: #ffffff;
-            padding: 25px 40px;
-            border-radius: 12px;
-            margin: 0 auto 20px auto;
-            max-width: 1400px; /* Zwiększyłem szerokość sekcji górnej */
+        .top-section, .filters, .table-container {
+            max-width: 1450px;
             width: 100%;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+            background: #ffffff;
             box-sizing: border-box;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
         }
 
-        .top-left { flex: 1.5; }
-        .top-left h1 { margin-top: 0; color: #005bbb; }
-        .rates { font-size: 16px; margin-bottom: 10px; }
-        .creator { font-size: 14px; margin-bottom: 10px; line-height: 1.4; }
-        .update { font-size: 13px; color: #444; }
-        .top-right { flex: 1; display: flex; justify-content: center; align-items: center; }
+        .top-section {
+            padding: 25px;
+            border-radius: 16px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
 
-        .top-right img {
-            width: 180px;
-            height: 180px;
-            object-fit: cover;
+        .lang-btn {
+            padding: 6px 18px;
+            border: 2px solid var(--primary-blue);
+            background: white;
+            color: var(--primary-blue);
+            cursor: pointer;
+            font-weight: bold;
             border-radius: 20px;
             transition: 0.2s;
         }
-
-        .top-right img:hover { transform: scale(1.08); }
+        .lang-btn.active { background: var(--primary-blue); color: white; }
 
         .filters {
+            padding: 20px;
+            border-radius: 12px;
             margin-bottom: 20px;
-            background: #ffffff;
-            padding: 15px;
-            border-radius: 8px;
-            max-width: 1400px;
-            width: 100%;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
             display: flex;
             flex-wrap: wrap;
             gap: 15px;
-            box-sizing: border-box;
         }
-
-        .filters label { display: flex; flex-direction: column; font-size: 14px; }
 
         .table-container {
-            max-width: 1400px; /* Szerzej, żeby dopasować do góry */
-            width: 100%;
-            background: #ffffff;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-            box-sizing: border-box;
-            overflow-x: auto; /* Zapewnia scrollowanie przy szerokiej tabeli */
+            padding: 15px 25px 30px 15px; /* Większy prawy padding by widzieć ostatnie kolumny */
+            border-radius: 12px;
+            overflow-x: auto;
         }
 
-        /* Ustawienia kolumn zapobiegające skakaniu szerokości i zawijaniu nazw */
-        table#produkty { width: 100% !important; border-collapse: collapse; }
-        table#produkty td, table#produkty th { 
-            white-space: nowrap; /* Blokada zawijania tekstu w komórkach */
-            padding: 10px 15px;
+        /* --- NAGŁÓWEK TABELI - FIX WYSOKOŚCI --- */
+        table.dataTable thead th {
+            background: var(--primary-blue) !important;
+            color: white !important;
+            height: 45px !important; /* Stała wysokość */
+            line-height: 45px !important; /* Wyśrodkowanie w pionie */
+            padding: 0 10px !important;
+            white-space: nowrap;
+            font-size: 13px;
+            border: none !important;
         }
 
-        /* Definicja minimalnych szerokości, żeby przy zmianie języka nic nie drgało */
-        th:nth-child(1), td:nth-child(1) { min-width: 450px; white-space: normal !important; } /* Produkt może się zawinąć, ale ma dużo miejsca */
-        th:nth-child(2), td:nth-child(2) { min-width: 90px; }
-        th:nth-child(3), td:nth-child(3) { min-width: 80px; }
-        th:nth-child(4), td:nth-child(4) { min-width: 130px; }
-        th:nth-child(5), td:nth-child(5) { min-width: 100px; }
-        th:nth-child(6), td:nth-child(6) { min-width: 110px; }
-        th:nth-child(7), td:nth-child(7) { min-width: 110px; }
-        th:nth-child(8), td:nth-child(8) { min-width: 110px; }
-        th:nth-child(9), td:nth-child(9) { min-width: 130px; }
-        th:nth-child(10), td:nth-child(10) { min-width: 120px; font-weight: bold; }
-
-        table.dataTable thead th { background: #005bbb; color: white; text-align: left; }
-        .select2-container { min-width: 170px; }
-
-        @media (max-width: 768px) {
-            .top-section { flex-direction: column; gap: 20px; padding: 20px; }
-            .top-right img { width: 120px; height: 120px; }
+        table.dataTable tbody td {
+            padding: 10px !important;
+            font-size: 14px;
+            white-space: nowrap;
+            border-bottom: 1px solid #f0f0f0;
         }
+
+        /* --- SZEROKOŚCI KOLUMN --- */
+        .col-prod { min-width: 400px; white-space: normal !important; }
+        .col-small { width: 60px !important; text-align: center; } /* Cena / CCY */
+        .col-brand { width: 90px !important; } /* Marka */
+        .col-last { font-weight: bold; color: var(--primary-blue); min-width: 110px; }
+
+        table.dataTable.stripe tbody tr.odd { background-color: #fafafa; }
+        table.dataTable tbody tr:hover { background-color: #f1f7ff !important; }
+
+        .top-right img { width: 140px; height: 140px; border-radius: 20px; }
     </style>
 </head>
 
@@ -122,63 +112,52 @@
 
 <div class="top-section">
     <div class="top-left">
-        <h1 id="main-heading">📦 Porównanie cen boxów z kartami piłkarskimi</h1>
-
-        <div class="rates">
-            <strong id="rates-label">Orientacyjne kursy walut:</strong><br>
-            EUR/PLN: <span id="eurpln">...</span> |
-            USD/PLN: <span id="usdpln">...</span> |
-            UK Tax: <span id="gbptax">...</span>
+        <h1 id="main-heading">📦 Boxy Price Tracker</h1>
+        <div style="margin-bottom: 10px;">
+            <strong id="rates-label">Kursy:</strong> 
+            EUR: <span id="eurpln">...</span> | USD: <span id="usdpln">...</span> | Tax: <span id="gbptax">...</span>
         </div>
-
         <div class="creator">
-            <strong>Biwekson & Friends</strong><br>
-            TikTok: <a id="tiktok-link" href="#" target="_blank">link</a> |
-            Instagram: <a id="instagram-link" href="#" target="_blank">link</a>
-            <div id="disclaimer-text" style="margin-top: 10px; font-style: italic; color: #555;"></div>
+            <strong>Biwekson & Friends</strong> • 
+            <a id="tiktok-link" href="#" target="_blank">TikTok</a> • 
+            <a id="instagram-link" href="#" target="_blank">Instagram</a>
         </div>
-
-        <div class="update">
-            <strong id="update-label">Aktualizacja danych:</strong>
-            <span id="last-update">...</span>
+        <div id="disclaimer-text" style="margin: 10px 0; font-size: 11px; color: #777;"></div>
+        <div class="update" style="font-size: 12px;">
+            <span id="update-label">Aktualizacja:</span> <span id="last-update">...</span>
         </div>
-
-        <div style="margin-top: 15px;">
-            <span id="lang-label">🌍 Język:</span>
-            <button id="lang-pl" style="padding: 5px 15px; cursor: pointer;">PL</button>
-            <button id="lang-en" style="padding: 5px 15px; cursor: pointer;">EN</button>
+        <div class="lang-switch" style="margin-top: 15px;">
+            <button id="lang-pl" class="lang-btn active">PL</button>
+            <button id="lang-en" class="lang-btn">EN</button>
         </div>
     </div>
-
     <div class="top-right">
-        <a href="https://www.tiktok.com/@biwekson/video/7619650676280364320" target="_blank">
-            <img src="logo_biwekson.jpg" alt="logo">
-        </a>
+        <img src="logo_biwekson.jpg" alt="logo">
     </div>
 </div>
 
 <div class="filters">
-    <label><span id="filter-sklep-label">Sklep:</span> <select id="filter-sklep" multiple></select></label>
-    <label><span id="filter-sezon-label">Sezon:</span> <select id="filter-sezon" multiple></select></label>
-    <label><span id="filter-team-label">Team:</span> <select id="filter-team" multiple></select></label>
-    <label><span id="filter-producent-label">Producent:</span> <select id="filter-producent" multiple></select></label>
-    <label><span id="filter-typboxa-label">Typ boxa:</span> <select id="filter-typboxa" multiple></select></label>
+    <label><span id="filter-sklep-label">Sklep</span><br><select id="filter-sklep" multiple></select></label>
+    <label><span id="filter-sezon-label">Sezon</span><br><select id="filter-sezon" multiple></select></label>
+    <label><span id="filter-team-label">Team</span><br><select id="filter-team" multiple></select></label>
+    <label><span id="filter-producent-label">Marka</span><br><select id="filter-producent" multiple></select></label>
+    <label><span id="filter-typboxa-label">Typ</span><br><select id="filter-typboxa" multiple></select></label>
 </div>
 
 <div class="table-container">
-    <table id="produkty" class="display" style="width:100%">
+    <table id="produkty" class="display stripe" style="width:100%">
         <thead>
             <tr id="table-headers">
                 <th>Produkt</th>
                 <th>Cena</th>
-                <th>Waluta</th>
+                <th>CCY</th>
                 <th>Sklep</th>
                 <th>Sezon</th>
-                <th>Producent</th>
-                <th>Typ karty</th>
-                <th>Typ boxa</th>
+                <th>Marka</th>
+                <th>Karta</th>
+                <th>Typ</th>
                 <th>Team</th>
-                <th>Cena box (PLN)</th>
+                <th>Cena (PLN)</th>
             </tr>
         </thead>
         <tbody></tbody>
@@ -187,53 +166,30 @@
 
 <script>
 $(document).ready(function() {
-
     const translations = {
         PL: {
             ui: {
-                pageTitle: "Boxy – Tabela produktów",
-                mainHeading: "📦 Porównanie cen boxów z kartami piłkarskimi",
-                ratesLabel: "Orientacyjne kursy walut:",
-                updateLabel: "Aktualizacja danych:",
-                langLabel: "🌍 Język:",
-                noInfo: "brak informacji",
-                disclaimer: "To jest projekt niekomercyjny. Jeśli widzisz bugi – napisz na TikToka. Nie wspieram żadnego sklepu, ani żaden sklep nie wspiera mnie.",
-                filters: {
-                    sklep: "Sklep:", sezon: "Sezon:", team: "Team:", producent: "Producent:", typBoxa: "Typ boxa:", placeholder: "Wybierz..."
-                },
-                tableHeaders: ["Produkt", "Cena", "Waluta", "Sklep", "Sezon", "Producent", "Typ karty", "Typ boxa", "Team", "Cena box (PLN)"]
+                mainHeading: "📦 Porównanie cen boxów",
+                ratesLabel: "Kursy walut:",
+                updateLabel: "Aktualizacja:",
+                noInfo: "brak danych",
+                disclaimer: "Projekt niekomercyjny. Nie wspieram żadnego sklepu.",
+                filters: { sklep: "Sklep:", sezon: "Sezon:", team: "Team:", producent: "Marka:", typBoxa: "Typ:", placeholder: "Wszystkie" },
+                tableHeaders: ["Produkt", "Cena", "CCY", "Sklep", "Sezon", "Marka", "Karta", "Typ", "Team", "Cena (PLN)"]
             },
-            dt: {
-                lengthMenu: "Pokaż _MENU_ boxów",
-                info: "Pokazuję od _START_ do _END_ z _TOTAL_ boxów",
-                infoEmpty: "Brak boxów",
-                zeroRecords: "Brak wyników",
-                search: "Szukaj:",
-                paginate: { first: "Pierwsza", last: "Ostatnia", next: "Następna", previous: "Poprzednia" }
-            }
+            dt: { search: "Szukaj:", lengthMenu: "_MENU_", info: "_START_-_END_ z _TOTAL_", paginate: { next: "→", previous: "←" } }
         },
         EN: {
             ui: {
-                pageTitle: "Boxes – Product Table",
-                mainHeading: "📦 Football Card Boxes Price Comparison",
-                ratesLabel: "Estimated Exchange Rates:",
-                updateLabel: "Data Update:",
-                langLabel: "🌍 Language:",
-                noInfo: "no information",
-                disclaimer: "This is a non-commercial project. If you see any bugs – message me on TikTok. I do not endorse any store, nor does any store endorse me.",
-                filters: {
-                    sklep: "Store:", sezon: "Season:", team: "Team:", producent: "Manufacturer:", typBoxa: "Box Type:", placeholder: "Select..."
-                },
-                tableHeaders: ["Product", "Price", "Currency", "Store", "Season", "Manufacturer", "Card Type", "Box Type", "Team", "Box Price (PLN)"]
+                mainHeading: "📦 Card Box Price Comparison",
+                ratesLabel: "Exchange Rates:",
+                updateLabel: "Updated:",
+                noInfo: "no data",
+                disclaimer: "Non-commercial project. No store endorsements.",
+                filters: { sklep: "Store:", sezon: "Season:", team: "Team:", producent: "Brand:", typBoxa: "Type:", placeholder: "All" },
+                tableHeaders: ["Product", "Price", "CCY", "Store", "Season", "Brand", "Card", "Type", "Team", "Price (PLN)"]
             },
-            dt: {
-                lengthMenu: "Show _MENU_ boxes",
-                info: "Showing _START_ to _END_ of _TOTAL_ boxes",
-                infoEmpty: "No boxes available",
-                zeroRecords: "No results found",
-                search: "Search:",
-                paginate: { first: "First", last: "Last", next: "Next", previous: "Previous" }
-            }
+            dt: { search: "Search:", lengthMenu: "_MENU_", info: "_START_-_END_ of _TOTAL_", paginate: { next: "Next", previous: "Prev" } }
         }
     };
 
@@ -242,14 +198,10 @@ $(document).ready(function() {
 
     function updateUI(lang) {
         const ui = translations[lang].ui;
-
-        document.getElementById('page-title').innerText = ui.pageTitle;
         document.getElementById('main-heading').innerText = ui.mainHeading;
         document.getElementById('rates-label').innerText = ui.ratesLabel;
         document.getElementById('update-label').innerText = ui.updateLabel;
-        document.getElementById('lang-label').innerText = ui.langLabel;
         document.getElementById('disclaimer-text').innerText = ui.disclaimer;
-
         document.getElementById('filter-sklep-label').innerText = ui.filters.sklep;
         document.getElementById('filter-sezon-label').innerText = ui.filters.sezon;
         document.getElementById('filter-team-label').innerText = ui.filters.team;
@@ -259,31 +211,26 @@ $(document).ready(function() {
         const ths = document.querySelectorAll('#table-headers th');
         ui.tableHeaders.forEach((text, index) => { if (ths[index]) ths[index].innerText = text; });
 
-        const lastUpdateElem = document.getElementById('last-update');
-        if (globalUpdateDate) {
-            const locale = lang === 'PL' ? "pl-PL" : "en-GB";
-            lastUpdateElem.innerText = globalUpdateDate.toLocaleString(locale, { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: false });
-        } else { lastUpdateElem.innerText = ui.noInfo; }
-
-        $("#filter-sklep, #filter-sezon, #filter-team, #filter-producent, #filter-typboxa").select2({ placeholder: ui.filters.placeholder, allowClear: true });
+        $('.lang-btn').removeClass('active');
+        $(`#lang-${lang.toLowerCase()}`).addClass('active');
 
         initTable(lang);
     }
 
     function initTable(lang) {
-        if ($.fn.DataTable.isDataTable('#produkty')) { 
-            // Zapisujemy obecne filtry przed przeładowaniem
-            table.destroy(); 
-        }
-
+        if ($.fn.DataTable.isDataTable('#produkty')) { table.destroy(); }
         table = $('#produkty').DataTable({
             pageLength: 25,
-            deferRender: true,
-            processing: true,
-            fixedHeader: true,
             scrollX: true,
-            autoWidth: false, // Korzystamy z min-width z CSS
-            language: translations[lang].dt
+            autoWidth: false,
+            fixedHeader: true,
+            language: translations[lang].dt,
+            columnDefs: [
+                { targets: 0, className: 'col-prod' },
+                { targets: [1, 2], className: 'col-small' },
+                { targets: 5, className: 'col-brand' },
+                { targets: 9, className: 'col-last' }
+            ]
         });
     }
 
@@ -292,10 +239,10 @@ $(document).ready(function() {
         complete: function(results) {
             const config = {};
             results.data.forEach(row => { if(row[0] && row[1]) config[row[0]] = row[1].trim(); });
-            document.getElementById("eurpln").innerText = config.EUR ? config.EUR.replace(",", ".") : "0";
-            document.getElementById("usdpln").innerText = config.USD ? config.USD.replace(",", ".") : "0";
-            const gbpText = config.GB_Tax ? config.GB_Tax.replace(",", ".") : "0";
-            document.getElementById("gbptax").innerText = (parseFloat(gbpText) * 100).toFixed(0) + "%";
+            document.getElementById("eurpln").innerText = config.EUR || "...";
+            document.getElementById("usdpln").innerText = config.USD || "...";
+            const gbpText = config.GB_Tax || "0";
+            document.getElementById("gbptax").innerText = (parseFloat(gbpText.replace(",", ".")) * 100).toFixed(0) + "%";
             if(config.TIKTOK_LINK) document.getElementById("tiktok-link").href = config.TIKTOK_LINK;
             if(config.INSTAGRAM_LINK) document.getElementById("instagram-link").href = config.INSTAGRAM_LINK;
             if(config.OSTATNIE_URUCHOMIENIE) {
@@ -309,42 +256,37 @@ $(document).ready(function() {
         download: true, header: true, delimiter: ";",
         complete: function(results) {
             results.data.forEach(function(row) {
-                if (!row.Produkt || row.Produkt.trim() === "") return;
-                let cenaRaw = row.cena_box_PLN ? row.cena_box_PLN.replace(",", ".") : "0";
-                let cenaNumeric = parseFloat(cenaRaw) || 0;
+                if (!row.Produkt) return;
+                let cenaNum = parseFloat(row.cena_box_PLN?.replace(",", ".")) || 0;
                 $('#produkty tbody').append(`
                     <tr>
-                        <td>${row.Produkt}</td><td>${row.Box}</td><td>${row.Waluta}</td><td>${row.Sklep}</td><td>${row.Sezon}</td><td>${row.Producent}</td><td>${row["Typ karty"] || ""}</td><td>${row["Typ boxa"] || ""}</td><td>${row.Team || ""}</td><td data-order="${cenaNumeric}">${cenaNumeric.toFixed(2).replace(".", ",")}</td>
+                        <td>${row.Produkt}</td><td>${row.Box}</td><td>${row.Waluta}</td><td>${row.Sklep}</td><td>${row.Sezon}</td><td>${row.Producent}</td><td>${row["Typ karty"] || ""}</td><td>${row["Typ boxa"] || ""}</td><td>${row.Team || ""}</td><td data-order="${cenaNum}">${cenaNum.toFixed(2).replace(".", ",")}</td>
                     </tr>
                 `);
             });
-            updateUI('PL'); 
+            updateUI('PL');
             $('#lang-pl').on('click', function() { updateUI('PL'); });
             $('#lang-en').on('click', function() { updateUI('EN'); });
-
-            function fillFilter(columnIndex, selectId, reverse=false) {
-                var column = table.column(columnIndex);
-                var select = $(selectId);
-                let dataArray = [...new Set(column.data().toArray().filter(d => d && d.trim() !== ""))];
-                dataArray.sort((a, b) => a.localeCompare(b, 'pl'));
-                if(reverse) dataArray.reverse();
-                select.empty();
-                dataArray.forEach(d => select.append(new Option(d, d)));
-                select.on('change', function() {
-                    var values = $(this).val();
-                    if (!values) { column.search("").draw(); return; }
-                    var regex = values.map(v => '^' + v.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '$').join('|');
-                    column.search(regex, true, false).draw();
-                });
-            }
-
-            fillFilter(3, '#filter-sklep');      
-            fillFilter(4, '#filter-sezon', true); 
-            fillFilter(8, '#filter-team');        
-            fillFilter(5, '#filter-producent', true); 
-            fillFilter(7, '#filter-typboxa');     
+            
+            // Re-inicjalizacja filtrów
+            ['#filter-sklep', '#filter-sezon', '#filter-team', '#filter-producent', '#filter-typboxa'].forEach((id, idx) => {
+                const colIdx = [3, 4, 8, 5, 7][idx];
+                fillFilter(colIdx, id);
+            });
         }
     });
+
+    function fillFilter(columnIndex, selectId) {
+        let column = table.column(columnIndex);
+        let data = [...new Set(column.data().toArray())].filter(x => x).sort();
+        $(selectId).empty().append(new Option("", ""));
+        data.forEach(d => $(selectId).append(new Option(d, d)));
+        $(selectId).select2({ width: '180px', allowClear: true, placeholder: "Wszystkie" });
+        $(selectId).on('change', function() {
+            let val = $(this).val();
+            column.search(val ? '^' + val.join('$|^') + '$' : '', true, false).draw();
+        });
+    }
 });
 </script>
 
