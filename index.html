@@ -50,19 +50,49 @@
             box-shadow: 0 2px 6px rgba(0,0,0,0.1);
         }
 
-        .top-left { flex: 1.5; }
+        .top-left {
+            flex: 1.5;
+        }
 
-        .top-left h1 { margin-top: 0; color: #005bbb; }
+        .top-left h1 {
+            margin-top: 0;
+            color: #005bbb;
+        }
 
-        .rates, .creator, .update { margin-bottom: 10px; }
+        .rates {
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
 
-        .top-right { flex: 1; display: flex; justify-content: center; align-items: center; }
+        .creator {
+            font-size: 14px;
+            margin-bottom: 10px;
+            line-height: 1.4;
+        }
+
+        .update {
+            font-size: 13px;
+            color: #444;
+        }
+
+        .top-right {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
 
         .top-right img {
-            width: 220px; height: 220px; object-fit: cover;
-            border-radius: 20px; transition: 0.2s;
+            width: 220px;
+            height: 220px;
+            object-fit: cover;
+            border-radius: 20px;
+            transition: 0.2s;
         }
-        .top-right img:hover { transform: scale(1.08); }
+
+        .top-right img:hover {
+            transform: scale(1.08);
+        }
 
         .filters {
             margin-bottom: 20px;
@@ -72,34 +102,61 @@
             max-width: 1200px;
             width: 100%;
             box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-            display: flex;
-            flex-wrap: wrap;
-            gap: 15px;
         }
 
-        .filters label {
-            display: flex;
-            flex-direction: column;
+        table {
             font-size: 14px;
+            max-width: 1200px;
+            width: 100%;
         }
 
-        #filter-sklep + .select2-container,
-        #filter-team + .select2-container { width: 260px !important; }
+        table.dataTable thead th {
+            background: #005bbb;
+            color: white;
+        }
 
-        #filter-sezon + .select2-container,
-        #filter-producent + .select2-container,
-        #filter-typboxa + .select2-container { width: 160px !important; }
-
-        table { font-size: 14px; max-width: 1200px; width: 100%; }
-
-        table.dataTable thead th { background: #005bbb; color: white; }
-
-        .select2-container { min-width: 170px; }
+        .select2-container {
+            min-width: 170px;
+        }
 
         @media (max-width: 768px) {
-            .top-section { flex-direction: column; gap: 20px; }
-            .top-right img { width: 150px; height: 150px; }
+            .top-section {
+                flex-direction: column;
+                gap: 20px;
+            }
+            .top-right img {
+                width: 150px;
+                height: 150px;
+            }
         }
+/* kontener filtrów */
+.filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+/* każdy filtr jako blok */
+.filters label {
+    display: flex;
+    flex-direction: column;
+    font-size: 14px;
+}
+
+/* 🔥 SZEROKIE */
+#filter-sklep + .select2-container,
+#filter-team + .select2-container {
+    width: 260px !important;
+}
+
+/* 🔥 WĄSKIE */
+#filter-sezon + .select2-container,
+#filter-producent + .select2-container,
+#filter-typboxa + .select2-container {
+    width: 160px !important;
+}
+
+
     </style>
 </head>
 
@@ -108,15 +165,10 @@
 <div class="top-section">
 
     <div class="top-left">
-        <h1 data-lang-pl="📦 Porównanie cen boxów z kartami piłkarskimi"
-            data-lang-en="📦 Football Card Box Price Comparison">
-            📦 Porównanie cen boxów z kartami piłkarskimi
-        </h1>
+        <h1>📦 Porównanie cen boxów z kartami piłkarskimi</h1>
 
         <div class="rates">
-            <strong data-lang-pl="Orientacyjne kursy walut:" data-lang-en="Exchange rates (approx.):">
-                Orientacyjne kursy walut:
-            </strong><br>
+            <strong>Orientacyjne kursy walut:</strong><br>
             EUR/PLN: <span id="eurpln">ładowanie...</span> |
             USD/PLN: <span id="usdpln">ładowanie...</span> |
             UK Tax: <span id="gbptax">ładowanie...</span>
@@ -129,15 +181,15 @@
         </div>
 
         <div class="update">
-            <strong data-lang-pl="Aktualizacja danych:" data-lang-en="Last update:">Aktualizacja danych:</strong>
+            <strong>Aktualizacja danych:</strong>
             <span id="last-update">ładowanie...</span>
         </div>
+	<div style="margin-top: 10px;">
+    	🌍 Język:
+   	 <button id="lang-pl">PL</button>
+    	<button id="lang-en">EN</button>
+</div>
 
-        <div style="margin-top: 10px;">
-            🌍 <span data-lang-pl="Język:" data-lang-en="Language:">Język:</span>
-            <button id="lang-pl">PL</button>
-            <button id="lang-en">EN</button>
-        </div>
     </div>
 
     <div class="top-right">
@@ -149,26 +201,26 @@
 </div>
 
 <div class="filters">
-    <label data-lang-pl="Sklep:" data-lang-en="Shop:">Sklep: <select id="filter-sklep" multiple></select></label>
-    <label data-lang-pl="Sezon:" data-lang-en="Season:">Sezon: <select id="filter-sezon" multiple></select></label>
-    <label data-lang-pl="Team:" data-lang-en="Team:">Team: <select id="filter-team" multiple></select></label>
-    <label data-lang-pl="Producent:" data-lang-en="Manufacturer:">Producent: <select id="filter-producent" multiple></select></label>
-    <label data-lang-pl="Typ boxa:" data-lang-en="Box type:">Typ boxa: <select id="filter-typboxa" multiple></select></label>
+    <label>Sklep: <select id="filter-sklep" multiple></select></label>
+    <label>Sezon: <select id="filter-sezon" multiple></select></label>
+    <label>Team: <select id="filter-team" multiple></select></label>
+    <label>Producent: <select id="filter-producent" multiple></select></label>
+    <label>Typ boxa: <select id="filter-typboxa" multiple></select></label>
 </div>
 
 <table id="produkty" class="display">
     <thead>
         <tr>
-            <th data-lang-pl="Produkt" data-lang-en="Product">Produkt</th>
-            <th data-lang-pl="Box" data-lang-en="Box">Box</th>
-            <th data-lang-pl="Sklep" data-lang-en="Shop">Sklep</th>
-            <th data-lang-pl="Waluta" data-lang-en="Currency">Waluta</th>
-            <th data-lang-pl="Sezon" data-lang-en="Season">Sezon</th>
-            <th data-lang-pl="Producent" data-lang-en="Manufacturer">Producent</th>
-            <th data-lang-pl="Typ karty" data-lang-en="Card type">Typ karty</th>
-            <th data-lang-pl="Typ boxa" data-lang-en="Box type">Typ boxa</th>
-            <th data-lang-pl="Team" data-lang-en="Team">Team</th>
-            <th data-lang-pl="Cena box (PLN)" data-lang-en="Box price (PLN)">Cena box (PLN)</th>
+            <th>Produkt</th>
+            <th>Box</th>
+            <th>Sklep</th>
+            <th>Waluta</th>
+            <th>Sezon</th>
+            <th>Producent</th>
+            <th>Typ karty</th>
+            <th>Typ boxa</th>
+            <th>Team</th>
+            <th>Cena box (PLN)</th>
         </tr>
     </thead>
     <tbody></tbody>
@@ -177,6 +229,7 @@
 <script>
 $(document).ready(function() {
 
+    // 🔹 1️⃣ Tłumaczenia
     const translations = {
         PL: {
             lengthMenu: "Pokaż _MENU_ boxów",
@@ -188,8 +241,7 @@ $(document).ready(function() {
             first: "Pierwsza",
             last: "Ostatnia",
             next: "Następna",
-            previous: "Poprzednia",
-            selectPlaceholder: "Wybierz..."
+            previous: "Poprzednia"
         },
         EN: {
             lengthMenu: "Show _MENU_ boxes",
@@ -201,15 +253,18 @@ $(document).ready(function() {
             first: "First",
             last: "Last",
             next: "Next",
-            previous: "Previous",
-            selectPlaceholder: "Select..."
+            previous: "Previous"
         }
     };
 
+    // 🔹 2️⃣ Zmienna globalna dla tabeli
     let table;
 
+    // 🔹 3️⃣ Funkcja inicjalizująca DataTable w wybranym języku
     function initTable(lang) {
-        if ($.fn.DataTable.isDataTable('#produkty')) { table.destroy(); }
+        if ($.fn.DataTable.isDataTable('#produkty')) {
+            table.destroy();
+        }
 
         table = $('#produkty').DataTable({
             pageLength: 25,
@@ -232,107 +287,144 @@ $(document).ready(function() {
                 }
             }
         });
-
-        ["#filter-sklep","#filter-sezon","#filter-team","#filter-producent","#filter-typboxa"].forEach(id=>{
-            const select = $(id);
-            select.select2({
-                placeholder: translations[lang].selectPlaceholder,
-                allowClear: true,
-                data: select.find("option").map(function(){ return {id: this.value, text: this.text}; }).get()
-            });
-        });
-
-        $("[data-lang-pl]").each(function(){
-            const plText = $(this).attr("data-lang-pl");
-            const enText = $(this).attr("data-lang-en");
-            $(this).text(lang==="PL"?plText:enText);
-        });
     }
 
-    Papa.parse("config.csv", { download: true, header: false, delimiter: ";", skipEmptyLines: true,
+    // 🔹 4️⃣ Wczytanie config.csv
+    Papa.parse("config.csv", {
+        download: true,
+        header: false,
+        delimiter: ";",
+        skipEmptyLines: true,
         complete: function(results) {
             const config = {};
-            results.data.forEach(row => { if(row[0] && row[1]) config[row[0]] = row[1].trim(); });
+            results.data.forEach(row => {
+                if(row[0] && row[1]) config[row[0]] = row[1].trim();
+            });
 
-            document.getElementById("eurpln").innerText = config.EUR.replace(",", ".");
-            document.getElementById("usdpln").innerText = config.USD.replace(",", ".");
-            document.getElementById("gbptax").innerText = (parseFloat(config.GB_Tax.replace(",", "."))*100).toFixed(0)+"%";
+            // kursy walut i podatek
+            const eur = config.EUR.replace(",", ".");
+            const usd = config.USD.replace(",", ".");
+            const gbp = (parseFloat(config.GB_Tax.replace(",", ".")) * 100).toFixed(0) + "%";
 
+            document.getElementById("eurpln").innerText = eur;
+            document.getElementById("usdpln").innerText = usd;
+            document.getElementById("gbptax").innerText = gbp;
+
+            // linki do social media
             if(config.TIKTOK_LINK) document.getElementById("tiktok-link").href = config.TIKTOK_LINK;
             if(config.INSTAGRAM_LINK) document.getElementById("instagram-link").href = config.INSTAGRAM_LINK;
 
-            if(config.OSTATNIE_URUCHOMIENIE){
-                const excelDate=parseFloat(config.OSTATNIE_URUCHOMIENIE.replace(",","."));
-                const jsDate=new Date((excelDate-25569)*86400*1000);
-                const options={day:"2-digit",month:"2-digit",year:"numeric",hour:"2-digit",minute:"2-digit",second:"2-digit",hour12:false,timeZone:"Europe/Warsaw"};
-                document.getElementById("last-update").innerText = jsDate.toLocaleString("pl-PL",options);
-            } else { document.getElementById("last-update").innerText = "brak informacji"; }
-
-            if(config.OPIS){
-                const opisElem=document.createElement("p");
-                opisElem.innerText=config.OPIS;
+            // opis
+            if(config.OPIS) {
+                const opisElem = document.createElement("p");
+                opisElem.innerText = config.OPIS;
                 document.querySelector(".creator").appendChild(opisElem);
+            }
+
+            // data ostatniego uruchomienia (Excel date float)
+            if(config.OSTATNIE_URUCHOMIENIE) {
+                const excelDate = parseFloat(config.OSTATNIE_URUCHOMIENIE.replace(",", "."));
+                const jsDate = new Date((excelDate - 25569) * 86400 * 1000);
+
+                const options = { 
+                    day: "2-digit", month: "2-digit", year: "numeric",
+                    hour: "2-digit", minute: "2-digit", second: "2-digit",
+                    hour12: false,
+                    timeZone: "Europe/Warsaw"
+                };
+
+                document.getElementById("last-update").innerText = jsDate.toLocaleString("pl-PL", options);
+
+            } else {
+                document.getElementById("last-update").innerText = "brak informacji";
             }
         }
     });
 
-    Papa.parse("export.csv",{download:true,header:true,delimiter:";", complete:function(results){
-        var data=results.data;
+    // 🔹 5️⃣ Wczytanie danych CSV z produktami
+    Papa.parse("export.csv", {
+        download: true,
+        header: true,
+        delimiter: ";",
+        complete: function(results) {
+            var data = results.data;
 
-        data.forEach(function(row){
-            if(!row.Produkt || row.Produkt.trim()==="") return;
+            data.forEach(function(row) {
+                if (!row.Produkt || row.Produkt.trim() === "") return;
 
-            let cena=row.cena_box_PLN ? row.cena_box_PLN.replace(",","."):"0";
-            cena=parseFloat(cena).toFixed(2).replace(".",",");
+                let cena = row.cena_box_PLN ? row.cena_box_PLN.replace(",", ".") : "0";
+                cena = parseFloat(cena).toFixed(2).replace(".", ",");
 
-            $('#produkty tbody').append(`
-                <tr>
-                    <td>${row.Produkt}</td>
-                    <td>${row.Box}</td>
-                    <td>${row.Sklep}</td>
-                    <td>${row.Waluta}</td>
-                    <td>${row.Sezon}</td>
-                    <td>${row.Producent}</td>
-                    <td>${row["Typ karty"]}</td>
-                    <td>${row["Typ boxa"]}</td>
-                    <td>${row.Team}</td>
-                    <td>${cena}</td>
-                </tr>
-            `);
-        });
-
-        initTable('PL');
-
-        $('#lang-pl').on('click', function(){ initTable('PL'); });
-        $('#lang-en').on('click', function(){ initTable('EN'); });
-
-        function fillFilter(columnIndex, selectId, reverse=false){
-            var column=table.column(columnIndex);
-            var select=$(selectId);
-
-            let dataArray=column.data().toArray();
-            dataArray=dataArray.filter(d=>d&&d.trim()!=="");
-            dataArray=[...new Set(dataArray)];
-            dataArray.sort((a,b)=>a.localeCompare(b,'pl'));
-            if(reverse) dataArray.reverse();
-
-            select.empty();
-            dataArray.forEach(d=>{ select.append(new Option(d,d)); });
-
-            select.on('change', function(){
-                var values=$(this).val();
-                if(!values||values.length===0){ column.search("").draw(); return; }
-                var regex=values.map(v=>v.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')).join('|');
-                column.search(regex,true,false).draw();
+                $('#produkty tbody').append(`
+                    <tr>
+                        <td>${row.Produkt}</td>
+                        <td>${row.Box}</td>
+                        <td>${row.Sklep}</td>
+                        <td>${row.Waluta}</td>
+                        <td>${row.Sezon}</td>
+                        <td>${row.Producent}</td>
+                        <td>${row["Typ karty"]}</td>
+                        <td>${row["Typ boxa"]}</td>
+                        <td>${row.Team}</td>
+                        <td>${cena}</td>
+                    </tr>
+                `);
             });
-        }
 
-        fillFilter(2,'#filter-sklep');
-        fillFilter(4,'#filter-sezon',true);
-        fillFilter(8,'#filter-team');
-        fillFilter(5,'#filter-producent',true);
-        fillFilter(7,'#filter-typboxa');
-    }});
+            // 🔹 6️⃣ Uruchomienie tabeli po wczytaniu danych
+            initTable('PL'); // startowy język
+
+            // 🔹 7️⃣ Eventy przycisków językowych
+            $('#lang-pl').on('click', function() {
+                initTable('PL');
+            });
+
+            $('#lang-en').on('click', function() {
+                initTable('EN');
+            });
+
+            // 🔹 8️⃣ Inicjalizacja Select2
+            $("#filter-sklep, #filter-sezon, #filter-team, #filter-producent, #filter-typboxa").select2({
+                placeholder: "Wybierz...",
+                allowClear: true
+            });
+
+            // 🔹 9️⃣ Funkcja uzupełniająca filtry
+            function fillFilter(columnIndex, selectId, reverse=false) {
+                var column = table.column(columnIndex);
+                var select = $(selectId);
+
+                let dataArray = column.data().toArray();
+                dataArray = dataArray.filter(d => d && d.trim() !== "");
+                dataArray = [...new Set(dataArray)];
+                dataArray.sort((a, b) => a.localeCompare(b, 'pl'));
+                if(reverse) dataArray.reverse();
+
+                select.empty();
+                dataArray.forEach(function(d) {
+                    select.append(new Option(d, d));
+                });
+
+                select.on('change', function() {
+                    var values = $(this).val();
+                    if (!values || values.length === 0) {
+                        column.search("").draw();
+                        return;
+                    }
+                    var regex = values.map(v => v.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|');
+                    column.search(regex, true, false).draw();
+                });
+            }
+
+            // 🔹 10️⃣ Wypełnienie filtrów
+            fillFilter(2, '#filter-sklep');
+            fillFilter(4, '#filter-sezon', true);
+            fillFilter(8, '#filter-team');
+            fillFilter(5, '#filter-producent', true);
+            fillFilter(7, '#filter-typboxa');
+        }
+    });
+
 });
 </script>
 
