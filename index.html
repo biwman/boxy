@@ -2,28 +2,24 @@
 <html lang="pl">
 <head>
     <meta charset="UTF-8">
-    <title>Boxy – Tabela produktów</title>
+    <title id="page-title">Boxy – Tabela produktów</title>
 
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <!-- DataTables CSS -->
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/fixedheader/3.4.0/css/fixedHeader.dataTables.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.5.0/css/responsive.dataTables.min.css">
 
-    <!-- Select2 -->
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 
-    <!-- jQuery -->
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 
-    <!-- DataTables JS -->
     <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/fixedheader/3.4.0/js/dataTables.fixedHeader.min.js"></script>
+    <script src="https://cdn.datatables.net/responsive/2.5.0/js/dataTables.responsive.min.js"></script>
 
-    <!-- Select2 JS -->
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
-    <!-- PapaParse -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
 
     <style>
@@ -48,6 +44,7 @@
             max-width: 1200px;
             width: 100%;
             box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+            box-sizing: border-box;
         }
 
         .top-left {
@@ -105,6 +102,7 @@
             display: flex;
             flex-wrap: wrap;
             gap: 15px;
+            box-sizing: border-box;
         }
 
         .filters label {
@@ -143,6 +141,7 @@
             .top-section {
                 flex-direction: column;
                 gap: 20px;
+                padding: 20px;
             }
             .top-right img {
                 width: 150px;
@@ -157,13 +156,13 @@
 <div class="top-section">
 
     <div class="top-left">
-        <h1>📦 Porównanie cen boxów z kartami piłkarskimi</h1>
+        <h1 id="main-heading">📦 Porównanie cen boxów z kartami piłkarskimi</h1>
 
         <div class="rates">
-            <strong>Orientacyjne kursy walut:</strong><br>
-            EUR/PLN: <span id="eurpln">ładowanie...</span> |
-            USD/PLN: <span id="usdpln">ładowanie...</span> |
-            UK Tax: <span id="gbptax">ładowanie...</span>
+            <strong id="rates-label">Orientacyjne kursy walut:</strong><br>
+            EUR/PLN: <span id="eurpln">...</span> |
+            USD/PLN: <span id="usdpln">...</span> |
+            UK Tax: <span id="gbptax">...</span>
         </div>
 
         <div class="creator">
@@ -173,12 +172,12 @@
         </div>
 
         <div class="update">
-            <strong>Aktualizacja danych:</strong>
-            <span id="last-update">ładowanie...</span>
+            <strong id="update-label">Aktualizacja danych:</strong>
+            <span id="last-update">...</span>
         </div>
 
         <div style="margin-top: 10px;">
-            🌍 Język:
+            <span id="lang-label">🌍 Język:</span>
             <button id="lang-pl">PL</button>
             <button id="lang-en">EN</button>
         </div>
@@ -194,16 +193,16 @@
 </div>
 
 <div class="filters">
-    <label>Sklep: <select id="filter-sklep" multiple></select></label>
-    <label>Sezon: <select id="filter-sezon" multiple></select></label>
-    <label>Team: <select id="filter-team" multiple></select></label>
-    <label>Producent: <select id="filter-producent" multiple></select></label>
-    <label>Typ boxa: <select id="filter-typboxa" multiple></select></label>
+    <label><span id="filter-sklep-label">Sklep:</span> <select id="filter-sklep" multiple></select></label>
+    <label><span id="filter-sezon-label">Sezon:</span> <select id="filter-sezon" multiple></select></label>
+    <label><span id="filter-team-label">Team:</span> <select id="filter-team" multiple></select></label>
+    <label><span id="filter-producent-label">Producent:</span> <select id="filter-producent" multiple></select></label>
+    <label><span id="filter-typboxa-label">Typ boxa:</span> <select id="filter-typboxa" multiple></select></label>
 </div>
 
-<table id="produkty" class="display">
+<table id="produkty" class="display responsive nowrap" style="width:100%">
     <thead>
-        <tr>
+        <tr id="table-headers">
             <th>Produkt</th>
             <th>Cena</th>
             <th>Waluta</th>
@@ -222,38 +221,120 @@
 <script>
 $(document).ready(function() {
 
-    // 🔹 1️⃣ Tłumaczenia
+    // 🔹 1️⃣ Rozbudowane tłumaczenia UI oraz DataTables
     const translations = {
         PL: {
-            lengthMenu: "Pokaż _MENU_ boxów",
-            info: "Pokazuję od _START_ do _END_ z _TOTAL_ boxów",
-            infoEmpty: "Brak boxów do wyświetlenia",
-            infoFiltered: "(przefiltrowano z _MAX_ wszystkich boxów)",
-            zeroRecords: "Brak wyników",
-            search: "Szukaj:",
-            first: "Pierwsza",
-            last: "Ostatnia",
-            next: "Następna",
-            previous: "Poprzednia"
+            ui: {
+                pageTitle: "Boxy – Tabela produktów",
+                mainHeading: "📦 Porównanie cen boxów z kartami piłkarskimi",
+                ratesLabel: "Orientacyjne kursy walut:",
+                updateLabel: "Aktualizacja danych:",
+                langLabel: "🌍 Język:",
+                loading: "ładowanie...",
+                noInfo: "brak informacji",
+                filters: {
+                    sklep: "Sklep:",
+                    sezon: "Sezon:",
+                    team: "Team:",
+                    producent: "Producent:",
+                    typBoxa: "Typ boxa:",
+                    placeholder: "Wybierz..."
+                },
+                tableHeaders: ["Produkt", "Cena", "Waluta", "Sklep", "Sezon", "Producent", "Typ karty", "Typ boxa", "Team", "Cena box (PLN)"]
+            },
+            dt: {
+                lengthMenu: "Pokaż _MENU_ boxów",
+                info: "Pokazuję od _START_ do _END_ z _TOTAL_ boxów",
+                infoEmpty: "Brak boxów do wyświetlenia",
+                infoFiltered: "(przefiltrowano z _MAX_ wszystkich boxów)",
+                zeroRecords: "Brak wyników",
+                search: "Szukaj:",
+                paginate: { first: "Pierwsza", last: "Ostatnia", next: "Następna", previous: "Poprzednia" }
+            }
         },
         EN: {
-            lengthMenu: "Show _MENU_ boxes",
-            info: "Showing _START_ to _END_ of _TOTAL_ boxes",
-            infoEmpty: "No boxes available",
-            infoFiltered: "(filtered from _MAX_ total boxes)",
-            zeroRecords: "No results found",
-            search: "Search:",
-            first: "First",
-            last: "Last",
-            next: "Next",
-            previous: "Previous"
+            ui: {
+                pageTitle: "Boxes – Product Table",
+                mainHeading: "📦 Football Card Boxes Price Comparison",
+                ratesLabel: "Estimated Exchange Rates:",
+                updateLabel: "Data Update:",
+                langLabel: "🌍 Language:",
+                loading: "loading...",
+                noInfo: "no information",
+                filters: {
+                    sklep: "Store:",
+                    sezon: "Season:",
+                    team: "Team:",
+                    producent: "Manufacturer:",
+                    typBoxa: "Box Type:",
+                    placeholder: "Select..."
+                },
+                tableHeaders: ["Product", "Price", "Currency", "Store", "Season", "Manufacturer", "Card Type", "Box Type", "Team", "Box Price (PLN)"]
+            },
+            dt: {
+                lengthMenu: "Show _MENU_ boxes",
+                info: "Showing _START_ to _END_ of _TOTAL_ boxes",
+                infoEmpty: "No boxes available",
+                infoFiltered: "(filtered from _MAX_ total boxes)",
+                zeroRecords: "No results found",
+                search: "Search:",
+                paginate: { first: "First", last: "Last", next: "Next", previous: "Previous" }
+            }
         }
     };
 
-    // 🔹 2️⃣ Zmienna globalna dla tabeli
     let table;
+    let globalUpdateDate = null;
 
-    // 🔹 3️⃣ Funkcja inicjalizująca DataTable w wybranym języku
+    // 🔹 2️⃣ Funkcja zmieniająca teksty w HTML i przeładowująca tabelę
+    function updateUI(lang) {
+        const ui = translations[lang].ui;
+
+        // Tłumaczenie tekstów statycznych
+        document.getElementById('page-title').innerText = ui.pageTitle;
+        document.getElementById('main-heading').innerText = ui.mainHeading;
+        document.getElementById('rates-label').innerText = ui.ratesLabel;
+        document.getElementById('update-label').innerText = ui.updateLabel;
+        document.getElementById('lang-label').innerText = ui.langLabel;
+
+        // Tłumaczenie etykiet filtrów
+        document.getElementById('filter-sklep-label').innerText = ui.filters.sklep;
+        document.getElementById('filter-sezon-label').innerText = ui.filters.sezon;
+        document.getElementById('filter-team-label').innerText = ui.filters.team;
+        document.getElementById('filter-producent-label').innerText = ui.filters.producent;
+        document.getElementById('filter-typboxa-label').innerText = ui.filters.typBoxa;
+
+        // Tłumaczenie nagłówków tabeli
+        const ths = document.querySelectorAll('#table-headers th');
+        ui.tableHeaders.forEach((text, index) => {
+            if (ths[index]) ths[index].innerText = text;
+        });
+
+        // Formatowanie daty zgodnie z językiem
+        const lastUpdateElem = document.getElementById('last-update');
+        if (globalUpdateDate) {
+            const options = { 
+                day: "2-digit", month: "2-digit", year: "numeric",
+                hour: "2-digit", minute: "2-digit", second: "2-digit",
+                hour12: false, timeZone: "Europe/Warsaw"
+            };
+            const locale = lang === 'PL' ? "pl-PL" : "en-GB";
+            lastUpdateElem.innerText = globalUpdateDate.toLocaleString(locale, options);
+        } else {
+            lastUpdateElem.innerText = ui.noInfo;
+        }
+
+        // Aktualizacja Select2 (aby odświeżyć placeholder)
+        $("#filter-sklep, #filter-sezon, #filter-team, #filter-producent, #filter-typboxa").select2({
+            placeholder: ui.filters.placeholder,
+            allowClear: true
+        });
+
+        // Na koniec ładujemy na nowo tabelę
+        initTable(lang);
+    }
+
+    // 🔹 3️⃣ Funkcja inicjalizująca DataTable
     function initTable(lang) {
         if ($.fn.DataTable.isDataTable('#produkty')) {
             table.destroy();
@@ -265,20 +346,7 @@ $(document).ready(function() {
             processing: true,
             fixedHeader: true,
             responsive: true,
-            language: {
-                lengthMenu: translations[lang].lengthMenu,
-                info: translations[lang].info,
-                infoEmpty: translations[lang].infoEmpty,
-                infoFiltered: translations[lang].infoFiltered,
-                zeroRecords: translations[lang].zeroRecords,
-                search: translations[lang].search,
-                paginate: {
-                    first: translations[lang].first,
-                    last: translations[lang].last,
-                    next: translations[lang].next,
-                    previous: translations[lang].previous
-                }
-            }
+            language: translations[lang].dt
         });
     }
 
@@ -294,9 +362,10 @@ $(document).ready(function() {
                 if(row[0] && row[1]) config[row[0]] = row[1].trim();
             });
 
-            const eur = config.EUR.replace(",", ".");
-            const usd = config.USD.replace(",", ".");
-            const gbp = (parseFloat(config.GB_Tax.replace(",", ".")) * 100).toFixed(0) + "%";
+            const eur = config.EUR ? config.EUR.replace(",", ".") : "0";
+            const usd = config.USD ? config.USD.replace(",", ".") : "0";
+            const gbpText = config.GB_Tax ? config.GB_Tax.replace(",", ".") : "0";
+            const gbp = (parseFloat(gbpText) * 100).toFixed(0) + "%";
 
             document.getElementById("eurpln").innerText = eur;
             document.getElementById("usdpln").innerText = usd;
@@ -311,20 +380,10 @@ $(document).ready(function() {
                 document.querySelector(".creator").appendChild(opisElem);
             }
 
+            // Przechwycenie daty do zmiennej globalnej, aby formatować ją w updateUI()
             if(config.OSTATNIE_URUCHOMIENIE) {
                 const excelDate = parseFloat(config.OSTATNIE_URUCHOMIENIE.replace(",", "."));
-                const jsDate = new Date((excelDate - 25569) * 86400 * 1000);
-
-                const options = { 
-                    day: "2-digit", month: "2-digit", year: "numeric",
-                    hour: "2-digit", minute: "2-digit", second: "2-digit",
-                    hour12: false,
-                    timeZone: "Europe/Warsaw"
-                };
-
-                document.getElementById("last-update").innerText = jsDate.toLocaleString("pl-PL", options);
-            } else {
-                document.getElementById("last-update").innerText = "brak informacji";
+                globalUpdateDate = new Date((excelDate - 25569) * 86400 * 1000);
             }
         }
     });
@@ -340,8 +399,10 @@ $(document).ready(function() {
             data.forEach(function(row) {
                 if (!row.Produkt || row.Produkt.trim() === "") return;
 
-                let cena = row.cena_box_PLN ? row.cena_box_PLN.replace(",", ".") : "0";
-                cena = parseFloat(cena).toFixed(2).replace(".", ",");
+                // Bezpieczne parsowanie liczby do atrybutu data-order
+                let cenaRaw = row.cena_box_PLN ? row.cena_box_PLN.replace(",", ".") : "0";
+                let cenaNumeric = parseFloat(cenaRaw) || 0;
+                let cenaFormatted = cenaNumeric.toFixed(2).replace(".", ",");
 
                 $('#produkty tbody').append(`
                     <tr>
@@ -351,28 +412,22 @@ $(document).ready(function() {
                         <td>${row.Sklep}</td>
                         <td>${row.Sezon}</td>
                         <td>${row.Producent}</td>
-                        <td>${row["Typ karty"]}</td>
-                        <td>${row["Typ boxa"]}</td>
-                        <td>${row.Team}</td>
-                        <td>${cena}</td>
+                        <td>${row["Typ karty"] || ""}</td>
+                        <td>${row["Typ boxa"] || ""}</td>
+                        <td>${row.Team || ""}</td>
+                        <td data-order="${cenaNumeric}">${cenaFormatted}</td>
                     </tr>
                 `);
             });
 
-            // 🔹 6️⃣ Uruchomienie tabeli po wczytaniu danych
-            initTable('PL'); 
+            // 🔹 6️⃣ Pierwsze uruchomienie po wczytaniu danych (domyślnie PL)
+            updateUI('PL'); 
 
             // 🔹 7️⃣ Eventy przycisków językowych
-            $('#lang-pl').on('click', function() { initTable('PL'); });
-            $('#lang-en').on('click', function() { initTable('EN'); });
+            $('#lang-pl').on('click', function() { updateUI('PL'); });
+            $('#lang-en').on('click', function() { updateUI('EN'); });
 
-            // 🔹 8️⃣ Inicjalizacja Select2
-            $("#filter-sklep, #filter-sezon, #filter-team, #filter-producent, #filter-typboxa").select2({
-                placeholder: "Wybierz...",
-                allowClear: true
-            });
-
-            // 🔹 9️⃣ Funkcja uzupełniająca filtry
+            // 🔹 8️⃣ Funkcja uzupełniająca filtry
             function fillFilter(columnIndex, selectId, reverse=false) {
                 var column = table.column(columnIndex);
                 var select = $(selectId);
@@ -385,7 +440,8 @@ $(document).ready(function() {
 
                 select.empty();
                 dataArray.forEach(function(d) {
-                    select.append(new Option(d, d));
+                    // Dodajemy opcje. Placeholdery dodawane są przez updateUI/Select2
+                    select.append(new Option(d, d, false, false));
                 });
 
                 select.on('change', function() {
@@ -394,12 +450,12 @@ $(document).ready(function() {
                         column.search("").draw();
                         return;
                     }
-                    var regex = values.map(v => v.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|');
+                    var regex = values.map(v => '^' + v.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '$').join('|');
                     column.search(regex, true, false).draw();
                 });
             }
 
-            // 🔹 10️⃣ Wypełnienie filtrów (zaktualizowane indeksy)
+            // 🔹 9️⃣ Wypełnienie filtrów
             fillFilter(3, '#filter-sklep');      
             fillFilter(4, '#filter-sezon', true); 
             fillFilter(8, '#filter-team');        
