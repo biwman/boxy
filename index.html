@@ -6,149 +6,86 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
-    <link rel="stylesheet" href="https://cdn.datatables.net/fixedheader/3.4.0/css/fixedHeader.dataTables.min.css">
-    <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.5.0/css/responsive.dataTables.min.css">
-
-    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
 
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
-    <script src="https://cdn.datatables.net/fixedheader/3.4.0/js/dataTables.fixedHeader.min.js"></script>
-    <script src="https://cdn.datatables.net/responsive/2.5.0/js/dataTables.responsive.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
 
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-            background: linear-gradient(135deg, #e3f2fd, #f7f9fc);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
+        body { font-family: sans-serif; margin: 20px; background: #f7f9fc; display: flex; flex-direction: column; align-items: center; }
+        
+        .top-section { 
+            display: flex; align-items: center; justify-content: space-between; gap: 20px; 
+            background: #fff; padding: 20px; border-radius: 12px; margin-bottom: 20px; 
+            max-width: 1300px; width: 100%; box-shadow: 0 2px 6px rgba(0,0,0,0.1); 
         }
 
-        .top-section {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 40px;
-            background: #ffffff;
-            padding: 25px 40px;
-            border-radius: 12px;
-            margin: 0 auto 20px auto;
-            max-width: 1200px;
-            width: 100%;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+        .filters { 
+            margin-bottom: 20px; background: #fff; padding: 15px; border-radius: 8px; 
+            max-width: 1300px; width: 100%; box-shadow: 0 2px 6px rgba(0,0,0,0.1); 
+            display: flex; flex-wrap: nowrap; gap: 10px; align-items: flex-start;
         }
 
-        .top-left h1 { margin-top: 0; color: #005bbb; font-size: 22px; }
-        .rates, .creator, .update { font-size: 14px; margin-bottom: 10px; }
-        #ui-description { display: block; margin-top: 5px; font-style: italic; color: #444; }
+        .filters label { display: flex; flex-direction: column; font-size: 12px; font-weight: bold; color: #005bbb; }
+        .filters label span { margin-bottom: 5px; }
 
-        .top-right img {
-            width: 200px; height: 200px;
-            object-fit: cover; border-radius: 20px;
-        }
-
-        /* Sekcja filtrów - kluczowe poprawki widoczności */
-        .filters {
-            margin-bottom: 20px;
-            background: #ffffff;
-            padding: 20px;
-            border-radius: 8px;
-            max-width: 1200px;
-            width: 100%;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-            display: flex;
-            flex-wrap: wrap;
-            gap: 20px;
-            align-items: flex-start;
-        }
-
-        .filters label { 
-            display: flex; 
-            flex-direction: column; 
-            font-size: 14px; 
-            font-weight: bold;
-            flex: 1; /* Pozwala filtrom rosnąć */
-            min-width: 200px; 
-        }
-
-        .filters label span { margin-bottom: 8px; color: #005bbb; }
-
-        /* WYMUSZENIE WIDOCZNOŚCI WYBRANYCH ELEMENTÓW (TAGÓW) */
+        /* --- SELECT2 FIXED STYLES --- */
         .select2-container--default .select2-selection--multiple {
-            border: 1px solid #ccc !important;
+            border: 1px solid #aaa !important;
             min-height: 40px !important;
-            height: auto !important; /* Pozwala polu rosnąć w dół przy wielu tagach */
-            padding-bottom: 5px !important;
+            background-color: #fff !important;
         }
 
-        .select2-container .select2-selection--multiple .select2-selection__rendered {
-            display: block !important; /* Pigułki będą się zawijać w nowe linie */
-            padding: 0 5px !important;
+        .select2-selection__rendered {
+            display: block !important;
+            padding: 0 4px 4px 4px !important;
         }
 
         .select2-container--default .select2-selection--multiple .select2-selection__choice {
             background-color: #005bbb !important;
-            color: white !important;
-            border: none !important;
+            border: 1px solid #004488 !important;
+            border-radius: 4px !important;
             padding: 2px 8px !important;
+            margin: 4px 4px 0 0 !important;
+            color: #ffffff !important;
+        }
+
+        .select2-container--default .select2-selection--multiple .select2-selection__choice__display {
+            color: #ffffff !important;
+            padding-left: 5px !important;
             font-size: 12px !important;
-            margin-top: 5px !important;
         }
 
         .select2-container--default .select2-selection--multiple .select2-selection__choice__remove {
-            color: white !important;
+            color: #ffffff !important;
+            border-right: 1px solid rgba(255,255,255,0.3) !important;
             margin-right: 5px !important;
+            padding: 0 5px !important;
         }
 
         table.dataTable thead th { background: #005bbb; color: white; }
-        
-        @media (max-width: 768px) {
-            .top-section { flex-direction: column; text-align: center; }
-            .filters label { min-width: 100%; }
+
+        @media (max-width: 1100px) {
+            .filters { flex-wrap: wrap; }
+            .filters label { width: 100%; }
+            .select2-container { width: 100% !important; }
         }
     </style>
 </head>
-
 <body>
 
 <div class="top-section">
     <div class="top-left">
         <h1 id="ui-title">📦 Porównanie cen boxów</h1>
-
-        <div class="rates">
-            <strong id="ui-rates-label">Orientacyjne kursy walut:</strong><br>
-            EUR/PLN: <span id="eurpln">...</span> |
-            USD/PLN: <span id="usdpln">...</span> |
-            UK Tax: <span id="gbptax">...</span>
-        </div>
-
-        <div class="creator">
-            <strong>Biwekson & Friends</strong><br>
-            TikTok: <a id="tiktok-link" href="#" target="_blank">link</a> |
-            Instagram: <a id="instagram-link" href="#" target="_blank">link</a>
-            <span id="ui-description"></span>
-        </div>
-
-        <div class="update">
-            <strong id="ui-update-label">Aktualizacja danych:</strong>
-            <span id="last-update">...</span>
-        </div>
-
         <div style="margin-top: 10px;">
-            <span id="ui-lang-label">🌍 Język:</span>
-            <button id="lang-pl">PL</button>
-            <button id="lang-en">EN</button>
+            <button id="lang-pl" style="padding: 5px 15px; cursor:pointer;">PL</button> 
+            <button id="lang-en" style="padding: 5px 15px; cursor:pointer;">EN</button>
         </div>
     </div>
-
     <div class="top-right">
-        <a href="https://www.tiktok.com/@biwekson" target="_blank">
-            <img src="logo_biwekson.jpg" alt="logo">
-        </a>
+        <img src="logo_biwekson.jpg" alt="logo" style="width:120px; border-radius:10px;">
     </div>
 </div>
 
@@ -163,16 +100,8 @@
 <table id="produkty" class="display" style="width:100%">
     <thead>
         <tr>
-            <th>Item</th>
-            <th>Price</th>
-            <th>CCY</th>
-            <th>Shop</th>
-            <th>Season</th>
-            <th>Brand</th>
-            <th>Card Type</th>
-            <th>Box</th>
-            <th>Team</th>
-            <th>Price PLN</th>
+            <th>Produkt</th><th>Box</th><th>CCY</th><th>Sklep</th><th>Sezon</th>
+            <th>Brand</th><th>Typ karty</th><th>Typ boxa</th><th>Team</th><th>Cena PLN</th>
         </tr>
     </thead>
     <tbody></tbody>
@@ -180,180 +109,100 @@
 
 <script>
 $(document).ready(function() {
-
-    const translations = {
-        PL: {
-            title: "📦 Porównanie cen boxów z kartami piłkarskimi",
-            rates: "Orientacyjne kursy walut:",
-            update: "Aktualizacja danych:",
-            lang: "🌍 Język:",
-            placeholder: "Wszystkie",
-            f_shop: "Sklep:", f_season: "Sezon:", f_team: "Team:", f_brand: "Marka/Brand:", f_type: "Typ boxa:",
-            h: ["Produkt", "Cena", "CCY", "Sklep", "Sezon", "Brand", "Typ karty", "Box", "Team", "Cena PLN"],
-            dt: {
-                lengthMenu: "Pokaż _MENU_ pozycji",
-                info: "Widok _START_-_END_ z _TOTAL_",
-                infoEmpty: "Brak danych",
-                infoFiltered: "(z _MAX_)",
-                zeroRecords: "Brak wyników",
-                search: "Szukaj w tabeli:",
-                paginate: { first: "Pierwsza", last: "Ostatnia", next: "Dalej", previous: "Wstecz" }
-            }
-        },
-        EN: {
-            title: "📦 Football Card Box Price Comparison",
-            rates: "Estimated Exchange Rates:",
-            update: "Last Update:",
-            lang: "🌍 Language:",
-            placeholder: "All",
-            f_shop: "Shop:", f_season: "Season:", f_team: "Team:", f_brand: "Brand:", f_type: "Box Type:",
-            h: ["Item", "Price", "CCY", "Shop", "Season", "Brand", "Card Type", "Box", "Team", "Price PLN"],
-            dt: {
-                lengthMenu: "Show _MENU_ items",
-                info: "Showing _START_ to _END_ of _TOTAL_",
-                infoEmpty: "No data",
-                infoFiltered: "(from _MAX_)",
-                zeroRecords: "No results",
-                search: "Search table:",
-                paginate: { first: "First", last: "Last", next: "Next", previous: "Prev" }
-            }
-        }
-    };
-
     let table;
-    let configData = {};
     let currentLang = 'PL';
 
-    function updateUI(lang) {
-        currentLang = lang;
-        const t = translations[lang];
-        $("#ui-title").text(t.title);
-        $("#ui-rates-label").text(t.rates);
-        $("#ui-update-label").text(t.update);
-        $("#ui-lang-label").text(t.lang);
-        $(".lbl-shop").text(t.f_shop);
-        $(".lbl-season").text(t.f_season);
-        $(".lbl-team").text(t.f_team);
-        $(".lbl-brand").text(t.f_brand);
-        $(".lbl-type").text(t.f_type);
+    const trans = {
+        PL: { shop: "Sklep:", season: "Sezon:", team: "Team:", brand: "Brand:", type: "Typ boxa:", placeholder: "Wybierz..." },
+        EN: { shop: "Shop:", season: "Season:", team: "Team:", brand: "Brand:", type: "Box Type:", placeholder: "Select..." }
+    };
 
-        const opis = (lang === 'PL') ? configData.OPIS_PL : configData.OPIS_EN;
-        $("#ui-description").text(opis || configData.OPIS || "");
-
-        // Nagłówki tabeli
-        $('#produkty thead th').each(function(i) { $(this).text(t.h[i]); });
-        
-        // Re-inicjalizacja Select2 z nowym placeholderem, ale zachowaniem wartości
-        $("select").each(function() {
-            const selectedVals = $(this).val();
-            $(this).select2({
-                placeholder: t.placeholder,
-                allowClear: true,
-                closeOnSelect: false,
-                width: '100%'
-            }).val(selectedVals).trigger('change.select2');
+    function initSelect2() {
+        $('select').select2({
+            placeholder: trans[currentLang].placeholder,
+            allowClear: true,
+            closeOnSelect: false
         });
     }
 
-    function initTable(lang) {
-        if ($.fn.DataTable.isDataTable('#produkty')) { table.destroy(); }
-        table = $('#produkty').DataTable({
-            pageLength: 25,
-            responsive: true,
-            fixedHeader: true,
-            language: translations[lang].dt
-        });
-        updateUI(lang);
-    }
+    function fillFilter(columnIndex, selectId, reverse = false) {
+        const select = $(selectId);
+        const savedValues = select.val();
 
-    Papa.parse("config.csv", {
-        download: true,
-        header: false,
-        delimiter: ";",
-        skipEmptyLines: true,
-        complete: function(results) {
-            results.data.forEach(row => { if(row[0] && row[1]) configData[row[0]] = row[1].trim(); });
-            $("#eurpln").text(configData.EUR || "---");
-            $("#usdpln").text(configData.USD || "---");
-            $("#gbptax").text(configData.GB_Tax ? (parseFloat(configData.GB_Tax.replace(",",".")) * 100).toFixed(0) + "%" : "---");
-            if(configData.TIKTOK_LINK) $("#tiktok-link").attr("href", configData.TIKTOK_LINK);
-            if(configData.INSTAGRAM_LINK) $("#instagram-link").attr("href", configData.INSTAGRAM_LINK);
-            if(configData.OSTATNIE_URUCHOMIENIE) {
-                const excelDate = parseFloat(configData.OSTATNIE_URUCHOMIENIE.replace(",", "."));
-                const jsDate = new Date((excelDate - 25569) * 86400 * 1000);
-                $("#last-update").text(jsDate.toLocaleString("pl-PL"));
+        let data = [...new Set(table.column(columnIndex, {search:'applied'}).data().toArray().filter(d => d).map(d => d.trim()))];
+        data.sort((a, b) => a.localeCompare(b, 'pl'));
+        if (reverse) data.reverse();
+
+        select.empty();
+        data.forEach(d => {
+            let option = new Option(d, d, false, savedValues && savedValues.includes(d));
+            select.append(option);
+        });
+
+        // Przywrócenie zaznaczenia
+        if (savedValues) select.val(savedValues).trigger('change');
+
+        // Obsługa filtrowania
+        select.off('change').on('change', function() {
+            const vals = $(this).val();
+            if (!vals || vals.length === 0) {
+                table.column(columnIndex).search("").draw();
+            } else {
+                const regex = vals.map(v => '^' + v.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '$').join('|');
+                table.column(columnIndex).search(regex, true, false).draw();
             }
-            if(table) updateUI(currentLang);
-        }
-    });
+        });
+    }
+
+    function refreshAllFilters() {
+        fillFilter(3, '#filter-sklep');
+        fillFilter(4, '#filter-sezon', true);
+        fillFilter(8, '#filter-team');
+        fillFilter(5, '#filter-producent', true);
+        fillFilter(7, '#filter-typboxa');
+
+        // Aktualizacja placeholderów bez niszczenia Select2
+        $('select').each(function() {
+            $(this).data('select2').$container
+                .find('.select2-search__field')
+                .attr('placeholder', trans[currentLang].placeholder);
+        });
+    }
 
     Papa.parse("export.csv", {
-        download: true,
-        header: true,
-        delimiter: ";",
+        download: true, header: true, delimiter: ";",
         complete: function(results) {
             results.data.forEach(function(row) {
                 if (!row.Produkt) return;
-                let cenaPLN = row.cena_box_PLN ? row.cena_box_PLN.replace(",", ".") : "0";
-                let cenaRaw = parseFloat(cenaPLN);
-                let cenaFormat = cenaRaw.toFixed(2).replace(".", ",");
-
+                let cenaRaw = parseFloat(row.cena_box_PLN ? row.cena_box_PLN.replace(",", ".") : "0");
                 $('#produkty tbody').append(`
                     <tr>
-                        <td>${row.Produkt}</td>
-                        <td>${row.Box}</td>
-                        <td>${row.Waluta}</td>
-                        <td>${row.Sklep}</td>
-                        <td>${row.Sezon}</td>
-                        <td>${row.Producent}</td>
-                        <td>${row["Typ karty"]}</td>
-                        <td>${row["Typ boxa"]}</td>
-                        <td>${row.Team}</td>
-                        <td data-order="${cenaRaw}"><strong>${cenaFormat}</strong></td>
+                        <td>${row.Produkt}</td><td>${row.Box}</td><td>${row.Waluta}</td>
+                        <td>${row.Sklep}</td><td>${row.Sezon}</td><td>${row.Producent}</td>
+                        <td>${row["Typ karty"]}</td><td>${row["Typ boxa"]}</td><td>${row.Team}</td>
+                        <td data-order="${cenaRaw}"><strong>${cenaRaw.toFixed(2).replace(".", ",")}</strong></td>
                     </tr>
                 `);
             });
 
-            initTable('PL');
+            table = $('#produkty').DataTable({ pageLength: 25, responsive: true });
+            initSelect2();
+            refreshAllFilters();
 
-            $('#lang-pl').on('click', function() { initTable('PL'); fillAllFilters(); });
-            $('#lang-en').on('click', function() { initTable('EN'); fillAllFilters(); });
+            $('#lang-pl, #lang-en').click(function() {
+                currentLang = (this.id === 'lang-pl') ? 'PL' : 'EN';
 
-            function fillFilter(columnIndex, selectId, reverse = false) {
-                const column = table.column(columnIndex);
-                const select = $(selectId);
-                let data = [...new Set(column.data().toArray().filter(d => d).map(d => d.trim()))];
-                
-                data.sort((a, b) => a.localeCompare(b, 'pl'));
-                if (reverse) data.reverse();
+                $('.lbl-shop').text(trans[currentLang].shop);
+                $('.lbl-season').text(trans[currentLang].season);
+                $('.lbl-team').text(trans[currentLang].team);
+                $('.lbl-brand').text(trans[currentLang].brand);
+                $('.lbl-type').text(trans[currentLang].type);
 
-                select.empty();
-                data.forEach(d => select.append(new Option(d, d)));
-
-                select.off('change').on('change', function() {
-                    const vals = $(this).val();
-                    if (!vals || vals.length === 0) {
-                        column.search("").draw();
-                    } else {
-                        const regex = vals.map(v => '^' + v.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '$').join('|');
-                        column.search(regex, true, false).draw();
-                    }
-                });
-            }
-
-            function fillAllFilters() {
-                fillFilter(3, '#filter-sklep');
-                fillFilter(4, '#filter-sezon', true);
-                fillFilter(8, '#filter-team');
-                fillFilter(5, '#filter-producent', true);
-                fillFilter(7, '#filter-typboxa');
-            }
-
-            fillAllFilters();
+                refreshAllFilters();
+            });
         }
     });
 });
 </script>
-
 </body>
 </html>
