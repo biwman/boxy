@@ -44,15 +44,13 @@
         .filter-group { display: flex; flex-direction: column; flex: 1; min-width: 0; }
         .filter-group label { font-size: 12px; font-weight: bold; color: var(--main-blue); margin-bottom: 6px; }
 
-        /* SELECT2 STYLES */
         .select2-container--default .select2-selection--multiple { border: 1px solid #ced4da !important; min-height: 38px !important; border-radius: 6px !important; }
         .select2-container--default .select2-selection--multiple .select2-selection__choice {
             background-color: var(--main-blue) !important; color: #ffffff !important; border: none !important;
             padding: 2px 8px !important; margin-top: 5px !important; font-size: 12px !important;
         }
-        .select2-selection__choice__display { color: #ffffff !important; }
+        .select2-selection__choice__display { color: #ffffff !important; padding-left: 4px !important; }
 
-        /* TABELA */
         .table-holder { background: #fff; padding: 20px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
         table.dataTable { width: 100% !important; margin: 0 !important; border-collapse: collapse; }
         table.dataTable thead th { background-color: var(--main-blue); color: white; border: none; padding: 12px; text-align: left; white-space: nowrap; }
@@ -71,7 +69,7 @@
     <div class="top-left">
         <h1 id="ui-title">📦 Porównanie cen boxów</h1>
         <div class="info-row">
-            <strong id="ui-rates-lbl">Kursy:</strong> EUR: <span id="eurpln">...</span> | USD: <span id="usdpln">...</span> | Tax: <span id="gbptax">...</span>
+            <strong id="ui-rates-lbl">Kursy:</strong> EUR: <span id="eurpln">...</span> | USD: <span id="usdpln">...</span> | UK Tax: <span id="gbptax">...</span>
         </div>
         <div class="info-row">
             <strong>Socials:</strong> 
@@ -118,7 +116,6 @@
 $(document).ready(function() {
     let table;
     let config = {};
-    let currentLang = 'PL';
 
     const langData = {
         PL: { 
@@ -132,7 +129,6 @@ $(document).ready(function() {
     };
 
     function updateLanguage(lang) {
-        currentLang = lang;
         const d = langData[lang];
         $("#ui-title").text(d.title);
         $("#lbl-shop").text(d.shop);
@@ -144,17 +140,17 @@ $(document).ready(function() {
         $("#ui-update-lbl").text(d.update);
         $("#ui-description").text(lang === 'PL' ? config.OPIS_PL : config.OPIS_EN);
         
-        // Aktualizacja nagłówków tabeli
         $('#mainTable thead th').each(function(i) { $(this).text(d.h[i]); });
-
-        $('select').each(function() {
-            $(this).select2({ placeholder: d.placeholder });
-        });
+        $('select').each(function() { $(this).select2({ placeholder: d.placeholder }); });
     }
 
-    function fillFilter(columnIndex, selectId) {
+    function fillFilter(columnIndex, selectId, desc = false) {
         const select = $(selectId);
         let uniqueData = table.column(columnIndex).data().unique().sort().toArray();
+        
+        // Jeśli desc jest true, odwracamy kolejność (Z do A)
+        if (desc) { uniqueData.reverse(); }
+
         select.empty();
         uniqueData.forEach(item => { if(item) select.append(new Option(item, item)); });
         select.on('change', function() {
@@ -198,10 +194,21 @@ $(document).ready(function() {
                 `);
             });
 
-            table = $('#mainTable').DataTable({ pageLength: 25, responsive: false });
+            table = $('#mainTable').DataTable({ 
+                pageLength: 25, 
+                responsive: false,
+                order: [[8, "asc"]]
+            });
+
             $('select').select2({ placeholder: "Wszystkie", allowClear: true, closeOnSelect: false, width: '100%' });
             
-            fillFilter(3, '#f-shop'); fillFilter(4, '#f-season'); fillFilter(7, '#f-team'); fillFilter(5, '#f-brand'); fillFilter(6, '#f-type');
+            // Filtry: Sklep(3), Sezon(4), Drużyna(7), Marka(5), Typ(6)
+            // Dodano 'true' dla Sezonu i Marki, aby sortowały od Z do A
+            fillFilter(3, '#f-shop'); 
+            fillFilter(4, '#f-season', true); 
+            fillFilter(7, '#f-team'); 
+            fillFilter(5, '#f-brand', true); 
+            fillFilter(6, '#f-type');
 
             $("#btn-pl").click(() => updateLanguage('PL'));
             $("#btn-en").click(() => updateLanguage('EN'));
