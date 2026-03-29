@@ -225,9 +225,10 @@ $(document).ready(function() {
             }
             if(config.INSTAGRAM_LINK) $("#link-insta").attr("href", config.INSTAGRAM_LINK);
             if(config.OSTATNIE_URUCHOMIENIE) {
-                let d = new Date((parseFloat(config.OSTATNIE_URUCHOMIENIE.replace(',','.')) - 25569) * 86400 * 1000);
-                $("#last-update").text(d.toLocaleString());
-            }
+    let d = new Date((parseFloat(config.OSTATNIE_URUCHOMIENIE.replace(',','.')) - 25569) * 86400 * 1000);
+    // Wymuszenie czasu polskiego (Warszawa) z automatyczną obsługą czasu letniego/zimowego:
+    $("#last-update").text(d.toLocaleString("pl-PL", { timeZone: "Europe/Warsaw" }));
+}
             updateLanguage('PL');
             
             // OPEN MODAL AFTER CONFIG LOADS
