@@ -16,51 +16,42 @@
 
     <style>
         :root { --main-blue: #005bbb; --bg-light: #f7f9fc; }
+        body { font-family: 'Segoe UI', Arial, sans-serif; margin: 20px; background: linear-gradient(135deg, #e3f2fd, #f7f9fc); display: flex; flex-direction: column; align-items: center; }
         
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 20px; background: linear-gradient(135deg, #e3f2fd, #f7f9fc); display: flex; flex-direction: column; align-items: center; }
-        
-        /* NAGŁÓWEK */
         .top-section { 
             display: flex; align-items: center; justify-content: space-between; gap: 30px; 
             background: #ffffff; padding: 25px 40px; border-radius: 15px; margin-bottom: 20px; 
-            max-width: 1300px; width: 100%; box-shadow: 0 4px 20px rgba(0,0,0,0.08); 
-            box-sizing: border-box;
+            max-width: 1300px; width: 100%; box-shadow: 0 4px 20px rgba(0,0,0,0.08); box-sizing: border-box;
         }
-        .top-left h1 { margin: 0 0 15px 0; color: var(--main-blue); font-size: 26px; }
-        .info-row { font-size: 14px; margin-bottom: 6px; color: #333; }
-        .top-right img { width: 160px; height: auto; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        .top-left h1 { margin: 0 0 10px 0; color: var(--main-blue); font-size: 24px; }
+        .info-row { font-size: 13px; margin-bottom: 5px; color: #333; line-height: 1.4; }
+        #ui-description { display: block; margin-top: 10px; font-size: 12px; color: #666; font-style: italic; max-width: 600px; }
+        
+        /* Styl dla klikalnego logo */
+        .top-right a { display: block; cursor: pointer; transition: transform 0.2s; }
+        .top-right a:hover { transform: scale(1.02); }
+        .top-right img { width: 150px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); display: block; }
 
-        /* FILTRY */
         .filters-container { 
             margin-bottom: 20px; background: #ffffff; padding: 20px; border-radius: 12px; 
             max-width: 1300px; width: 100%; box-shadow: 0 4px 20px rgba(0,0,0,0.08); 
             display: flex; flex-wrap: nowrap; gap: 10px; box-sizing: border-box;
         }
         .filter-group { display: flex; flex-direction: column; flex: 1; min-width: 0; }
-        .filter-group label { font-size: 12px; font-weight: bold; color: var(--main-blue); margin-bottom: 6px; white-space: nowrap; }
+        .filter-group label { font-size: 12px; font-weight: bold; color: var(--main-blue); margin-bottom: 6px; }
 
-        /* WYMUSZENIE WIDOCZNOŚCI PIGUŁEK SELECT2 */
-        .select2-container--default .select2-selection--multiple {
-            border: 1px solid #ced4da !important; min-height: 38px !important; border-radius: 6px !important;
-        }
+        /* SELECT2 STYLES */
+        .select2-container--default .select2-selection--multiple { border: 1px solid #ced4da !important; min-height: 38px !important; border-radius: 6px !important; }
         .select2-container--default .select2-selection--multiple .select2-selection__choice {
-            background-color: var(--main-blue) !important;
-            color: #ffffff !important;
-            border: none !important;
-            padding: 2px 8px !important;
-            margin-top: 5px !important;
-            font-size: 12px !important;
+            background-color: var(--main-blue) !important; color: #ffffff !important; border: none !important;
+            padding: 2px 8px !important; margin-top: 5px !important; font-size: 12px !important;
         }
-        .select2-selection__choice__display { color: #ffffff !important; padding-left: 4px !important; }
-        .select2-container--default .select2-selection--multiple .select2-selection__choice__remove {
-            color: #ffffff !important; margin-right: 5px !important; opacity: 0.7;
-        }
-        .select2-container--default .select2-selection--multiple .select2-selection__choice__remove:hover { opacity: 1; background: none; }
+        .select2-selection__choice__display { color: #ffffff !important; }
+        .select2-container--default .select2-selection--multiple .select2-selection__choice__remove { color: #ffffff !important; margin-right: 5px !important; }
 
-        /* TABELA */
-        .table-holder { width: 100%; max-width: 1300px; background: #fff; padding: 10px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
+        .table-holder { width: 100%; max-width: 1300px; background: #fff; padding: 15px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); box-sizing: border-box; }
         table.dataTable thead th { background-color: var(--main-blue); color: white; border: none; padding: 12px; }
-        
+
         @media (max-width: 1100px) {
             .filters-container { flex-wrap: wrap; }
             .filter-group { flex: 1 1 200px; }
@@ -74,47 +65,35 @@
     <div class="top-left">
         <h1 id="ui-title">📦 Porównanie cen boxów</h1>
         <div class="info-row">
-            <strong>Kursy:</strong> EUR: <span id="eurpln">...</span> | USD: <span id="usdpln">...</span> | Tax: <span id="gbptax">...</span>
+            <strong id="ui-rates-lbl">Kursy:</strong> EUR: <span id="eurpln">...</span> | USD: <span id="usdpln">...</span> | Tax: <span id="gbptax">...</span>
         </div>
         <div class="info-row">
-            <strong>Biwekson & Friends:</strong> 
-            <a href="https://www.tiktok.com/@biwekson" target="_blank">TikTok</a> | 
-            <a href="https://www.instagram.com/biwekson/" target="_blank">Instagram</a>
+            <strong>Socials:</strong> 
+            <a id="link-tiktok" href="#" target="_blank">TikTok</a> | 
+            <a id="link-insta" href="#" target="_blank">Instagram</a>
         </div>
-        <div class="info-row" id="ui-update-row">
-            <strong>Aktualizacja:</strong> <span id="last-update">...</span>
+        <div class="info-row">
+            <strong id="ui-update-lbl">Aktualizacja:</strong> <span id="last-update">...</span>
         </div>
+        <div id="ui-description">...</div>
         <div style="margin-top: 15px;">
-            <button id="btn-pl" style="cursor:pointer; padding: 5px 12px;">PL</button>
-            <button id="btn-en" style="cursor:pointer; padding: 5px 12px;">EN</button>
+            <button id="btn-pl" style="cursor:pointer; padding: 5px 12px; border-radius: 4px; border: 1px solid #ccc;">PL</button>
+            <button id="btn-en" style="cursor:pointer; padding: 5px 12px; border-radius: 4px; border: 1px solid #ccc;">EN</button>
         </div>
     </div>
     <div class="top-right">
-        <img src="logo_biwekson.jpg" alt="Logo">
+        <a id="link-logo" href="#" target="_blank">
+            <img src="logo_biwekson.jpg" alt="Logo">
+        </a>
     </div>
 </div>
 
 <div class="filters-container">
-    <div class="filter-group">
-        <label id="lbl-shop">Sklep:</label>
-        <select id="f-shop" multiple="multiple"></select>
-    </div>
-    <div class="filter-group">
-        <label id="lbl-season">Sezon:</label>
-        <select id="f-season" multiple="multiple"></select>
-    </div>
-    <div class="filter-group">
-        <label id="lbl-team">Team:</label>
-        <select id="f-team" multiple="multiple"></select>
-    </div>
-    <div class="filter-group">
-        <label id="lbl-brand">Marka:</label>
-        <select id="f-brand" multiple="multiple"></select>
-    </div>
-    <div class="filter-group">
-        <label id="lbl-type">Typ boxa:</label>
-        <select id="f-type" multiple="multiple"></select>
-    </div>
+    <div class="filter-group"><label id="lbl-shop">Sklep:</label><select id="f-shop" multiple="multiple"></select></div>
+    <div class="filter-group"><label id="lbl-season">Sezon:</label><select id="f-season" multiple="multiple"></select></div>
+    <div class="filter-group"><label id="lbl-team">Team:</label><select id="f-team" multiple="multiple"></select></div>
+    <div class="filter-group"><label id="lbl-brand">Marka:</label><select id="f-brand" multiple="multiple"></select></div>
+    <div class="filter-group"><label id="lbl-type">Typ boxa:</label><select id="f-type" multiple="multiple"></select></div>
 </div>
 
 <div class="table-holder">
@@ -132,21 +111,13 @@
 <script>
 $(document).ready(function() {
     let table;
+    let config = {};
     let currentLang = 'PL';
 
     const langData = {
-        PL: { title: "📦 Porównanie cen boxów", shop: "Sklep:", season: "Sezon:", team: "Team:", brand: "Marka:", type: "Typ boxa:", placeholder: "Wszystkie" },
-        EN: { title: "📦 Box Price Comparison", shop: "Shop:", season: "Season:", team: "Team:", brand: "Brand:", type: "Box Type:", placeholder: "All" }
+        PL: { title: "📦 Porównanie cen boxów", shop: "Sklep:", season: "Sezon:", team: "Team:", brand: "Marka:", type: "Typ boxa:", placeholder: "Wszystkie", rates: "Kursy:", update: "Aktualizacja:" },
+        EN: { title: "📦 Box Price Comparison", shop: "Shop:", season: "Season:", team: "Team:", brand: "Brand:", type: "Box Type:", placeholder: "All", rates: "Rates:", update: "Update:" }
     };
-
-    function initSelect2() {
-        $('select').select2({
-            placeholder: langData[currentLang].placeholder,
-            allowClear: true,
-            closeOnSelect: false,
-            width: '100%'
-        });
-    }
 
     function updateLanguage(lang) {
         currentLang = lang;
@@ -157,8 +128,10 @@ $(document).ready(function() {
         $("#lbl-team").text(d.team);
         $("#lbl-brand").text(d.brand);
         $("#lbl-type").text(d.type);
+        $("#ui-rates-lbl").text(d.rates);
+        $("#ui-update-lbl").text(d.update);
+        $("#ui-description").text(lang === 'PL' ? config.OPIS_PL : config.OPIS_EN);
         
-        // Odświeżenie placeholderów w Select2 bez niszczenia zaznaczeń
         $('select').each(function() {
             $(this).select2({ placeholder: d.placeholder });
         });
@@ -167,39 +140,41 @@ $(document).ready(function() {
     function fillFilter(columnIndex, selectId) {
         const select = $(selectId);
         let uniqueData = table.column(columnIndex).data().unique().sort().toArray();
-        
         select.empty();
-        uniqueData.forEach(item => {
-            if(item) select.append(new Option(item, item));
-        });
-
+        uniqueData.forEach(item => { if(item) select.append(new Option(item, item)); });
         select.on('change', function() {
             let vals = $(this).val();
-            if(!vals || vals.length === 0) {
-                table.column(columnIndex).search('').draw();
-            } else {
+            if(!vals || vals.length === 0) { table.column(columnIndex).search('').draw(); }
+            else {
                 let pattern = vals.map(v => '^' + $.fn.dataTable.util.escapeRegex(v) + '$').join('|');
                 table.column(columnIndex).search(pattern, true, false).draw();
             }
         });
     }
 
-    // Ładowanie CONFIG (Kursy itp.)
     Papa.parse("config.csv", {
         download: true, header: false, delimiter: ";", complete: function(results) {
-            results.data.forEach(row => {
-                if(row[0] === 'EUR') $("#eurpln").text(row[1]);
-                if(row[0] === 'USD') $("#usdpln").text(row[1]);
-                if(row[0] === 'GB_Tax') $("#gbptax").text(row[1]);
-                if(row[0] === 'OSTATNIE_URUCHOMIENIE') {
-                    let d = new Date((parseFloat(row[1].replace(',','.')) - 25569) * 86400 * 1000);
-                    $("#last-update").text(d.toLocaleString());
-                }
-            });
+            results.data.forEach(row => { if(row[0]) config[row[0].trim()] = row[1].trim(); });
+            
+            $("#eurpln").text(config.EUR || "---");
+            $("#usdpln").text(config.USD || "---");
+            if(config.GB_Tax) $("#gbptax").text((parseFloat(config.GB_Tax.replace(',','.')) * 100).toFixed(0) + "%");
+            
+            // Ustawienie linków
+            if(config.TIKTOK_LINK) {
+                $("#link-tiktok").attr("href", config.TIKTOK_LINK);
+                $("#link-logo").attr("href", config.TIKTOK_LINK); // Logo do TikToka
+            }
+            if(config.INSTAGRAM_LINK) $("#link-insta").attr("href", config.INSTAGRAM_LINK);
+            
+            if(config.OSTATNIE_URUCHOMIENIE) {
+                let d = new Date((parseFloat(config.OSTATNIE_URUCHOMIENIE.replace(',','.')) - 25569) * 86400 * 1000);
+                $("#last-update").text(d.toLocaleString());
+            }
+            updateLanguage('PL');
         }
     });
 
-    // Ładowanie DANYCH
     Papa.parse("export.csv", {
         download: true, header: true, delimiter: ";", complete: function(results) {
             results.data.forEach(row => {
@@ -216,14 +191,8 @@ $(document).ready(function() {
             });
 
             table = $('#mainTable').DataTable({ pageLength: 25, responsive: true });
-            
-            // Inicjalizacja filtrów
-            initSelect2();
-            fillFilter(3, '#f-shop');
-            fillFilter(4, '#f-season');
-            fillFilter(8, '#f-team');
-            fillFilter(5, '#f-brand');
-            fillFilter(7, '#f-type');
+            $('select').select2({ placeholder: "Wszystkie", allowClear: true, closeOnSelect: false, width: '100%' });
+            fillFilter(3, '#f-shop'); fillFilter(4, '#f-season'); fillFilter(8, '#f-team'); fillFilter(5, '#f-brand'); fillFilter(7, '#f-type');
 
             $("#btn-pl").click(() => updateLanguage('PL'));
             $("#btn-en").click(() => updateLanguage('EN'));
