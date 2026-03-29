@@ -14,18 +14,19 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
 
     <style>
-        :root { --main-blue: #005bbb; --bg-light: #f0f4f8; }
+        :root { --main-blue: #005bbb; }
         
-        /* 1) NOWE CIEKAWE TŁO GRADIENTOWE */
         body { 
             font-family: 'Segoe UI', Arial, sans-serif; 
             margin: 20px; 
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #6B8DD6 100%);
+            /* Nowoczesny gradient */
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
             background-attachment: fixed;
             display: flex; 
             flex-direction: column; 
             align-items: center; 
             min-height: 100vh;
+            color: #333;
         }
         
         .top-section, .filters-container, .table-holder { 
@@ -37,59 +38,44 @@
         .top-section { 
             display: flex; align-items: center; justify-content: space-between; gap: 30px; 
             background: rgba(255, 255, 255, 0.95); padding: 25px 40px; border-radius: 15px; margin-bottom: 20px; 
-            box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
         }
-        .top-left h1 { margin: 0 0 10px 0; color: var(--main-blue); font-size: 24px; }
-        .info-row { font-size: 13px; margin-bottom: 5px; color: #333; line-height: 1.4; }
-        #ui-description { display: block; margin-top: 10px; font-size: 12px; color: #666; font-style: italic; max-width: 800px; }
-        
-        .top-right a { display: block; cursor: pointer; transition: transform 0.2s; }
-        .top-right a:hover { transform: scale(1.05); }
-        .top-right img { width: 150px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); display: block; }
 
         .filters-container { 
             margin-bottom: 20px; background: rgba(255, 255, 255, 0.95); padding: 20px; border-radius: 12px; 
-            box-shadow: 0 8px 32px rgba(0,0,0,0.1); 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2); 
             display: flex; flex-wrap: nowrap; gap: 10px;
         }
-        .filter-group { display: flex; flex-direction: column; flex: 1; min-width: 0; }
-        .filter-group label { font-size: 12px; font-weight: bold; color: var(--main-blue); margin-bottom: 6px; }
 
-        .select2-container--default .select2-selection--multiple { border: 1px solid #ced4da !important; min-height: 38px !important; border-radius: 6px !important; }
-        .select2-container--default .select2-selection--multiple .select2-selection__choice {
-            background-color: var(--main-blue) !important; color: #ffffff !important; border: none !important;
-            padding: 2px 8px !important; margin-top: 5px !important; font-size: 12px !important;
-        }
-
-        /* 3) PRZYKLEJONE NAGŁÓWKI (STICKY HEADER) */
         .table-holder { 
             background: #fff; padding: 20px; border-radius: 12px; 
-            box-shadow: 0 8px 32px rgba(0,0,0,0.15); 
-            overflow: visible; /* ważne dla sticky */
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            /* Żeby sticky działało, kontener nie może blokować overflow */
         }
-        table.dataTable { width: 100% !important; margin: 0 !important; border-collapse: separate; border-spacing: 0; }
+
+        /* POPRAWKA STICKY HEADER */
+        table.dataTable { width: 100% !important; border-collapse: separate; border-spacing: 0; }
         
         table.dataTable thead th { 
-            background-color: var(--main-blue); 
-            color: white; 
-            border: none; 
-            padding: 12px; 
+            background-color: var(--main-blue) !important; 
+            color: white !important; 
+            padding: 15px 12px; 
             text-align: left; 
-            white-space: nowrap;
             position: sticky;
-            top: 0;
-            z-index: 10;
-            box-shadow: 0 2px 2px rgba(0,0,0,0.1);
+            top: -21px; /* Kompensata marginesu body/paddingu */
+            z-index: 100;
+            border-bottom: 2px solid #004488;
         }
-        
-        .col-pln { font-weight: bold; color: var(--main-blue); text-align: right !important; }
-        .col-price { text-align: right !important; padding-right: 20px !important; }
 
-        @media (max-width: 1100px) {
-            .filters-container { flex-wrap: wrap; }
-            .filter-group { flex: 1 1 200px; }
-            .top-section { flex-direction: column; text-align: center; }
-        }
+        .col-pln { font-weight: bold; color: var(--main-blue); text-align: right !important; }
+        .col-price { text-align: right !important; }
+
+        /* Stylizacja Select2 */
+        .select2-container--default .select2-selection--multiple { border-radius: 6px !important; border: 1px solid #ddd !important; }
+        .select2-selection__choice { background-color: var(--main-blue) !important; color: white !important; border: none !important; }
+
+        .top-right img { width: 150px; border-radius: 10px; }
+        .filter-group label { font-size: 12px; font-weight: bold; color: var(--main-blue); margin-bottom: 5px; }
     </style>
 </head>
 <body>
@@ -105,19 +91,14 @@
             <a id="link-tiktok" href="#" target="_blank">TikTok</a> | 
             <a id="link-insta" href="#" target="_blank">Instagram</a>
         </div>
-        <div class="info-row">
-            <strong id="ui-update-lbl">Aktualizacja:</strong> <span id="last-update">...</span>
-        </div>
         <div id="ui-description">...</div>
         <div style="margin-top: 15px;">
-            <button id="btn-pl" style="cursor:pointer; padding: 5px 12px; border-radius: 4px; border: 1px solid #ccc;">PL</button>
-            <button id="btn-en" style="cursor:pointer; padding: 5px 12px; border-radius: 4px; border: 1px solid #ccc;">EN</button>
+            <button id="btn-pl">PL</button>
+            <button id="btn-en">EN</button>
         </div>
     </div>
     <div class="top-right">
-        <a id="link-logo" href="#" target="_blank">
-            <img src="logo_biwekson.jpg" alt="Logo">
-        </a>
+        <a id="link-logo" href="#" target="_blank"><img src="logo_biwekson.jpg" alt="Logo"></a>
     </div>
 </div>
 
@@ -130,7 +111,7 @@
 </div>
 
 <div class="table-holder">
-    <table id="mainTable" class="display nowrap" style="width:100%">
+    <table id="mainTable" class="display nowrap">
         <thead>
             <tr>
                 <th>Produkt</th><th>Cena</th><th>Waluta</th><th>Sklep</th><th>Sezon</th>
@@ -147,14 +128,8 @@ $(document).ready(function() {
     let config = {};
 
     const langData = {
-        PL: { 
-            title: "📦 Porównanie cen boxów", shop: "Sklep:", season: "Sezon:", team: "Drużyna:", brand: "Marka:", type: "Typ:", placeholder: "Wszystkie", rates: "Kursy:", update: "Aktualizacja:",
-            h: ["Produkt", "Cena", "Waluta", "Sklep", "Sezon", "Marka", "Typ", "Drużyna", "Cena PLN"]
-        },
-        EN: { 
-            title: "📦 Box Price Comparison", shop: "Shop:", season: "Season:", team: "Team:", brand: "Brand:", type: "Type:", placeholder: "All", rates: "Rates:", update: "Update:",
-            h: ["Product", "Price", "CCY", "Shop", "Season", "Brand", "Type", "Team", "Price PLN"]
-        }
+        PL: { title: "📦 Porównanie cen boxów", shop: "Sklep:", season: "Sezon:", team: "Drużyna:", brand: "Marka:", type: "Typ:", h: ["Produkt", "Cena", "Waluta", "Sklep", "Sezon", "Marka", "Typ", "Drużyna", "Cena PLN"] },
+        EN: { title: "📦 Box Price Comparison", shop: "Shop:", season: "Season:", team: "Team:", brand: "Brand:", type: "Type:", h: ["Product", "Price", "CCY", "Shop", "Season", "Brand", "Type", "Team", "Price PLN"] }
     };
 
     function updateLanguage(lang) {
@@ -165,24 +140,19 @@ $(document).ready(function() {
         $("#lbl-team").text(d.team);
         $("#lbl-brand").text(d.brand);
         $("#lbl-type").text(d.type);
-        $("#ui-rates-lbl").text(d.rates);
-        $("#ui-update-lbl").text(d.update);
-        $("#ui-description").text(lang === 'PL' ? config.OPIS_PL : config.OPIS_EN);
-        
         $('#mainTable thead th').each(function(i) { $(this).text(d.h[i]); });
-        $('select').each(function() { $(this).select2({ placeholder: d.placeholder }); });
+        $('select').select2({ placeholder: "Wszystkie" });
     }
 
     function fillFilter(columnIndex, selectId, desc = false) {
         const select = $(selectId);
         let uniqueData = table.column(columnIndex).data().unique().sort().toArray();
-        if (desc) { uniqueData.reverse(); }
-
+        if (desc) uniqueData.reverse();
         select.empty();
         uniqueData.forEach(item => { if(item) select.append(new Option(item, item)); });
         select.on('change', function() {
             let vals = $(this).val();
-            if(!vals || vals.length === 0) { table.column(columnIndex).search('').draw(); }
+            if(!vals || vals.length === 0) table.column(columnIndex).search('').draw();
             else {
                 let pattern = vals.map(v => '^' + $.fn.dataTable.util.escapeRegex(v) + '$').join('|');
                 table.column(columnIndex).search(pattern, true, false).draw();
@@ -196,12 +166,6 @@ $(document).ready(function() {
             $("#eurpln").text(config.EUR || "---");
             $("#usdpln").text(config.USD || "---");
             if(config.GB_Tax) $("#gbptax").text((parseFloat(config.GB_Tax.replace(',','.')) * 100).toFixed(0) + "%");
-            if(config.TIKTOK_LINK) { $("#link-tiktok, #link-logo").attr("href", config.TIKTOK_LINK); }
-            if(config.INSTAGRAM_LINK) $("#link-insta").attr("href", config.INSTAGRAM_LINK);
-            if(config.OSTATNIE_URUCHOMIENIE) {
-                let d = new Date((parseFloat(config.OSTATNIE_URUCHOMIENIE.replace(',','.')) - 25569) * 86400 * 1000);
-                $("#last-update").text(d.toLocaleString());
-            }
             updateLanguage('PL');
         }
     });
@@ -210,33 +174,24 @@ $(document).ready(function() {
         download: true, header: true, delimiter: ";", complete: function(results) {
             results.data.forEach(row => {
                 if(!row.Produkt) return;
-                
-                // 2) FORMATOWANIE CEN Z 2 MIEJSCAMI PO PRZECINKU
-                let cenaOryginalna = parseFloat(row.Box ? row.Box.replace(',','.') : 0);
-                let cenaPLN = parseFloat(row.cena_box_PLN ? row.cena_box_PLN.replace(',','.') : 0);
-                
+                let cOrig = parseFloat(row.Box ? row.Box.replace(',','.') : 0);
+                let cPLN = parseFloat(row.cena_box_PLN ? row.cena_box_PLN.replace(',','.') : 0);
                 $('#mainTable tbody').append(`
                     <tr>
                         <td>${row.Produkt}</td>
-                        <td class="col-price" data-order="${cenaOryginalna}">${cenaOryginalna.toFixed(2)}</td>
+                        <td class="col-price" data-order="${cOrig}">${cOrig.toFixed(2)}</td>
                         <td>${row.Waluta}</td>
                         <td>${row.Sklep}</td>
                         <td>${row.Sezon}</td>
                         <td>${row.Producent}</td>
                         <td>${row["Typ boxa"]}</td>
                         <td>${row.Team}</td>
-                        <td class="col-pln" data-order="${cenaPLN}">${cenaPLN.toFixed(2)}</td>
+                        <td class="col-pln" data-order="${cPLN}">${cPLN.toFixed(2)}</td>
                     </tr>
                 `);
             });
 
-            table = $('#mainTable').DataTable({ 
-                pageLength: 25, 
-                responsive: false,
-                order: [[8, "asc"]]
-            });
-
-            $('select').select2({ placeholder: "Wszystkie", allowClear: true, closeOnSelect: false, width: '100%' });
+            table = $('#mainTable').DataTable({ pageLength: 25, responsive: false, order: [[8, "asc"]] });
             
             fillFilter(3, '#f-shop'); 
             fillFilter(4, '#f-season', true); 
