@@ -18,24 +18,30 @@
         :root { --main-blue: #005bbb; --bg-light: #f7f9fc; }
         body { font-family: 'Segoe UI', Arial, sans-serif; margin: 20px; background: linear-gradient(135deg, #e3f2fd, #f7f9fc); display: flex; flex-direction: column; align-items: center; }
         
+        /* Rozszerzenie kontenerów dla lepszego wykorzystania miejsca */
+        .top-section, .filters-container, .table-holder { 
+            max-width: 1600px; /* Zwiększono z 1300px */
+            width: 98%; 
+            box-sizing: border-box;
+        }
+
         .top-section { 
             display: flex; align-items: center; justify-content: space-between; gap: 30px; 
             background: #ffffff; padding: 25px 40px; border-radius: 15px; margin-bottom: 20px; 
-            max-width: 1300px; width: 100%; box-shadow: 0 4px 20px rgba(0,0,0,0.08); box-sizing: border-box;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
         }
         .top-left h1 { margin: 0 0 10px 0; color: var(--main-blue); font-size: 24px; }
         .info-row { font-size: 13px; margin-bottom: 5px; color: #333; line-height: 1.4; }
-        #ui-description { display: block; margin-top: 10px; font-size: 12px; color: #666; font-style: italic; max-width: 600px; }
+        #ui-description { display: block; margin-top: 10px; font-size: 12px; color: #666; font-style: italic; max-width: 800px; }
         
-        /* Styl dla klikalnego logo */
         .top-right a { display: block; cursor: pointer; transition: transform 0.2s; }
         .top-right a:hover { transform: scale(1.02); }
         .top-right img { width: 150px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); display: block; }
 
         .filters-container { 
             margin-bottom: 20px; background: #ffffff; padding: 20px; border-radius: 12px; 
-            max-width: 1300px; width: 100%; box-shadow: 0 4px 20px rgba(0,0,0,0.08); 
-            display: flex; flex-wrap: nowrap; gap: 10px; box-sizing: border-box;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08); 
+            display: flex; flex-wrap: nowrap; gap: 10px;
         }
         .filter-group { display: flex; flex-direction: column; flex: 1; min-width: 0; }
         .filter-group label { font-size: 12px; font-weight: bold; color: var(--main-blue); margin-bottom: 6px; }
@@ -49,8 +55,16 @@
         .select2-selection__choice__display { color: #ffffff !important; }
         .select2-container--default .select2-selection--multiple .select2-selection__choice__remove { color: #ffffff !important; margin-right: 5px !important; }
 
-        .table-holder { width: 100%; max-width: 1300px; background: #fff; padding: 15px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); box-sizing: border-box; }
-        table.dataTable thead th { background-color: var(--main-blue); color: white; border: none; padding: 12px; }
+        /* TABELA - DOPASOWANIE DO SZEROKOŚCI */
+        .table-holder { 
+            background: #fff; padding: 20px; border-radius: 12px; 
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08); 
+        }
+        table.dataTable { width: 100% !important; margin: 0 !important; }
+        table.dataTable thead th { background-color: var(--main-blue); color: white; border: none; padding: 12px; text-align: left; }
+        
+        /* Styl dla kwoty PLN, żeby była wyraźna i wyrównana */
+        .col-pln { font-weight: bold; color: var(--main-blue); text-align: right !important; }
 
         @media (max-width: 1100px) {
             .filters-container { flex-wrap: wrap; }
@@ -97,7 +111,7 @@
 </div>
 
 <div class="table-holder">
-    <table id="mainTable" class="display responsive nowrap" style="width:100%">
+    <table id="mainTable" class="display nowrap" style="width:100%">
         <thead>
             <tr>
                 <th>Produkt</th><th>Box</th><th>CCY</th><th>Sklep</th><th>Sezon</th>
@@ -155,18 +169,11 @@ $(document).ready(function() {
     Papa.parse("config.csv", {
         download: true, header: false, delimiter: ";", complete: function(results) {
             results.data.forEach(row => { if(row[0]) config[row[0].trim()] = row[1].trim(); });
-            
             $("#eurpln").text(config.EUR || "---");
             $("#usdpln").text(config.USD || "---");
             if(config.GB_Tax) $("#gbptax").text((parseFloat(config.GB_Tax.replace(',','.')) * 100).toFixed(0) + "%");
-            
-            // Ustawienie linków
-            if(config.TIKTOK_LINK) {
-                $("#link-tiktok").attr("href", config.TIKTOK_LINK);
-                $("#link-logo").attr("href", config.TIKTOK_LINK); // Logo do TikToka
-            }
+            if(config.TIKTOK_LINK) { $("#link-tiktok, #link-logo").attr("href", config.TIKTOK_LINK); }
             if(config.INSTAGRAM_LINK) $("#link-insta").attr("href", config.INSTAGRAM_LINK);
-            
             if(config.OSTATNIE_URUCHOMIENIE) {
                 let d = new Date((parseFloat(config.OSTATNIE_URUCHOMIENIE.replace(',','.')) - 25569) * 86400 * 1000);
                 $("#last-update").text(d.toLocaleString());
@@ -185,12 +192,17 @@ $(document).ready(function() {
                         <td>${row.Produkt}</td><td>${row.Box}</td><td>${row.Waluta}</td>
                         <td>${row.Sklep}</td><td>${row.Sezon}</td><td>${row.Producent}</td>
                         <td>${row["Typ karty"]}</td><td>${row["Typ boxa"]}</td><td>${row.Team}</td>
-                        <td data-order="${cena}"><strong>${cena.toFixed(2)}</strong></td>
+                        <td class="col-pln" data-order="${cena}">${cena.toFixed(2)}</td>
                     </tr>
                 `);
             });
 
-            table = $('#mainTable').DataTable({ pageLength: 25, responsive: true });
+            table = $('#mainTable').DataTable({ 
+                pageLength: 25, 
+                responsive: false, // Wyłączone, by wymusić pełną szerokość bez chowania kolumn
+                scrollX: false     // Wyłączone, by tabela rozpychała kontener zamiast tworzyć suwak wewnątrz
+            });
+
             $('select').select2({ placeholder: "Wszystkie", allowClear: true, closeOnSelect: false, width: '100%' });
             fillFilter(3, '#f-shop'); fillFilter(4, '#f-season'); fillFilter(8, '#f-team'); fillFilter(5, '#f-brand'); fillFilter(7, '#f-type');
 
