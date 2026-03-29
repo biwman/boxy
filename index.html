@@ -296,16 +296,41 @@ const nocache = new Date().getTime(); // unikalny timestamp
     var column = table.column(columnIndex);
     var select = $(selectId);
 
-    let dataArray = column.data().unique().sort();
-    if(reverse) dataArray = dataArray.reverse();
+    // 🔥 KLUCZOWE: zamiana na normalną tablicę
+    let dataArray = column.data().toArray();
 
+    // usunięcie pustych
+    dataArray = dataArray.filter(d => d && d.trim() !== "");
+
+    // unikalne wartości
+    dataArray = [...new Set(dataArray)];
+
+    // sortowanie
+    dataArray.sort((a, b) => a.localeCompare(b, 'pl'));
+
+    if(reverse) dataArray.reverse();
+
+    // czyszczenie selecta (ważne przy reloadach)
+    select.empty();
+
+    // dodanie opcji
     dataArray.forEach(function(d) {
-        if (d) select.append('<option value="'+d+'">'+d+'</option>');
+        select.append(new Option(d, d));
     });
 
+    // event filtrowania
     select.on('change', function() {
         var values = $(this).val();
-        column.search(values ? values.join('|') : "", true, false).draw();
+
+        if (!values || values.length === 0) {
+            column.search("").draw();
+            return;
+        }
+
+        // escape regex
+        var regex = values.map(v => v.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|');
+
+        column.search(regex, true, false).draw();
     });
 }
 
