@@ -8,7 +8,6 @@
 
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/fixedheader/3.4.0/css/fixedHeader.dataTables.min.css">
-    <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.5.0/css/responsive.dataTables.min.css">
 
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 
@@ -16,7 +15,6 @@
 
     <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/fixedheader/3.4.0/js/dataTables.fixedHeader.min.js"></script>
-    <script src="https://cdn.datatables.net/responsive/2.5.0/js/dataTables.responsive.min.js"></script>
 
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
@@ -47,37 +45,12 @@
             box-sizing: border-box;
         }
 
-        .top-left {
-            flex: 1.5;
-        }
-
-        .top-left h1 {
-            margin-top: 0;
-            color: #005bbb;
-        }
-
-        .rates {
-            font-size: 16px;
-            margin-bottom: 10px;
-        }
-
-        .creator {
-            font-size: 14px;
-            margin-bottom: 10px;
-            line-height: 1.4;
-        }
-
-        .update {
-            font-size: 13px;
-            color: #444;
-        }
-
-        .top-right {
-            flex: 1;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
+        .top-left { flex: 1.5; }
+        .top-left h1 { margin-top: 0; color: #005bbb; }
+        .rates { font-size: 16px; margin-bottom: 10px; }
+        .creator { font-size: 14px; margin-bottom: 10px; line-height: 1.4; }
+        .update { font-size: 13px; color: #444; }
+        .top-right { flex: 1; display: flex; justify-content: center; align-items: center; }
 
         .top-right img {
             width: 220px;
@@ -87,9 +60,7 @@
             transition: 0.2s;
         }
 
-        .top-right img:hover {
-            transform: scale(1.08);
-        }
+        .top-right img:hover { transform: scale(1.08); }
 
         .filters {
             margin-bottom: 20px;
@@ -105,48 +76,38 @@
             box-sizing: border-box;
         }
 
-        .filters label {
-            display: flex;
-            flex-direction: column;
-            font-size: 14px;
-        }
+        .filters label { display: flex; flex-direction: column; font-size: 14px; }
 
-        #filter-sklep + .select2-container,
-        #filter-team + .select2-container {
-            width: 260px !important;
-        }
-
-        #filter-sezon + .select2-container,
-        #filter-producent + .select2-container,
-        #filter-typboxa + .select2-container {
-            width: 160px !important;
-        }
-
-        table {
-            font-size: 14px;
+        .table-container {
             max-width: 1200px;
             width: 100%;
+            background: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+            box-sizing: border-box;
         }
 
-        table.dataTable thead th {
-            background: #005bbb;
-            color: white;
-        }
+        /* Sztywne szerokości kolumn w CSS zapobiegające skakaniu */
+        table#produkty { table-layout: fixed !important; }
+        th:nth-child(1) { width: 25%; } /* Produkt */
+        th:nth-child(2) { width: 80px; } /* Cena (oryg) */
+        th:nth-child(3) { width: 70px; } /* Waluta */
+        th:nth-child(4) { width: 120px; } /* Sklep */
+        th:nth-child(5) { width: 90px; } /* Sezon */
+        th:nth-child(6) { width: 100px; } /* Producent */
+        th:nth-child(7) { width: 100px; } /* Typ karty */
+        th:nth-child(8) { width: 100px; } /* Typ boxa */
+        th:nth-child(9) { width: 120px; } /* Team */
+        th:nth-child(10) { width: 110px; } /* Cena PLN */
 
-        .select2-container {
-            min-width: 170px;
-        }
+        table.dataTable thead th { background: #005bbb; color: white; }
+        .select2-container { min-width: 170px; }
 
         @media (max-width: 768px) {
-            .top-section {
-                flex-direction: column;
-                gap: 20px;
-                padding: 20px;
-            }
-            .top-right img {
-                width: 150px;
-                height: 150px;
-            }
+            .top-section { flex-direction: column; gap: 20px; padding: 20px; }
+            .top-right img { width: 150px; height: 150px; }
+            table#produkty { table-layout: auto !important; } /* Na mobile pozwalamy na auto */
         }
     </style>
 </head>
@@ -154,7 +115,6 @@
 <body>
 
 <div class="top-section">
-
     <div class="top-left">
         <h1 id="main-heading">📦 Porównanie cen boxów z kartami piłkarskimi</h1>
 
@@ -169,6 +129,7 @@
             <strong>Biwekson & Friends</strong><br>
             TikTok: <a id="tiktok-link" href="#" target="_blank">link</a> |
             Instagram: <a id="instagram-link" href="#" target="_blank">link</a>
+            <div id="disclaimer-text" style="margin-top: 10px; font-style: italic; color: #555;"></div>
         </div>
 
         <div class="update">
@@ -181,7 +142,6 @@
             <button id="lang-pl">PL</button>
             <button id="lang-en">EN</button>
         </div>
-
     </div>
 
     <div class="top-right">
@@ -189,7 +149,6 @@
             <img src="logo_biwekson.jpg" alt="logo">
         </a>
     </div>
-
 </div>
 
 <div class="filters">
@@ -200,28 +159,29 @@
     <label><span id="filter-typboxa-label">Typ boxa:</span> <select id="filter-typboxa" multiple></select></label>
 </div>
 
-<table id="produkty" class="display responsive nowrap" style="width:100%">
-    <thead>
-        <tr id="table-headers">
-            <th>Produkt</th>
-            <th>Cena</th>
-            <th>Waluta</th>
-            <th>Sklep</th>
-            <th>Sezon</th>
-            <th>Producent</th>
-            <th>Typ karty</th>
-            <th>Typ boxa</th>
-            <th>Team</th>
-            <th>Cena box (PLN)</th>
-        </tr>
-    </thead>
-    <tbody></tbody>
-</table>
+<div class="table-container">
+    <table id="produkty" class="display" style="width:100%">
+        <thead>
+            <tr id="table-headers">
+                <th>Produkt</th>
+                <th>Cena</th>
+                <th>Waluta</th>
+                <th>Sklep</th>
+                <th>Sezon</th>
+                <th>Producent</th>
+                <th>Typ karty</th>
+                <th>Typ boxa</th>
+                <th>Team</th>
+                <th>Cena box (PLN)</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+</div>
 
 <script>
 $(document).ready(function() {
 
-    // 🔹 1️⃣ Rozbudowane tłumaczenia UI oraz DataTables
     const translations = {
         PL: {
             ui: {
@@ -230,23 +190,17 @@ $(document).ready(function() {
                 ratesLabel: "Orientacyjne kursy walut:",
                 updateLabel: "Aktualizacja danych:",
                 langLabel: "🌍 Język:",
-                loading: "ładowanie...",
                 noInfo: "brak informacji",
+                disclaimer: "To jest projekt niekomercyjny. Jeśli widzisz bugi – napisz na TikToka. Nie wspieram żadnego sklepu, ani żaden sklep nie wspiera mnie.",
                 filters: {
-                    sklep: "Sklep:",
-                    sezon: "Sezon:",
-                    team: "Team:",
-                    producent: "Producent:",
-                    typBoxa: "Typ boxa:",
-                    placeholder: "Wybierz..."
+                    sklep: "Sklep:", sezon: "Sezon:", team: "Team:", producent: "Producent:", typBoxa: "Typ boxa:", placeholder: "Wybierz..."
                 },
                 tableHeaders: ["Produkt", "Cena", "Waluta", "Sklep", "Sezon", "Producent", "Typ karty", "Typ boxa", "Team", "Cena box (PLN)"]
             },
             dt: {
                 lengthMenu: "Pokaż _MENU_ boxów",
                 info: "Pokazuję od _START_ do _END_ z _TOTAL_ boxów",
-                infoEmpty: "Brak boxów do wyświetlenia",
-                infoFiltered: "(przefiltrowano z _MAX_ wszystkich boxów)",
+                infoEmpty: "Brak boxów",
                 zeroRecords: "Brak wyników",
                 search: "Szukaj:",
                 paginate: { first: "Pierwsza", last: "Ostatnia", next: "Następna", previous: "Poprzednia" }
@@ -259,15 +213,10 @@ $(document).ready(function() {
                 ratesLabel: "Estimated Exchange Rates:",
                 updateLabel: "Data Update:",
                 langLabel: "🌍 Language:",
-                loading: "loading...",
                 noInfo: "no information",
+                disclaimer: "This is a non-commercial project. If you see any bugs – message me on TikTok. I do not endorse any store, nor does any store endorse me.",
                 filters: {
-                    sklep: "Store:",
-                    sezon: "Season:",
-                    team: "Team:",
-                    producent: "Manufacturer:",
-                    typBoxa: "Box Type:",
-                    placeholder: "Select..."
+                    sklep: "Store:", sezon: "Season:", team: "Team:", producent: "Manufacturer:", typBoxa: "Box Type:", placeholder: "Select..."
                 },
                 tableHeaders: ["Product", "Price", "Currency", "Store", "Season", "Manufacturer", "Card Type", "Box Type", "Team", "Box Price (PLN)"]
             },
@@ -275,7 +224,6 @@ $(document).ready(function() {
                 lengthMenu: "Show _MENU_ boxes",
                 info: "Showing _START_ to _END_ of _TOTAL_ boxes",
                 infoEmpty: "No boxes available",
-                infoFiltered: "(filtered from _MAX_ total boxes)",
                 zeroRecords: "No results found",
                 search: "Search:",
                 paginate: { first: "First", last: "Last", next: "Next", previous: "Previous" }
@@ -286,101 +234,73 @@ $(document).ready(function() {
     let table;
     let globalUpdateDate = null;
 
-    // 🔹 2️⃣ Funkcja zmieniająca teksty w HTML i przeładowująca tabelę
     function updateUI(lang) {
         const ui = translations[lang].ui;
 
-        // Tłumaczenie tekstów statycznych
         document.getElementById('page-title').innerText = ui.pageTitle;
         document.getElementById('main-heading').innerText = ui.mainHeading;
         document.getElementById('rates-label').innerText = ui.ratesLabel;
         document.getElementById('update-label').innerText = ui.updateLabel;
         document.getElementById('lang-label').innerText = ui.langLabel;
+        document.getElementById('disclaimer-text').innerText = ui.disclaimer;
 
-        // Tłumaczenie etykiet filtrów
         document.getElementById('filter-sklep-label').innerText = ui.filters.sklep;
         document.getElementById('filter-sezon-label').innerText = ui.filters.sezon;
         document.getElementById('filter-team-label').innerText = ui.filters.team;
         document.getElementById('filter-producent-label').innerText = ui.filters.producent;
         document.getElementById('filter-typboxa-label').innerText = ui.filters.typBoxa;
 
-        // Tłumaczenie nagłówków tabeli
         const ths = document.querySelectorAll('#table-headers th');
-        ui.tableHeaders.forEach((text, index) => {
-            if (ths[index]) ths[index].innerText = text;
-        });
+        ui.tableHeaders.forEach((text, index) => { if (ths[index]) ths[index].innerText = text; });
 
-        // Formatowanie daty zgodnie z językiem
         const lastUpdateElem = document.getElementById('last-update');
         if (globalUpdateDate) {
-            const options = { 
-                day: "2-digit", month: "2-digit", year: "numeric",
-                hour: "2-digit", minute: "2-digit", second: "2-digit",
-                hour12: false, timeZone: "Europe/Warsaw"
-            };
             const locale = lang === 'PL' ? "pl-PL" : "en-GB";
-            lastUpdateElem.innerText = globalUpdateDate.toLocaleString(locale, options);
-        } else {
-            lastUpdateElem.innerText = ui.noInfo;
-        }
+            lastUpdateElem.innerText = globalUpdateDate.toLocaleString(locale, { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: false });
+        } else { lastUpdateElem.innerText = ui.noInfo; }
 
-        // Aktualizacja Select2 (aby odświeżyć placeholder)
-        $("#filter-sklep, #filter-sezon, #filter-team, #filter-producent, #filter-typboxa").select2({
-            placeholder: ui.filters.placeholder,
-            allowClear: true
-        });
+        $("#filter-sklep, #filter-sezon, #filter-team, #filter-producent, #filter-typboxa").select2({ placeholder: ui.filters.placeholder, allowClear: true });
 
-        // Na koniec ładujemy na nowo tabelę
         initTable(lang);
     }
 
-    // 🔹 3️⃣ Funkcja inicjalizująca DataTable
     function initTable(lang) {
-        if ($.fn.DataTable.isDataTable('#produkty')) {
-            table.destroy();
-        }
+        if ($.fn.DataTable.isDataTable('#produkty')) { table.destroy(); }
 
         table = $('#produkty').DataTable({
             pageLength: 25,
             deferRender: true,
             processing: true,
             fixedHeader: true,
-            responsive: true,
-            language: translations[lang].dt
+            scrollX: true,
+            autoWidth: false, // Kluczowe, by szerokości z CSS były respektowane
+            language: translations[lang].dt,
+            columnDefs: [
+                { width: "25%", targets: 0 },
+                { width: "80px", targets: 1 },
+                { width: "70px", targets: 2 },
+                { width: "120px", targets: 3 },
+                { width: "90px", targets: 4 },
+                { width: "100px", targets: 5 },
+                { width: "100px", targets: 6 },
+                { width: "100px", targets: 7 },
+                { width: "120px", targets: 8 },
+                { width: "110px", targets: 9 }
+            ]
         });
     }
 
-    // 🔹 4️⃣ Wczytanie config.csv
     Papa.parse("config.csv", {
-        download: true,
-        header: false,
-        delimiter: ";",
-        skipEmptyLines: true,
+        download: true, header: false, delimiter: ";", skipEmptyLines: true,
         complete: function(results) {
             const config = {};
-            results.data.forEach(row => {
-                if(row[0] && row[1]) config[row[0]] = row[1].trim();
-            });
-
-            const eur = config.EUR ? config.EUR.replace(",", ".") : "0";
-            const usd = config.USD ? config.USD.replace(",", ".") : "0";
+            results.data.forEach(row => { if(row[0] && row[1]) config[row[0]] = row[1].trim(); });
+            document.getElementById("eurpln").innerText = config.EUR ? config.EUR.replace(",", ".") : "0";
+            document.getElementById("usdpln").innerText = config.USD ? config.USD.replace(",", ".") : "0";
             const gbpText = config.GB_Tax ? config.GB_Tax.replace(",", ".") : "0";
-            const gbp = (parseFloat(gbpText) * 100).toFixed(0) + "%";
-
-            document.getElementById("eurpln").innerText = eur;
-            document.getElementById("usdpln").innerText = usd;
-            document.getElementById("gbptax").innerText = gbp;
-
+            document.getElementById("gbptax").innerText = (parseFloat(gbpText) * 100).toFixed(0) + "%";
             if(config.TIKTOK_LINK) document.getElementById("tiktok-link").href = config.TIKTOK_LINK;
             if(config.INSTAGRAM_LINK) document.getElementById("instagram-link").href = config.INSTAGRAM_LINK;
-
-            if(config.OPIS) {
-                const opisElem = document.createElement("p");
-                opisElem.innerText = config.OPIS;
-                document.querySelector(".creator").appendChild(opisElem);
-            }
-
-            // Przechwycenie daty do zmiennej globalnej, aby formatować ją w updateUI()
             if(config.OSTATNIE_URUCHOMIENIE) {
                 const excelDate = parseFloat(config.OSTATNIE_URUCHOMIENIE.replace(",", "."));
                 globalUpdateDate = new Date((excelDate - 25569) * 86400 * 1000);
@@ -388,74 +308,40 @@ $(document).ready(function() {
         }
     });
 
-    // 🔹 5️⃣ Wczytanie danych CSV z produktami
     Papa.parse("export.csv", {
-        download: true,
-        header: true,
-        delimiter: ";",
+        download: true, header: true, delimiter: ";",
         complete: function(results) {
-            var data = results.data;
-
-            data.forEach(function(row) {
+            results.data.forEach(function(row) {
                 if (!row.Produkt || row.Produkt.trim() === "") return;
-
-                // Bezpieczne parsowanie liczby do atrybutu data-order
                 let cenaRaw = row.cena_box_PLN ? row.cena_box_PLN.replace(",", ".") : "0";
                 let cenaNumeric = parseFloat(cenaRaw) || 0;
-                let cenaFormatted = cenaNumeric.toFixed(2).replace(".", ",");
-
                 $('#produkty tbody').append(`
                     <tr>
-                        <td>${row.Produkt}</td>
-                        <td>${row.Box}</td>
-                        <td>${row.Waluta}</td>
-                        <td>${row.Sklep}</td>
-                        <td>${row.Sezon}</td>
-                        <td>${row.Producent}</td>
-                        <td>${row["Typ karty"] || ""}</td>
-                        <td>${row["Typ boxa"] || ""}</td>
-                        <td>${row.Team || ""}</td>
-                        <td data-order="${cenaNumeric}">${cenaFormatted}</td>
+                        <td>${row.Produkt}</td><td>${row.Box}</td><td>${row.Waluta}</td><td>${row.Sklep}</td><td>${row.Sezon}</td><td>${row.Producent}</td><td>${row["Typ karty"] || ""}</td><td>${row["Typ boxa"] || ""}</td><td>${row.Team || ""}</td><td data-order="${cenaNumeric}">${cenaNumeric.toFixed(2).replace(".", ",")}</td>
                     </tr>
                 `);
             });
-
-            // 🔹 6️⃣ Pierwsze uruchomienie po wczytaniu danych (domyślnie PL)
             updateUI('PL'); 
-
-            // 🔹 7️⃣ Eventy przycisków językowych
             $('#lang-pl').on('click', function() { updateUI('PL'); });
             $('#lang-en').on('click', function() { updateUI('EN'); });
 
-            // 🔹 8️⃣ Funkcja uzupełniająca filtry
+            // Funkcja filtrów
             function fillFilter(columnIndex, selectId, reverse=false) {
                 var column = table.column(columnIndex);
                 var select = $(selectId);
-
-                let dataArray = column.data().toArray();
-                dataArray = dataArray.filter(d => d && d.trim() !== "");
-                dataArray = [...new Set(dataArray)];
+                let dataArray = [...new Set(column.data().toArray().filter(d => d && d.trim() !== ""))];
                 dataArray.sort((a, b) => a.localeCompare(b, 'pl'));
                 if(reverse) dataArray.reverse();
-
                 select.empty();
-                dataArray.forEach(function(d) {
-                    // Dodajemy opcje. Placeholdery dodawane są przez updateUI/Select2
-                    select.append(new Option(d, d, false, false));
-                });
-
+                dataArray.forEach(d => select.append(new Option(d, d)));
                 select.on('change', function() {
                     var values = $(this).val();
-                    if (!values || values.length === 0) {
-                        column.search("").draw();
-                        return;
-                    }
+                    if (!values) { column.search("").draw(); return; }
                     var regex = values.map(v => '^' + v.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '$').join('|');
                     column.search(regex, true, false).draw();
                 });
             }
 
-            // 🔹 9️⃣ Wypełnienie filtrów
             fillFilter(3, '#filter-sklep');      
             fillFilter(4, '#filter-sezon', true); 
             fillFilter(8, '#filter-team');        
@@ -463,7 +349,6 @@ $(document).ready(function() {
             fillFilter(7, '#filter-typboxa');     
         }
     });
-
 });
 </script>
 
