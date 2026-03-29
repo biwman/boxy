@@ -6,7 +6,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
-    <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.5.0/css/responsive.dataTables.min.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
 
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
@@ -18,9 +17,8 @@
         :root { --main-blue: #005bbb; --bg-light: #f7f9fc; }
         body { font-family: 'Segoe UI', Arial, sans-serif; margin: 20px; background: linear-gradient(135deg, #e3f2fd, #f7f9fc); display: flex; flex-direction: column; align-items: center; }
         
-        /* Rozszerzenie kontenerów dla lepszego wykorzystania miejsca */
         .top-section, .filters-container, .table-holder { 
-            max-width: 1600px; /* Zwiększono z 1300px */
+            max-width: 1600px; 
             width: 98%; 
             box-sizing: border-box;
         }
@@ -53,17 +51,11 @@
             padding: 2px 8px !important; margin-top: 5px !important; font-size: 12px !important;
         }
         .select2-selection__choice__display { color: #ffffff !important; }
-        .select2-container--default .select2-selection--multiple .select2-selection__choice__remove { color: #ffffff !important; margin-right: 5px !important; }
 
-        /* TABELA - DOPASOWANIE DO SZEROKOŚCI */
-        .table-holder { 
-            background: #fff; padding: 20px; border-radius: 12px; 
-            box-shadow: 0 4px 20px rgba(0,0,0,0.08); 
-        }
-        table.dataTable { width: 100% !important; margin: 0 !important; }
-        table.dataTable thead th { background-color: var(--main-blue); color: white; border: none; padding: 12px; text-align: left; }
-        
-        /* Styl dla kwoty PLN, żeby była wyraźna i wyrównana */
+        /* TABELA */
+        .table-holder { background: #fff; padding: 20px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
+        table.dataTable { width: 100% !important; margin: 0 !important; border-collapse: collapse; }
+        table.dataTable thead th { background-color: var(--main-blue); color: white; border: none; padding: 12px; text-align: left; white-space: nowrap; }
         .col-pln { font-weight: bold; color: var(--main-blue); text-align: right !important; }
 
         @media (max-width: 1100px) {
@@ -105,17 +97,17 @@
 <div class="filters-container">
     <div class="filter-group"><label id="lbl-shop">Sklep:</label><select id="f-shop" multiple="multiple"></select></div>
     <div class="filter-group"><label id="lbl-season">Sezon:</label><select id="f-season" multiple="multiple"></select></div>
-    <div class="filter-group"><label id="lbl-team">Team:</label><select id="f-team" multiple="multiple"></select></div>
+    <div class="filter-group"><label id="lbl-team">Drużyna:</label><select id="f-team" multiple="multiple"></select></div>
     <div class="filter-group"><label id="lbl-brand">Marka:</label><select id="f-brand" multiple="multiple"></select></div>
-    <div class="filter-group"><label id="lbl-type">Typ boxa:</label><select id="f-type" multiple="multiple"></select></div>
+    <div class="filter-group"><label id="lbl-type">Typ:</label><select id="f-type" multiple="multiple"></select></div>
 </div>
 
 <div class="table-holder">
     <table id="mainTable" class="display nowrap" style="width:100%">
         <thead>
             <tr>
-                <th>Produkt</th><th>Box</th><th>CCY</th><th>Sklep</th><th>Sezon</th>
-                <th>Brand</th><th>Karta</th><th>Typ</th><th>Team</th><th>Cena PLN</th>
+                <th>Produkt</th><th>Cena</th><th>Waluta</th><th>Sklep</th><th>Sezon</th>
+                <th>Marka</th><th>Typ</th><th>Drużyna</th><th>Cena PLN</th>
             </tr>
         </thead>
         <tbody></tbody>
@@ -129,8 +121,14 @@ $(document).ready(function() {
     let currentLang = 'PL';
 
     const langData = {
-        PL: { title: "📦 Porównanie cen boxów", shop: "Sklep:", season: "Sezon:", team: "Team:", brand: "Marka:", type: "Typ boxa:", placeholder: "Wszystkie", rates: "Kursy:", update: "Aktualizacja:" },
-        EN: { title: "📦 Box Price Comparison", shop: "Shop:", season: "Season:", team: "Team:", brand: "Brand:", type: "Box Type:", placeholder: "All", rates: "Rates:", update: "Update:" }
+        PL: { 
+            title: "📦 Porównanie cen boxów", shop: "Sklep:", season: "Sezon:", team: "Drużyna:", brand: "Marka:", type: "Typ:", placeholder: "Wszystkie", rates: "Kursy:", update: "Aktualizacja:",
+            h: ["Produkt", "Cena", "Waluta", "Sklep", "Sezon", "Marka", "Typ", "Drużyna", "Cena PLN"]
+        },
+        EN: { 
+            title: "📦 Box Price Comparison", shop: "Shop:", season: "Season:", team: "Team:", brand: "Brand:", type: "Type:", placeholder: "All", rates: "Rates:", update: "Update:",
+            h: ["Product", "Price", "CCY", "Shop", "Season", "Brand", "Type", "Team", "Price PLN"]
+        }
     };
 
     function updateLanguage(lang) {
@@ -146,6 +144,9 @@ $(document).ready(function() {
         $("#ui-update-lbl").text(d.update);
         $("#ui-description").text(lang === 'PL' ? config.OPIS_PL : config.OPIS_EN);
         
+        // Aktualizacja nagłówków tabeli
+        $('#mainTable thead th').each(function(i) { $(this).text(d.h[i]); });
+
         $('select').each(function() {
             $(this).select2({ placeholder: d.placeholder });
         });
@@ -186,25 +187,21 @@ $(document).ready(function() {
         download: true, header: true, delimiter: ";", complete: function(results) {
             results.data.forEach(row => {
                 if(!row.Produkt) return;
-                let cena = parseFloat(row.cena_box_PLN ? row.cena_box_PLN.replace(',','.') : 0);
+                let cenaPLN = parseFloat(row.cena_box_PLN ? row.cena_box_PLN.replace(',','.') : 0);
                 $('#mainTable tbody').append(`
                     <tr>
                         <td>${row.Produkt}</td><td>${row.Box}</td><td>${row.Waluta}</td>
                         <td>${row.Sklep}</td><td>${row.Sezon}</td><td>${row.Producent}</td>
-                        <td>${row["Typ karty"]}</td><td>${row["Typ boxa"]}</td><td>${row.Team}</td>
-                        <td class="col-pln" data-order="${cena}">${cena.toFixed(2)}</td>
+                        <td>${row["Typ boxa"]}</td><td>${row.Team}</td>
+                        <td class="col-pln" data-order="${cenaPLN}">${cenaPLN.toFixed(2)}</td>
                     </tr>
                 `);
             });
 
-            table = $('#mainTable').DataTable({ 
-                pageLength: 25, 
-                responsive: false, // Wyłączone, by wymusić pełną szerokość bez chowania kolumn
-                scrollX: false     // Wyłączone, by tabela rozpychała kontener zamiast tworzyć suwak wewnątrz
-            });
-
+            table = $('#mainTable').DataTable({ pageLength: 25, responsive: false });
             $('select').select2({ placeholder: "Wszystkie", allowClear: true, closeOnSelect: false, width: '100%' });
-            fillFilter(3, '#f-shop'); fillFilter(4, '#f-season'); fillFilter(8, '#f-team'); fillFilter(5, '#f-brand'); fillFilter(7, '#f-type');
+            
+            fillFilter(3, '#f-shop'); fillFilter(4, '#f-season'); fillFilter(7, '#f-team'); fillFilter(5, '#f-brand'); fillFilter(6, '#f-type');
 
             $("#btn-pl").click(() => updateLanguage('PL'));
             $("#btn-en").click(() => updateLanguage('EN'));
