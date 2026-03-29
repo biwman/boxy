@@ -59,20 +59,8 @@
             color: #005bbb;
         }
 
-        .rates {
-            font-size: 16px;
+        .rates, .creator, .update {
             margin-bottom: 10px;
-        }
-
-        .creator {
-            font-size: 14px;
-            margin-bottom: 10px;
-            line-height: 1.4;
-        }
-
-        .update {
-            font-size: 13px;
-            color: #444;
         }
 
         .top-right {
@@ -102,6 +90,26 @@
             max-width: 1200px;
             width: 100%;
             box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .filters label {
+            display: flex;
+            flex-direction: column;
+            font-size: 14px;
+        }
+
+        #filter-sklep + .select2-container,
+        #filter-team + .select2-container {
+            width: 260px !important;
+        }
+
+        #filter-sezon + .select2-container,
+        #filter-producent + .select2-container,
+        #filter-typboxa + .select2-container {
+            width: 160px !important;
         }
 
         table {
@@ -129,34 +137,6 @@
                 height: 150px;
             }
         }
-/* kontener filtrów */
-.filters {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 15px;
-}
-
-/* każdy filtr jako blok */
-.filters label {
-    display: flex;
-    flex-direction: column;
-    font-size: 14px;
-}
-
-/* 🔥 SZEROKIE */
-#filter-sklep + .select2-container,
-#filter-team + .select2-container {
-    width: 260px !important;
-}
-
-/* 🔥 WĄSKIE */
-#filter-sezon + .select2-container,
-#filter-producent + .select2-container,
-#filter-typboxa + .select2-container {
-    width: 160px !important;
-}
-
-
     </style>
 </head>
 
@@ -165,10 +145,10 @@
 <div class="top-section">
 
     <div class="top-left">
-        <h1>📦 Porównanie cen boxów z kartami piłkarskimi</h1>
+        <h1 data-lang-pl="📦 Porównanie cen boxów z kartami piłkarskimi" data-lang-en="📦 Football Card Box Price Comparison">📦 Porównanie cen boxów z kartami piłkarskimi</h1>
 
         <div class="rates">
-            <strong>Orientacyjne kursy walut:</strong><br>
+            <strong data-lang-pl="Orientacyjne kursy walut:" data-lang-en="Exchange rates (approx.):">Orientacyjne kursy walut:</strong><br>
             EUR/PLN: <span id="eurpln">ładowanie...</span> |
             USD/PLN: <span id="usdpln">ładowanie...</span> |
             UK Tax: <span id="gbptax">ładowanie...</span>
@@ -181,14 +161,15 @@
         </div>
 
         <div class="update">
-            <strong>Aktualizacja danych:</strong>
+            <strong data-lang-pl="Aktualizacja danych:" data-lang-en="Last update:">Aktualizacja danych:</strong>
             <span id="last-update">ładowanie...</span>
         </div>
-	<div style="margin-top: 10px;">
-    	🌍 Język:
-   	 <button id="lang-pl">PL</button>
-    	<button id="lang-en">EN</button>
-</div>
+
+        <div style="margin-top: 10px;">
+            🌍 <span data-lang-pl="Język:" data-lang-en="Language:">Język:</span>
+            <button id="lang-pl">PL</button>
+            <button id="lang-en">EN</button>
+        </div>
 
     </div>
 
@@ -201,26 +182,26 @@
 </div>
 
 <div class="filters">
-    <label>Sklep: <select id="filter-sklep" multiple></select></label>
-    <label>Sezon: <select id="filter-sezon" multiple></select></label>
-    <label>Team: <select id="filter-team" multiple></select></label>
-    <label>Producent: <select id="filter-producent" multiple></select></label>
-    <label>Typ boxa: <select id="filter-typboxa" multiple></select></label>
+    <label data-lang-pl="Sklep:" data-lang-en="Shop:">Sklep: <select id="filter-sklep" multiple></select></label>
+    <label data-lang-pl="Sezon:" data-lang-en="Season:">Sezon: <select id="filter-sezon" multiple></select></label>
+    <label data-lang-pl="Team:" data-lang-en="Team:">Team: <select id="filter-team" multiple></select></label>
+    <label data-lang-pl="Producent:" data-lang-en="Manufacturer:">Producent: <select id="filter-producent" multiple></select></label>
+    <label data-lang-pl="Typ boxa:" data-lang-en="Box type:">Typ boxa: <select id="filter-typboxa" multiple></select></label>
 </div>
 
 <table id="produkty" class="display">
     <thead>
         <tr>
-            <th>Produkt</th>
-            <th>Box</th>
-            <th>Sklep</th>
-            <th>Waluta</th>
-            <th>Sezon</th>
-            <th>Producent</th>
-            <th>Typ karty</th>
-            <th>Typ boxa</th>
-            <th>Team</th>
-            <th>Cena box (PLN)</th>
+            <th data-lang-pl="Produkt" data-lang-en="Product">Produkt</th>
+            <th data-lang-pl="Box" data-lang-en="Box">Box</th>
+            <th data-lang-pl="Sklep" data-lang-en="Shop">Sklep</th>
+            <th data-lang-pl="Waluta" data-lang-en="Currency">Waluta</th>
+            <th data-lang-pl="Sezon" data-lang-en="Season">Sezon</th>
+            <th data-lang-pl="Producent" data-lang-en="Manufacturer">Producent</th>
+            <th data-lang-pl="Typ karty" data-lang-en="Card type">Typ karty</th>
+            <th data-lang-pl="Typ boxa" data-lang-en="Box type">Typ boxa</th>
+            <th data-lang-pl="Team" data-lang-en="Team">Team</th>
+            <th data-lang-pl="Cena box (PLN)" data-lang-en="Box price (PLN)">Cena box (PLN)</th>
         </tr>
     </thead>
     <tbody></tbody>
@@ -229,7 +210,7 @@
 <script>
 $(document).ready(function() {
 
-    // 🔹 1️⃣ Tłumaczenia
+    // 🔹 1️⃣ Tłumaczenia DataTables
     const translations = {
         PL: {
             lengthMenu: "Pokaż _MENU_ boxów",
@@ -241,7 +222,8 @@ $(document).ready(function() {
             first: "Pierwsza",
             last: "Ostatnia",
             next: "Następna",
-            previous: "Poprzednia"
+            previous: "Poprzednia",
+            selectPlaceholder: "Wybierz..."
         },
         EN: {
             lengthMenu: "Show _MENU_ boxes",
@@ -253,7 +235,8 @@ $(document).ready(function() {
             first: "First",
             last: "Last",
             next: "Next",
-            previous: "Previous"
+            previous: "Previous",
+            selectPlaceholder: "Select..."
         }
     };
 
@@ -287,9 +270,24 @@ $(document).ready(function() {
                 }
             }
         });
+
+        // 🔹 4️⃣ Zaktualizuj placeholdery Select2 po zmianie języka
+        $("#filter-sklep, #filter-sezon, #filter-team, #filter-producent, #filter-typboxa").each(function() {
+            $(this).select2({
+                placeholder: translations[lang].selectPlaceholder,
+                allowClear: true
+            });
+        });
+
+        // 🔹 5️⃣ Zaktualizuj nagłówki i teksty w top-section
+        $("[data-lang-pl]").each(function() {
+            const plText = $(this).attr("data-lang-pl");
+            const enText = $(this).attr("data-lang-en");
+            $(this).text(lang === "PL" ? plText : enText);
+        });
     }
 
-    // 🔹 4️⃣ Wczytanie config.csv
+    // 🔹 6️⃣ Wczytanie config.csv
     Papa.parse("config.csv", {
         download: true,
         header: false,
@@ -301,7 +299,6 @@ $(document).ready(function() {
                 if(row[0] && row[1]) config[row[0]] = row[1].trim();
             });
 
-            // kursy walut i podatek
             const eur = config.EUR.replace(",", ".");
             const usd = config.USD.replace(",", ".");
             const gbp = (parseFloat(config.GB_Tax.replace(",", ".")) * 100).toFixed(0) + "%";
@@ -310,18 +307,9 @@ $(document).ready(function() {
             document.getElementById("usdpln").innerText = usd;
             document.getElementById("gbptax").innerText = gbp;
 
-            // linki do social media
             if(config.TIKTOK_LINK) document.getElementById("tiktok-link").href = config.TIKTOK_LINK;
             if(config.INSTAGRAM_LINK) document.getElementById("instagram-link").href = config.INSTAGRAM_LINK;
 
-            // opis
-            if(config.OPIS) {
-                const opisElem = document.createElement("p");
-                opisElem.innerText = config.OPIS;
-                document.querySelector(".creator").appendChild(opisElem);
-            }
-
-            // data ostatniego uruchomienia (Excel date float)
             if(config.OSTATNIE_URUCHOMIENIE) {
                 const excelDate = parseFloat(config.OSTATNIE_URUCHOMIENIE.replace(",", "."));
                 const jsDate = new Date((excelDate - 25569) * 86400 * 1000);
@@ -341,7 +329,7 @@ $(document).ready(function() {
         }
     });
 
-    // 🔹 5️⃣ Wczytanie danych CSV z produktami
+    // 🔹 7️⃣ Wczytanie danych CSV z produktami
     Papa.parse("export.csv", {
         download: true,
         header: true,
@@ -371,25 +359,16 @@ $(document).ready(function() {
                 `);
             });
 
-            // 🔹 6️⃣ Uruchomienie tabeli po wczytaniu danych
             initTable('PL'); // startowy język
 
-            // 🔹 7️⃣ Eventy przycisków językowych
-            $('#lang-pl').on('click', function() {
-                initTable('PL');
-            });
+            $('#lang-pl').on('click', function() { initTable('PL'); });
+            $('#lang-en').on('click', function() { initTable('EN'); });
 
-            $('#lang-en').on('click', function() {
-                initTable('EN');
-            });
-
-            // 🔹 8️⃣ Inicjalizacja Select2
             $("#filter-sklep, #filter-sezon, #filter-team, #filter-producent, #filter-typboxa").select2({
-                placeholder: "Wybierz...",
+                placeholder: translations['PL'].selectPlaceholder,
                 allowClear: true
             });
 
-            // 🔹 9️⃣ Funkcja uzupełniająca filtry
             function fillFilter(columnIndex, selectId, reverse=false) {
                 var column = table.column(columnIndex);
                 var select = $(selectId);
@@ -416,7 +395,6 @@ $(document).ready(function() {
                 });
             }
 
-            // 🔹 10️⃣ Wypełnienie filtrów
             fillFilter(2, '#filter-sklep');
             fillFilter(4, '#filter-sezon', true);
             fillFilter(8, '#filter-team');
