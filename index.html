@@ -111,7 +111,7 @@
     <div class="modal-content">
         <span class="modal-close">&times;</span>
         <h2>Support me!</h2>
-        <p>Add me to observed in TikTok</p>
+        <p>Follow me on TikTok</p>
         <a id="modal-link" href="#" target="_blank">
             <img src="logo_biwekson.jpg" alt="Logo">
         </a>
@@ -182,20 +182,44 @@ $(document).ready(function() {
     };
 
     function updateLanguage(lang) {
-        const d = langData[lang];
-        $("#ui-title").text(d.title);
-        $("#lbl-shop").text(d.shop);
-        $("#lbl-season").text(d.season);
-        $("#lbl-team").text(d.team);
-        $("#lbl-brand").text(d.brand);
-        $("#lbl-type").text(d.type);
-        $("#ui-rates-lbl").text(d.rates);
-        $("#ui-update-lbl").text(d.update);
-        $("#ui-description").text(lang === 'PL' ? config.OPIS_PL : config.OPIS_EN);
-        
-        $('#mainTable thead th').each(function(i) { $(this).text(d.h[i]); });
-        $('select').each(function() { $(this).select2({ placeholder: d.placeholder }); });
-    }
+    const d = langData[lang];
+    $("#ui-title").text(d.title);
+    $("#lbl-shop").text(d.shop);
+    $("#lbl-season").text(d.season);
+    $("#lbl-team").text(d.team);
+    $("#lbl-brand").text(d.brand);
+    $("#lbl-type").text(d.type);
+    $("#ui-rates-lbl").text(d.rates);
+    $("#ui-update-lbl").text(d.update);
+    $("#ui-description").text(lang === 'PL' ? config.OPIS_PL : config.OPIS_EN);
+
+    // Zmieniamy nagłówki tabeli
+    $('#mainTable thead th').each(function(i) { 
+        if(i === 8) {
+            $(this).text(lang === 'PL' ? 'Cena PLN' : 'Price_EUR');
+        } else {
+            $(this).text(d.h[i]); 
+        }
+    });
+
+    // Aktualizacja wartości w ostatniej kolumnie
+    const eurRate = parseFloat(config.EUR ? config.EUR.replace(',','.') : 1); // kurs EUR z CSV
+    $('#mainTable tbody tr').each(function() {
+        const row = $(this);
+        const pricePLN = parseFloat(row.find('td:eq(8)').data('order')); // cena w PLN
+
+        if(lang === 'EN') {
+            const priceEUR = pricePLN / eurRate;
+            row.find('td:eq(8)').text(priceEUR.toFixed(2)).data('order', priceEUR);
+        } else {
+            row.find('td:eq(8)').text(pricePLN.toFixed(2)).data('order', pricePLN);
+        }
+    });
+
+    $('select').each(function() { 
+        $(this).select2({ placeholder: d.placeholder }); 
+    });
+}
 
     function fillFilter(columnIndex, selectId, desc = false) {
         const select = $(selectId);
