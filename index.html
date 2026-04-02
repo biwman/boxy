@@ -202,11 +202,14 @@ $(document).ready(function() {
         }
     });
 
-    // Aktualizacja wartości w ostatniej kolumnie
     const eurRate = parseFloat(config.EUR ? config.EUR.replace(',','.') : 1); // kurs EUR z CSV
+
     $('#mainTable tbody tr').each(function() {
         const row = $(this);
-        const pricePLN = parseFloat(row.find('td:eq(8)').data('order')); // cena w PLN
+
+        // Pobieramy zawsze oryginalne wartości zapisane w data
+        let pricePLN = parseFloat(row.find('td:eq(8)').attr('data-pln'));
+        if(isNaN(pricePLN)) pricePLN = parseFloat(row.find('td:eq(8)').data('order')); // fallback
 
         if(lang === 'EN') {
             const priceEUR = pricePLN / eurRate;
@@ -279,7 +282,7 @@ if(config.OSTATNIE_URUCHOMIENIE) {
                         <td>${row.Producent}</td>
                         <td>${row["Typ boxa"]}</td>
                         <td>${row.Team}</td>
-                        <td class="col-pln" data-order="${cenaPLN}">${cenaPLN.toFixed(2)}</td>
+                        <td class="col-pln" data-order="${cenaPLN}" data-pln="${cenaPLN}">${cenaPLN.toFixed(2)}</td>
                     </tr>
                 `);
             });
