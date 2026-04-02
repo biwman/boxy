@@ -202,23 +202,30 @@ $(document).ready(function() {
         }
     });
 
-    const eurRate = parseFloat(config.EUR ? config.EUR.replace(',','.') : 1); // kurs EUR z CSV
+    const eurRate = parseFloat(config.EUR ? config.EUR.replace(',','.') : 1);
 
-    $('#mainTable tbody tr').each(function() {
-        const row = $(this);
+    // Aktualizacja ostatniej kolumny w DataTables
+    table.rows().every(function(rowIdx, tableLoop, rowLoop) {
+        const rowNode = this.node();
+        const $td = $(rowNode).find('td:eq(8)');
 
-        // Pobieramy zawsze oryginalne wartości zapisane w data
-        let pricePLN = parseFloat(row.find('td:eq(8)').attr('data-pln'));
-        if(isNaN(pricePLN)) pricePLN = parseFloat(row.find('td:eq(8)').data('order')); // fallback
+        // zawsze pobieramy oryginalną cenę w PLN z atrybutu data-pln
+        let pricePLN = parseFloat($td.attr('data-pln'));
+        if(isNaN(pricePLN)) pricePLN = 0;
 
         if(lang === 'EN') {
             const priceEUR = pricePLN / eurRate;
-            row.find('td:eq(8)').text(priceEUR.toFixed(2)).data('order', priceEUR);
+            this.cell(rowIdx, 8).data(priceEUR.toFixed(2));  // aktualizujemy cache DataTables
+            $td.data('order', priceEUR); // dla poprawnego sortowania
         } else {
-            row.find('td:eq(8)').text(pricePLN.toFixed(2)).data('order', pricePLN);
+            this.cell(rowIdx, 8).data(pricePLN.toFixed(2));
+            $td.data('order', pricePLN);
         }
     });
 
+    table.draw(false); // odświeżamy tabelę, bez resetowania sortowania/paginacji
+
+    // Odśwież placeholdery Select2
     $('select').each(function() { 
         $(this).select2({ placeholder: d.placeholder }); 
     });
