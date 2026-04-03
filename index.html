@@ -157,6 +157,30 @@ table.dataTable thead th {
     .modal-content h2 { font-size: 18px; }
     .modal-content p { font-size: 12px; }
 }
+
+/* =======================
+   4b) WYRAŹNIEJSZE KOLORY TABELI
+======================= */
+table.dataTable tbody tr:nth-child(odd) { 
+    background-color: #e3f2fd;  /* jasny niebieski */
+}
+table.dataTable tbody tr:nth-child(even) { 
+    background-color: #ffffff;  /* biały */
+}
+
+/* efekt podświetlenia wiersza przy hover */
+table.dataTable tbody tr:hover { 
+    background-color: #90caf9 !important;  /* mocniejszy niebieski */
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+/* dodatkowo wyróżnienie komórki po najechaniu */
+table.dataTable tbody td:hover {
+    background-color: #64b5f6 !important;
+    color: #fff;
+}
+
 </style>
 
 
