@@ -145,7 +145,35 @@
         font-size: 12px; 
     }
 }
+/* POPUP - mobilny poprawiony */
+@media (max-width: 600px) {
+    #welcomeModal {
+        align-items: flex-start; /* start od góry */
+        overflow-y: auto;        /* scroll jeśli modal jest za wysoki */
+        padding-top: 30px;       /* trochę miejsca od góry */
+    }
 
+    .modal-content {
+        max-width: 90%;         /* dopasowuje się do szerokości telefonu */
+        margin: 0 auto;         /* wyśrodkowanie poziome */
+        max-height: 90vh;       /* max wysokość = 90% viewport */
+        overflow-y: auto;       /* scroll w samej treści jeśli za wysoka */
+    }
+}
+/* TABELA - poprawione sticky header i scroll */
+@media (max-width: 600px) {
+    .table-holder {
+        overflow-x: auto;  /* scroll poziomy */
+        overflow-y: visible; /* nadal widoczny w pionie */
+    }
+
+    table.dataTable thead th {
+        position: sticky;
+        top: 0;
+        z-index: 20;             /* wyższy niż inne elementy */
+        background-color: var(--main-blue); /* upewniamy się że tło jest zakryte */
+    }
+}
     </style>
 </head>
 <body>
