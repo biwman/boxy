@@ -417,10 +417,10 @@ if(config.OSTATNIE_URUCHOMIENIE) {
 });
 
 window.addEventListener('load', function() {
-    fetch('https://api.countapi.xyz/hit/boxy-cennik-biwekson-123/visits')
+    fetch('https://api.counterapi.dev/v1/boxy-cennik/visits/up')
         .then(res => res.json())
         .then(data => {
-            document.getElementById('visit-count').innerText = data.value;
+            document.getElementById('visit-count').innerText = data.count;
         })
         .catch(err => {
             console.log("Błąd licznika:", err);
