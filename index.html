@@ -90,6 +90,13 @@
             .filter-group { flex: 1 1 200px; }
             .top-section { flex-direction: column; text-align: center; }
         }
+	@media (max-width: 600px) {
+    .top-section { padding: 15px; gap: 15px; }
+    .top-left h1 { font-size: 18px; }
+    .top-left .info-row { font-size: 11px; }
+    #btn-pl, #btn-en { padding: 4px 8px; font-size: 11px; }
+    .top-right img { width: 100px; }
+}	
 
         /* POP-UP STYLES */
         #welcomeModal {
@@ -103,6 +110,42 @@
         .modal-close { position: absolute; top: 10px; right: 15px; font-size: 28px; cursor: pointer; color: #666; font-weight: bold; }
         .modal-content img { width: 150px; border-radius: 12px; margin: 15px 0; }
         .modal-content h2 { margin-top: 0; color: var(--main-blue); }
+
+/* RESPONSYWNOŚĆ FILTRÓW NA TELEFONACH */
+@media (max-width: 600px) {
+    .filters-container { 
+        flex-direction: column; 
+        gap: 8px; 
+    }
+    .filter-group { 
+        min-width: 100%; 
+    }
+}
+/* TABELA - zmniejszony padding i font na telefonach */
+@media (max-width: 600px) {
+    table.dataTable td,
+    table.dataTable th {
+        padding: 6px 8px !important;
+        font-size: 12px;
+    }
+}
+/* POPUP MODAL - responsywny na telefonach */
+@media (max-width: 600px) {
+    .modal-content {
+        max-width: 300px;
+        padding: 20px;
+    }
+    .modal-content img { 
+        width: 120px; 
+    }
+    .modal-content h2 { 
+        font-size: 18px; 
+    }
+    .modal-content p { 
+        font-size: 12px; 
+    }
+}
+
     </style>
 </head>
 <body>
