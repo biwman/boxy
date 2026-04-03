@@ -222,6 +222,10 @@ table.dataTable tbody td:hover {
         <div class="info-row">
             <strong id="ui-update-lbl">Aktualizacja:</strong> <span id="last-update">...</span>
         </div>
+	<div class="info-row">
+    <strong>Liczba odwiedzin:</strong> <span id="visit-count">...</span>
+</div>
+
         <div id="ui-description">...</div>
         <div style="margin-top: 15px;">
     		<img id="btn-pl" src="flag_pl.png" alt="Polska" style="width:30px; height:20px; cursor:pointer; margin-right:8px; border:1px solid #ccc; border-radius:3px;">
@@ -411,6 +415,19 @@ if(config.OSTATNIE_URUCHOMIENIE) {
         $("#welcomeModal").fadeOut(200);
     });
 });
+
+// LICZNIK ODWIEDZIN
+fetch('https://api.countapi.xyz/hit/boxy-cennik/odwiedziny')
+    .then(res => res.json())
+    .then(data => {
+        document.getElementById('visit-count').innerText = data.value;
+    })
+    .catch(err => {
+        console.log("Błąd licznika:", err);
+        document.getElementById('visit-count').innerText = "N/A";
+    });
+
+
 </script>
 </body>
 </html>
