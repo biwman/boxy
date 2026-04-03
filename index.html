@@ -13,13 +13,16 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
 
-   <style>
+  <style>
 :root { --main-blue: #005bbb; --bg-light: #f0f4f8; }
 
-/* 1) BODY I GRADIENT */
+/* =======================
+   1) TŁO STRONY
+======================= */
 body { 
     font-family: 'Segoe UI', Arial, sans-serif; 
-    margin: 20px; 
+    margin: 0; 
+    padding: 20px 0; 
     background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #6B8DD6 100%);
     background-attachment: fixed;
     display: flex; 
@@ -28,7 +31,9 @@ body {
     min-height: 100vh;
 }
 
-/* KONTEJNERY */
+/* =======================
+   2) SEKCJA GÓRNA
+======================= */
 .top-section, .filters-container, .table-holder { 
     max-width: 1600px; 
     width: 98%; 
@@ -40,6 +45,7 @@ body {
     background: rgba(255, 255, 255, 0.95); padding: 25px 40px; border-radius: 15px; margin-bottom: 20px; 
     box-shadow: 0 8px 32px rgba(0,0,0,0.15);
 }
+
 .top-left h1 { margin: 0 0 10px 0; color: var(--main-blue); font-size: 24px; }
 .info-row { font-size: 13px; margin-bottom: 5px; color: #333; line-height: 1.4; }
 #ui-description { display: block; margin-top: 10px; font-size: 12px; color: #666; font-style: italic; max-width: 800px; }
@@ -48,11 +54,15 @@ body {
 .top-right a:hover { transform: scale(1.05); }
 .top-right img { width: 150px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); display: block; }
 
+/* =======================
+   3) FILTRY
+======================= */
 .filters-container { 
     margin-bottom: 20px; background: rgba(255, 255, 255, 0.95); padding: 20px; border-radius: 12px; 
     box-shadow: 0 8px 32px rgba(0,0,0,0.1); 
     display: flex; flex-wrap: nowrap; gap: 10px;
 }
+
 .filter-group { display: flex; flex-direction: column; flex: 1; min-width: 0; }
 .filter-group label { font-size: 12px; font-weight: bold; color: var(--main-blue); margin-bottom: 6px; }
 
@@ -62,15 +72,18 @@ body {
     padding: 2px 8px !important; margin-top: 5px !important; font-size: 12px !important;
 }
 
-/* 3) TABELA I STICKY HEADER */
+/* =======================
+   4) TABELA
+======================= */
 .table-holder { 
     background: #fff; padding: 20px; border-radius: 12px; 
     box-shadow: 0 8px 32px rgba(0,0,0,0.15); 
-    overflow: visible; /* ważne dla sticky */
-    background-clip: padding-box;
+    overflow-x: auto; /* poziomy scroll jeśli potrzebny */
+    overflow-y: visible; 
 }
 
 table.dataTable { width: 100% !important; margin: 0 !important; border-collapse: separate; border-spacing: 0; }
+
 table.dataTable thead th { 
     background-color: var(--main-blue); 
     color: white; 
@@ -87,55 +100,59 @@ table.dataTable thead th {
 .col-pln { font-weight: bold; color: var(--main-blue); text-align: right !important; }
 .col-price { text-align: right !important; padding-right: 20px !important; }
 
-/* RESPONSYWNOŚĆ */
+/* =======================
+   5) POP-UP MODAL
+======================= */
+#welcomeModal {
+    display: none; 
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.8); z-index: 10000; 
+    justify-content: center; align-items: center;
+    padding: 20px; box-sizing: border-box;
+}
+
+.modal-content {
+    background: white; padding: 30px; border-radius: 20px; text-align: center;
+    max-width: 400px; width: 90%; position: relative;
+    max-height: 90vh; overflow-y: auto;
+}
+
+.modal-close { position: absolute; top: 10px; right: 15px; font-size: 28px; cursor: pointer; color: #666; font-weight: bold; }
+.modal-content img { width: 150px; border-radius: 12px; margin: 15px 0; }
+.modal-content h2 { margin-top: 0; color: var(--main-blue); }
+
+/* =======================
+   6) RESPONSYWNOŚĆ
+======================= */
 @media (max-width: 1100px) {
     .filters-container { flex-wrap: wrap; }
     .filter-group { flex: 1 1 200px; }
     .top-section { flex-direction: column; text-align: center; }
 }
+
 @media (max-width: 600px) {
-    /* TOP SECTION */
+    /* Top section */
     .top-section { padding: 15px; gap: 15px; }
     .top-left h1 { font-size: 18px; }
     .top-left .info-row { font-size: 11px; }
     #btn-pl, #btn-en { padding: 4px 8px; font-size: 11px; }
     .top-right img { width: 100px; }
 
-    /* FILTRY */
+    /* Filtry */
     .filters-container { flex-direction: column; gap: 8px; }
     .filter-group { min-width: 100%; }
 
-    /* TABELA */
+    /* Tabela */
     table.dataTable td,
     table.dataTable th { padding: 6px 8px !important; font-size: 12px; }
+    .table-holder { padding-right: 10px; }
 
-    .table-holder {
-        overflow-x: auto;       /* scroll poziomy */
-        overflow-y: visible;
-        padding: 10px;
-        background: #fff;
-        border-radius: 12px;
-    }
+    /* Sticky header */
+    table.dataTable thead th { position: sticky; top: 0; z-index: 30; background-color: var(--main-blue); }
 
-    table.dataTable thead th {
-        position: sticky;
-        top: 0;
-        z-index: 30;
-        background-color: var(--main-blue);
-        min-width: 120px;
-        box-shadow: 0 2px 2px rgba(0,0,0,0.1);
-    }
-
-    /* POPUP MODAL */
-    #welcomeModal {
-        align-items: flex-start; 
-        overflow-y: auto;        
-        padding-top: 30px;
-    }
-    .modal-content {
-        max-width: 90%; margin: 0 auto; max-height: 90vh; overflow-y: auto;
-        padding: 20px;
-    }
+    /* Popup */
+    #welcomeModal { align-items: center; overflow-y: auto; padding-top: 0; }
+    .modal-content { max-width: 90%; margin: 0 auto; max-height: 90vh; overflow-y: auto; padding: 20px; }
     .modal-content img { width: 120px; }
     .modal-content h2 { font-size: 18px; }
     .modal-content p { font-size: 12px; }
