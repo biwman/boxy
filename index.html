@@ -181,6 +181,16 @@ table.dataTable tbody td:hover {
     color: #fff;
 }
 
+/* =======================
+   EFEKT HOVER NA FLAGACH
+======================= */
+#btn-pl:hover, #btn-en:hover {
+    transform: scale(1.2);
+    transition: transform 0.2s;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+}
+
+
 </style>
 
 
@@ -214,9 +224,9 @@ table.dataTable tbody td:hover {
         </div>
         <div id="ui-description">...</div>
         <div style="margin-top: 15px;">
-            <button id="btn-pl" style="cursor:pointer; padding: 5px 12px; border-radius: 4px; border: 1px solid #ccc;">PL</button>
-            <button id="btn-en" style="cursor:pointer; padding: 5px 12px; border-radius: 4px; border: 1px solid #ccc;">EN</button>
-        </div>
+    		<img id="btn-pl" src="flag_pl.png" alt="Polska" style="width:30px; height:20px; cursor:pointer; margin-right:8px; border:1px solid #ccc; border-radius:3px;">
+    		<img id="btn-en" src="flag_uk.png" alt="UK" style="width:30px; height:20px; cursor:pointer; border:1px solid #ccc; border-radius:3px;">
+	</div>
     </div>
     <div class="top-right">
         <a id="link-logo" href="#" target="_blank">
