@@ -13,12 +13,10 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
 
-    <style>
-:root { 
-    --main-blue: #005bbb; 
-    --bg-light: #f0f4f8; 
-}
+   <style>
+:root { --main-blue: #005bbb; --bg-light: #f0f4f8; }
 
+/* 1) BODY I GRADIENT */
 body { 
     font-family: 'Segoe UI', Arial, sans-serif; 
     margin: 20px; 
@@ -30,7 +28,7 @@ body {
     min-height: 100vh;
 }
 
-/* SEKCJA TOP I FILTRY */
+/* KONTEJNERY */
 .top-section, .filters-container, .table-holder { 
     max-width: 1600px; 
     width: 98%; 
@@ -38,17 +36,10 @@ body {
 }
 
 .top-section { 
-    display: flex; 
-    align-items: center; 
-    justify-content: space-between; 
-    gap: 30px; 
-    background: rgba(255, 255, 255, 0.95); 
-    padding: 25px 40px; 
-    border-radius: 15px; 
-    margin-bottom: 20px; 
+    display: flex; align-items: center; justify-content: space-between; gap: 30px; 
+    background: rgba(255, 255, 255, 0.95); padding: 25px 40px; border-radius: 15px; margin-bottom: 20px; 
     box-shadow: 0 8px 32px rgba(0,0,0,0.15);
 }
-
 .top-left h1 { margin: 0 0 10px 0; color: var(--main-blue); font-size: 24px; }
 .info-row { font-size: 13px; margin-bottom: 5px; color: #333; line-height: 1.4; }
 #ui-description { display: block; margin-top: 10px; font-size: 12px; color: #666; font-style: italic; max-width: 800px; }
@@ -58,47 +49,28 @@ body {
 .top-right img { width: 150px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); display: block; }
 
 .filters-container { 
-    margin-bottom: 20px; 
-    background: rgba(255, 255, 255, 0.95); 
-    padding: 20px; 
-    border-radius: 12px; 
+    margin-bottom: 20px; background: rgba(255, 255, 255, 0.95); padding: 20px; border-radius: 12px; 
     box-shadow: 0 8px 32px rgba(0,0,0,0.1); 
-    display: flex; 
-    flex-wrap: nowrap; 
-    gap: 10px;
+    display: flex; flex-wrap: nowrap; gap: 10px;
 }
 .filter-group { display: flex; flex-direction: column; flex: 1; min-width: 0; }
 .filter-group label { font-size: 12px; font-weight: bold; color: var(--main-blue); margin-bottom: 6px; }
 
-/* Select2 */
-.select2-container--default .select2-selection--multiple { 
-    border: 1px solid #ced4da !important; 
-    min-height: 38px !important; 
-    border-radius: 6px !important; 
-}
+.select2-container--default .select2-selection--multiple { border: 1px solid #ced4da !important; min-height: 38px !important; border-radius: 6px !important; }
 .select2-container--default .select2-selection--multiple .select2-selection__choice {
-    background-color: var(--main-blue) !important; 
-    color: #ffffff !important; 
-    border: none !important;
-    padding: 2px 8px !important; 
-    margin-top: 5px !important; 
-    font-size: 12px !important;
+    background-color: var(--main-blue) !important; color: #ffffff !important; border: none !important;
+    padding: 2px 8px !important; margin-top: 5px !important; font-size: 12px !important;
 }
 
-/* TABELA */
+/* 3) TABELA I STICKY HEADER */
 .table-holder { 
-    background: #fff; 
-    padding: 20px; 
-    border-radius: 12px; 
+    background: #fff; padding: 20px; border-radius: 12px; 
     box-shadow: 0 8px 32px rgba(0,0,0,0.15); 
-    overflow: visible;
+    overflow: visible; /* ważne dla sticky */
+    background-clip: padding-box;
 }
-table.dataTable { 
-    width: 100% !important; 
-    margin: 0 !important; 
-    border-collapse: separate; 
-    border-spacing: 0; 
-}
+
+table.dataTable { width: 100% !important; margin: 0 !important; border-collapse: separate; border-spacing: 0; }
 table.dataTable thead th { 
     background-color: var(--main-blue); 
     color: white; 
@@ -111,45 +83,18 @@ table.dataTable thead th {
     z-index: 10;
     box-shadow: 0 2px 2px rgba(0,0,0,0.1);
 }
+
 .col-pln { font-weight: bold; color: var(--main-blue); text-align: right !important; }
 .col-price { text-align: right !important; padding-right: 20px !important; }
 
-/* POP-UP MODAL */
-#welcomeModal {
-    display: none; 
-    position: fixed; 
-    top: 0; left: 0; 
-    width: 100%; height: 100%;
-    background: rgba(0,0,0,0.8); 
-    z-index: 10000; 
-    justify-content: center; 
-    align-items: center;
-}
-.modal-content {
-    background: white; 
-    padding: 30px; 
-    border-radius: 20px; 
-    text-align: center;
-    max-width: 400px; 
-    width: 90%; 
-    position: relative;
-}
-.modal-close { 
-    position: absolute; top: 10px; right: 15px; 
-    font-size: 28px; cursor: pointer; color: #666; font-weight: bold; 
-}
-.modal-content img { width: 150px; border-radius: 12px; margin: 15px 0; }
-.modal-content h2 { margin-top: 0; color: var(--main-blue); }
-
-/* RESPONSYWNOŚĆ PC → MOBILE */
+/* RESPONSYWNOŚĆ */
 @media (max-width: 1100px) {
     .filters-container { flex-wrap: wrap; }
     .filter-group { flex: 1 1 200px; }
     .top-section { flex-direction: column; text-align: center; }
 }
-
 @media (max-width: 600px) {
-    /* TOP */
+    /* TOP SECTION */
     .top-section { padding: 15px; gap: 15px; }
     .top-left h1 { font-size: 18px; }
     .top-left .info-row { font-size: 11px; }
@@ -163,25 +108,33 @@ table.dataTable thead th {
     /* TABELA */
     table.dataTable td,
     table.dataTable th { padding: 6px 8px !important; font-size: 12px; }
-    .table-holder { overflow-x: auto; overflow-y: visible; padding-right: 10px; }
 
-    table.dataTable thead th {
-        position: sticky; top: 0; z-index: 30; 
-        background-color: var(--main-blue);
+    .table-holder {
+        overflow-x: auto;       /* scroll poziomy */
+        overflow-y: visible;
+        padding: 10px;
+        background: #fff;
+        border-radius: 12px;
     }
 
-    /* POPUP */
+    table.dataTable thead th {
+        position: sticky;
+        top: 0;
+        z-index: 30;
+        background-color: var(--main-blue);
+        min-width: 120px;
+        box-shadow: 0 2px 2px rgba(0,0,0,0.1);
+    }
+
+    /* POPUP MODAL */
     #welcomeModal {
-        align-items: flex-start;
-        overflow-y: auto;
+        align-items: flex-start; 
+        overflow-y: auto;        
         padding-top: 30px;
     }
     .modal-content {
-        max-width: 90%;
-        margin: 0 auto;
-        max-height: 90vh;
+        max-width: 90%; margin: 0 auto; max-height: 90vh; overflow-y: auto;
         padding: 20px;
-        overflow-y: auto;
     }
     .modal-content img { width: 120px; }
     .modal-content h2 { font-size: 18px; }
