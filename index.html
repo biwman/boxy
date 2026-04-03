@@ -416,16 +416,17 @@ if(config.OSTATNIE_URUCHOMIENIE) {
     });
 });
 
-// LICZNIK ODWIEDZIN
-fetch('https://api.countapi.xyz/hit/boxy-cennik/odwiedziny')
-    .then(res => res.json())
-    .then(data => {
-        document.getElementById('visit-count').innerText = data.value;
-    })
-    .catch(err => {
-        console.log("Błąd licznika:", err);
-        document.getElementById('visit-count').innerText = "N/A";
-    });
+window.addEventListener('load', function() {
+    fetch('https://api.countapi.xyz/hit/boxy-cennik-biwekson-123/visits')
+        .then(res => res.json())
+        .then(data => {
+            document.getElementById('visit-count').innerText = data.value;
+        })
+        .catch(err => {
+            console.log("Błąd licznika:", err);
+            document.getElementById('visit-count').innerText = "N/A";
+        });
+});
 
 
 </script>
