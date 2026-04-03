@@ -263,7 +263,7 @@ if(config.OSTATNIE_URUCHOMIENIE) {
     // Wyświetlamy dokładnie to, co jest w CSV
     $("#last-update").text(config.OSTATNIE_URUCHOMIENIE);
 }
-            updateLanguage('PL');
+            
             
             // OPEN MODAL AFTER CONFIG LOADS
             $("#welcomeModal").css("display", "flex");
@@ -299,6 +299,8 @@ if(config.OSTATNIE_URUCHOMIENIE) {
                 responsive: false,
                 order: [[8, "asc"]]
             });
+
+		updateLanguage('PL');
 
             $('select').select2({ placeholder: "Wszystkie", allowClear: true, closeOnSelect: false, width: '100%' });
             
