@@ -510,6 +510,47 @@ if(config.OSTATNIE_URUCHOMIENIE) {
                 order: [[8, "asc"]]
             });
 
+// Niestandardowy filtr DataTables
+$.fn.dataTable.ext.search.push(function(settings, data, dataIndex){
+    // 1) Filtr po sklepie
+    const selectedShops = $('#f-shop').val();
+    if(selectedShops && selectedShops.length > 0){
+        const cell = table.cell(dataIndex, 3).node(); // kolumna 3 = Sklep
+        const shopText = $(cell).find('a').text().trim();
+        if(!selectedShops.includes(shopText)) return false;
+    }
+
+    // 2) Filtr po sezonie
+    const selectedSeasons = $('#f-season').val();
+    if(selectedSeasons && selectedSeasons.length > 0){
+        const seasonText = data[4].trim();
+        if(!selectedSeasons.includes(seasonText)) return false;
+    }
+
+    // 3) Filtr po drużynie
+    const selectedTeams = $('#f-team').val();
+    if(selectedTeams && selectedTeams.length > 0){
+        const teamText = data[7].trim();
+        if(!selectedTeams.includes(teamText)) return false;
+    }
+
+    // 4) Filtr po producencie/brand
+    const selectedBrands = $('#f-brand').val();
+    if(selectedBrands && selectedBrands.length > 0){
+        const brandText = data[5].trim();
+        if(!selectedBrands.includes(brandText)) return false;
+    }
+
+    // 5) Filtr po typie boxa
+    const selectedTypes = $('#f-type').val();
+    if(selectedTypes && selectedTypes.length > 0){
+        const typeText = data[6].trim();
+        if(!selectedTypes.includes(typeText)) return false;
+    }
+
+    return true;
+});
+
 		updateLanguage('PL');
 
             $('select').select2({ placeholder: "Wszystkie", allowClear: true, closeOnSelect: false, width: '100%' });
@@ -519,7 +560,12 @@ if(config.OSTATNIE_URUCHOMIENIE) {
             fillFilter(7, '#f-team'); 
             fillFilter(5, '#f-brand', true); 
             fillFilter(6, '#f-type');
-
+// ==========================
+// KROK 3: Odświeżanie tabeli przy zmianie filtra
+// ==========================
+$('#f-shop, #f-season, #f-team, #f-brand, #f-type').on('change', function() {
+    table.draw(); // wywołuje niestandardowy filtr z kroku 2
+});
             $("#btn-pl").click(() => updateLanguage('PL'));
             $("#btn-en").click(() => updateLanguage('EN'));
         }
