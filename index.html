@@ -505,6 +505,7 @@
         };
 
         // ======================= Aktualizacja języka =======================
+      
         function updateLanguage(lang) {
             const d = langData[lang];
             const eurRate = parseFloat(config.EUR ? config.EUR.replace(',', '.') : 1);
@@ -519,27 +520,28 @@
             $("#ui-update-lbl").text(d.update);
             $("#ui-description").text(lang === 'PL' ? (config.OPIS_PL || '') : (config.OPIS_EN || ''));
 
-            // Nagłówki tabeli
+            // Zmiana nagłówków tabeli
             $('#mainTable thead th').each(function(i) {
                 $(this).text(d.h[i]);
             });
 
-            // Przeliczanie ceny w ostatniej kolumnie
+            // Przeliczanie ostatniej kolumny — ZAWSZE z oryginalnej ceny PLN
             table.rows().every(function(rowIdx) {
-                const data = this.data();
-                const pricePLN = parseFloat(data[8]) || 0;   // cena PLN jest zawsze w rawData
+                const originalPLN = parseFloat(this.data()[8]);   // oryginalna cena PLN jest zawsze w 8. kolumnie rawData
 
                 if (lang === 'EN') {
-                    const priceEUR = pricePLN / eurRate;
-                    this.cell(rowIdx, 8).data(priceEUR.toFixed(2));
+                    if (eurRate > 0) {
+                        const priceEUR = originalPLN / eurRate;
+                        this.cell(rowIdx, 8).data(priceEUR.toFixed(2));
+                    }
                 } else {
-                    this.cell(rowIdx, 8).data(pricePLN.toFixed(2));
+                    this.cell(rowIdx, 8).data(originalPLN.toFixed(2));
                 }
             });
 
             table.draw(false);
 
-            // Odświeżenie placeholderów Select2
+            // Odświeżenie Select2
             $('select').each(function() {
                 $(this).select2({ placeholder: d.placeholder });
             });
@@ -615,17 +617,18 @@
                     const cenaOryg = parseFloat(row.Box ? row.Box.replace(',', '.') : 0);
                     const cenaPLN = parseFloat(row.cena_box_PLN ? row.cena_box_PLN.replace(',', '.') : 0);
 
-                    rawData.push([
-                        escapeHtml(row.Produkt),
-                        cenaOryg.toFixed(2),
-                        row.Waluta || '',
-                        getFlagForShop(row.Sklep) + ' <a href="https://' + escapeHtml(row.Sklep) + '" target="_blank">' + escapeHtml(row.Sklep) + '</a>',
-                        row.Sezon || '',
-                        row.Producent || '',
-                        row["Typ boxa"] || '',
-                        row.Team || '',
-                        cenaPLN   // przechowujemy jako liczbę (do sortowania i przeliczania)
-                    ]);
+ 		rawData.push([
+    			escapeHtml(row.Produkt),
+    			cenaOryg.toFixed(2),
+    			row.Waluta || '',
+    			getFlagForShop(row.Sklep) + 
+       			 `<a href="https://${escapeHtml(row.Sklep)}" target="_blank">${escapeHtml(row.Sklep)}</a>`,
+    			row.Sezon || '',
+   			row.Producent || '',
+    			row["Typ boxa"] || '',
+   			row.Team || '',
+   			cenaPLN                     // oryginalna cena PLN jako liczba
+	]);
                 });
 
                 // Inicjalizacja DataTable
