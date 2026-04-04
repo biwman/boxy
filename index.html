@@ -497,7 +497,7 @@
                 const normalizedShop = shop.replace(/^https?:\/\//, '').replace(/^www\./, '').trim();
                 const key = Object.keys(shopCountryMap).find(k => {
                     const normalizedKey = k.replace(/^www\./, '').trim();
-                    return normalizedShop.includes(normalizedKey) || normalizedKey.includes(normalizedShop);
+                    return normalizedShop.includes(normalizedKey);
                 });
                 if(!key) return "";
                 let code = shopCountryMap[key].toLowerCase();
@@ -548,12 +548,9 @@
                 table.draw(false);
 
                 // Odśwież placeholdery Select2
-             $('select').select2({
-    placeholder: d.placeholder,
-    allowClear: true,
-    closeOnSelect: false,
-    width: '100%'
-});
+                $('select').each(function() {
+                    $(this).select2({ placeholder: d.placeholder });
+                });
             }
 
             // ======================= Wypełnianie filtrów =======================
@@ -562,7 +559,7 @@ function fillFilter(columnIndex, selectId, desc = false) {
 
     let uniqueData = table.column(columnIndex).nodes().to$().map(function() {
         if(columnIndex === 3) {
-            return $(this).data('shop').replace(/^www\./, '').trim();
+            return $(this).data('shop');
         } else {
             return $(this).text().trim();
         }
@@ -572,36 +569,20 @@ function fillFilter(columnIndex, selectId, desc = false) {
 
     if(desc) uniqueData.reverse();
 
-    let selected = select.val() || [];
+    select.empty();
+    uniqueData.forEach(item => {
+        if(item) select.append(new Option(item, item));
+    });
 
-select.empty();
-
-uniqueData.forEach(item => {
-    let option = new Option(item, item, false, selected.includes(item));
-    select.append(option);
-});
-
-select.trigger('change');
-	
-
-    select.off('change').on('change', function() {
-    let vals = $(this).val();
-
-    // usuń poprzedni filtr
-    $.fn.dataTable.ext.search = $.fn.dataTable.ext.search.filter(f => !f._shopFilter);
-
-    if(vals && vals.length > 0) {
-        let filterFn = function(settings, data, dataIndex) {
-            let cell = table.cell(dataIndex, columnIndex).node();
-            let text = $(cell).text().replace(/^www\./, '').trim();
-            return vals.includes(text);
-        };
-        filterFn._shopFilter = true;
-        $.fn.dataTable.ext.search.push(filterFn);
-    }
-
-    table.draw();
-});
+    select.on('change', function() {
+        let vals = $(this).val();
+        if(!vals || vals.length === 0) {
+            table.column(columnIndex).search('').draw();
+        } else {
+            let pattern = vals.map(v => '^' + $.fn.dataTable.util.escapeRegex(v) + '$').join('|');
+            table.column(columnIndex).search(pattern, true, false).draw();
+        }
+    });
 }
 
 
@@ -655,9 +636,9 @@ let shopUrl = row.Sklep.startsWith('http') ? row.Sklep : 'https://' + row.Sklep;
                                 <td>${row.Waluta}</td>
                                 
 
-<td data-shop="${row.Sklep.replace(/^www\./, '').trim()}">
+<td data-shop="${row.Sklep}">
   ${getFlagForShop(row.Sklep)}
-  <a href="${shopUrl}" target="_blank">${row.Sklep.replace(/^www\./, '')}</a>
+  <a href="${shopUrl}" target="_blank">${row.Sklep}</a>
 </td>
                                 <td>${row.Sezon}</td>
                                 <td>${row.Producent}</td>
