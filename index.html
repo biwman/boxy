@@ -497,7 +497,7 @@
                 const normalizedShop = shop.replace(/^https?:\/\//, '').replace(/^www\./, '').trim();
                 const key = Object.keys(shopCountryMap).find(k => {
                     const normalizedKey = k.replace(/^www\./, '').trim();
-                    return normalizedShop.includes(normalizedKey);
+                    return normalizedShop.includes(normalizedKey) || normalizedKey.includes(normalizedShop);
                 });
                 if(!key) return "";
                 let code = shopCountryMap[key].toLowerCase();
