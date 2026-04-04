@@ -557,9 +557,36 @@
             function fillFilter(columnIndex, selectId, desc = false) {
                 const select = $(selectId);
 
-let uniqueData = table.column(columnIndex).nodes().to$().map(function() {
-    return $(this).text().trim();
-}).get();
+function fillFilter(columnIndex, selectId, desc = false) {
+    const select = $(selectId);
+
+    let uniqueData = table.column(columnIndex).nodes().to$().map(function() {
+        if(columnIndex === 3) {
+            return $(this).data('shop');
+        } else {
+            return $(this).text().trim();
+        }
+    }).get();
+
+    uniqueData = [...new Set(uniqueData)].sort();
+
+    if(desc) uniqueData.reverse();
+
+    select.empty();
+    uniqueData.forEach(item => {
+        if(item) select.append(new Option(item, item));
+    });
+
+    select.on('change', function() {
+        let vals = $(this).val();
+        if(!vals || vals.length === 0) {
+            table.column(columnIndex).search('').draw();
+        } else {
+            let pattern = vals.map(v => '^' + $.fn.dataTable.util.escapeRegex(v) + '$').join('|');
+            table.column(columnIndex).search(pattern, true, false).draw();
+        }
+    });
+}
 
 uniqueData = [...new Set(uniqueData)].sort();
 
@@ -624,7 +651,12 @@ uniqueData = [...new Set(uniqueData)].sort();
                                 <td>${row.Produkt}</td>
                                 <td class="col-price" data-order="${cenaOryginalna}">${cenaOryginalna.toFixed(2)}</td>
                                 <td>${row.Waluta}</td>
-                                <td>${getFlagForShop(row.Sklep)} <a href="https://${row.Sklep}" target="_blank">${row.Sklep}</a></td>
+                                let shopUrl = row.Sklep.startsWith('http') ? row.Sklep : 'https://' + row.Sklep;
+
+<td data-shop="${row.Sklep}">
+  ${getFlagForShop(row.Sklep)}
+  <a href="${shopUrl}" target="_blank">${row.Sklep}</a>
+</td>
                                 <td>${row.Sezon}</td>
                                 <td>${row.Producent}</td>
                                 <td>${row["Typ boxa"]}</td>
