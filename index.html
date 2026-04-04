@@ -528,22 +528,24 @@
 
                 const eurRate = parseFloat(config.EUR ? config.EUR.replace(',','.') : 1);
 
-   // Aktualizacja ostatniej kolumny (PLN ↔ EUR)
-const eurRate = parseFloat(config.EUR ? config.EUR.replace(',','.') : 1);
+                // Aktualizacja ostatniej kolumny w DataTables
+                table.rows().every(function(rowIdx) {
+                    const rowNode = this.node();
+                    const $td = $(rowNode).find('td:eq(8)');
+                    let pricePLN = parseFloat($td.attr('data-pln'));
+                    if(isNaN(pricePLN)) pricePLN = 0;
 
-table.rows().every(function(rowIdx) {
-    const rowData = this.data();
-    const cenaPLN = parseFloat(rowData[9]);        // ukryta numeryczna wartość PLN
+                    if(lang === 'EN') {
+                        const priceEUR = pricePLN / eurRate;
+                        this.cell(rowIdx, 8).data(priceEUR.toFixed(2));
+                        $td.data('order', priceEUR);
+                    } else {
+                        this.cell(rowIdx, 8).data(pricePLN.toFixed(2));
+                        $td.data('order', pricePLN);
+                    }
+                });
 
-    if (lang === 'EN') {
-        const priceEUR = cenaPLN / eurRate;
-        this.cell(rowIdx, 8).data(priceEUR.toFixed(2));
-    } else {
-        this.cell(rowIdx, 8).data(cenaPLN.toFixed(2));
-    }
-});
-
-table.draw(false);
+                table.draw(false);
 
                 // Odśwież placeholdery Select2
                 $('select').each(function() {
@@ -599,94 +601,58 @@ table.draw(false);
                 }
             });
 
-           // ======================= Wczytanie danych tabeli =======================
-let tableData = [];
+            // ======================= Wczytanie danych tabeli =======================
+            Papa.parse("export.csv", {
+                download: true,
+                header: true,
+                delimiter: ";",
+                complete: function(results) {
+                    results.data.forEach(row => {
+                        if(!row.Produkt) return;
 
-Papa.parse("export.csv", {
-    download: true,
-    header: true,
-    delimiter: ";",
-    complete: function(results) {
+                        let cenaOryginalna = parseFloat(row.Box ? row.Box.replace(',','.') : 0);
+                        let cenaPLN = parseFloat(row.cena_box_PLN ? row.cena_box_PLN.replace(',','.') : 0);
 
-        results.data.forEach(row => {
-            if (!row.Produkt || row.Produkt.trim() === "") return;
+                        $('#mainTable tbody').append(`
+                            <tr>
+                                <td>${row.Produkt}</td>
+                                <td class="col-price" data-order="${cenaOryginalna}">${cenaOryginalna.toFixed(2)}</td>
+                                <td>${row.Waluta}</td>
+                                <td>${getFlagForShop(row.Sklep)} <a href="https://${row.Sklep}" target="_blank">${row.Sklep}</a></td>
+                                <td>${row.Sezon}</td>
+                                <td>${row.Producent}</td>
+                                <td>${row["Typ boxa"]}</td>
+                                <td>${row.Team}</td>
+                                <td class="col-pln" data-order="${cenaPLN}" data-pln="${cenaPLN}">${cenaPLN.toFixed(2)}</td>
+                            </tr>
+                        `);
+                    });
 
-            let cenaOryginalna = parseFloat(row.Box ? row.Box.replace(',', '.') : 0);
-            let cenaPLN = parseFloat(row.cena_box_PLN ? row.cena_box_PLN.replace(',', '.') : 0);
+                    table = $('#mainTable').DataTable({
+                        pageLength: 25,
+                        responsive: false,
+                        order: [[8, "asc"]]
+                    });
 
-            tableData.push([
-                row.Produkt,
-                cenaOryginalna.toFixed(2),
-                row.Waluta || "",
-                row.Sklep || "",                    // czysta nazwa sklepu
-                row.Sezon || "",
-                row.Producent || "",
-                row["Typ boxa"] || "",
-                row.Team || "",
-                cenaPLN.toFixed(2),                 // cena PLN jako string
-                cenaPLN                             // dodatkowa wartość numeryczna dla sortowania i przeliczania
-            ]);
-        });
+                    updateLanguage('PL');
 
-        table = $('#mainTable').DataTable({
-            data: tableData,
-            columns: [
-                { title: "Produkt" },
-                { title: "Cena", className: "col-price" },
-                { title: "Waluta" },
-                { title: "Sklep" },
-                { title: "Sezon" },
-                { title: "Marka" },
-                { title: "Typ" },
-                { title: "Drużyna" },
-                { title: "Cena PLN", className: "col-pln" }
-            ],
-            columnDefs: [
-                {
-                    targets: 3,   // Sklep
-                    render: function(data, type, row) {
-                        if (type === 'display') {
-                            const flag = getFlagForShop(data);
-                            return flag + ' <a href="https://' + data + '" target="_blank" style="text-decoration:underline; color:inherit;">' + data + '</a>';
-                        }
-                        return data;
-                    }
-                },
-                {
-                    targets: 8,   // Cena PLN / EUR
-                    render: function(data, type, row) {
-                        const cenaPLN = parseFloat(row[9]);   // bierzemy numeryczną wartość z 10. kolumny (index 9)
-                        if (type === 'display') {
-                            return cenaPLN.toFixed(2);
-                        }
-                        return cenaPLN;   // do sortowania i filtrowania
-                    }
+                    $('select').select2({
+                        placeholder: "Wszystkie",
+                        allowClear: true,
+                        closeOnSelect: false,
+                        width: '100%'
+                    });
+
+                    fillFilter(3, '#f-shop');
+                    fillFilter(4, '#f-season', true);
+                    fillFilter(7, '#f-team');
+                    fillFilter(5, '#f-brand', true);
+                    fillFilter(6, '#f-type');
+
+                    $("#btn-pl").click(() => updateLanguage('PL'));
+                    $("#btn-en").click(() => updateLanguage('EN'));
                 }
-            ],
-            pageLength: 25,
-            order: [[8, "asc"]],
-            responsive: false
-        });
-
-        updateLanguage('PL');
-
-        $('select').select2({
-            placeholder: "Wszystkie",
-            allowClear: true,
-            closeOnSelect: false,
-            width: '100%'
-        });
-
-        fillFilter(3, '#f-shop');
-        fillFilter(4, '#f-season', true);
-        fillFilter(7, '#f-team');
-        fillFilter(5, '#f-brand', true);
-        fillFilter(6, '#f-type');
-
-        $("#btn-pl").click(() => updateLanguage('PL'));
-        $("#btn-en").click(() => updateLanguage('EN'));
-    }
-});
+            });
 
             // ======================= LOGIKA ZAMYKANIA MODALA =======================
             $(".modal-close, #welcomeModal").click(function(e) {
