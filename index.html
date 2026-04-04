@@ -556,7 +556,13 @@
             // ======================= Wypełnianie filtrów =======================
             function fillFilter(columnIndex, selectId, desc = false) {
                 const select = $(selectId);
-                let uniqueData = table.column(columnIndex).data().unique().sort().toArray();
+
+let uniqueData = table.column(columnIndex).nodes().to$().map(function() {
+    return $(this).text().trim();
+}).get();
+
+uniqueData = [...new Set(uniqueData)].sort();
+
                 if(desc) uniqueData.reverse();
                 select.empty();
                 uniqueData.forEach(item => {
