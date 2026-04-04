@@ -548,8 +548,11 @@
                 table.draw(false);
 
                 // Odśwież placeholdery Select2
-              $('select').each(function() {
-    $(this).data('select2').options.set('placeholder', d.placeholder);
+             $('select').select2({
+    placeholder: d.placeholder,
+    allowClear: true,
+    closeOnSelect: false,
+    width: '100%'
 });
             }
 
@@ -569,10 +572,16 @@ function fillFilter(columnIndex, selectId, desc = false) {
 
     if(desc) uniqueData.reverse();
 
-    select.empty();
-    uniqueData.forEach(item => {
-        if(item) select.append(new Option(item, item));
-    });
+    let selected = select.val() || [];
+
+select.empty();
+
+uniqueData.forEach(item => {
+    let option = new Option(item, item, false, selected.includes(item));
+    select.append(option);
+});
+
+select.trigger('change');
 	
 
     select.off('change').on('change', function() {
