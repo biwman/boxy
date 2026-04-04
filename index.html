@@ -367,29 +367,92 @@ function getFlagForShop(shop) {
     });
 }
 
-function fillFilter(columnIndex, selectId, desc = false) {
+// =====================
+// FILTRY DLA DATATABLES
+// =====================
+
+// Funkcja wypełniająca Select2 tylko tekstem z kolumn (bez HTML)
+function fillFilterText(columnIndex, selectId, desc = false, isShop = false) {
     const select = $(selectId);
+
+    // Pobieramy tekst komórek
     let uniqueData = table.column(columnIndex).nodes().to$().map(function(){
-        return $(this).text().trim();
+        if(isShop){
+            return $(this).find('a').text().trim(); // tylko nazwa sklepu z <a>
+        } else {
+            return $(this).text().trim(); // reszta normalnie
+        }
     }).get();
 
-    // usuń puste i zduplikowane wartości
+    // Usuń puste i duplikaty
     uniqueData = [...new Set(uniqueData.filter(v => v))];
 
     if(desc) uniqueData.reverse();
 
+    // Wypełniamy Select2
     select.empty();
     uniqueData.forEach(item => select.append(new Option(item, item)));
 
+    // Zdarzenie zmiany filtra
     select.on('change', function() {
-        let vals = $(this).val();
-        if(!vals || vals.length === 0) { table.column(columnIndex).search('').draw(); }
-        else {
-            let pattern = vals.map(v => '^' + $.fn.dataTable.util.escapeRegex(v) + '$').join('|');
-            table.column(columnIndex).search(pattern, true, false).draw();
-        }
+        table.draw(); // odświeżamy tabelę, używając niestandardowego filtra
     });
+
+    // Inicjalizacja Select2
+    select.select2({ placeholder: langData.PL.placeholder, allowClear: true, closeOnSelect: false, width: '100%' });
 }
+
+// =====================
+// NIestandardowy filtr DataTables
+// =====================
+$.fn.dataTable.ext.search.push(function(settings, data, dataIndex){
+    // 1) Filtr po sklepie
+    const selectedShops = $('#f-shop').val();
+    if(selectedShops && selectedShops.length > 0){
+        const cell = table.cell(dataIndex, 3).node(); // kolumna 3 = Sklep
+        const shopText = $(cell).find('a').text().trim();
+        if(!selectedShops.includes(shopText)) return false;
+    }
+
+    // 2) Filtr po sezonie
+    const selectedSeasons = $('#f-season').val();
+    if(selectedSeasons && selectedSeasons.length > 0){
+        const seasonText = data[4].trim(); // kolumna 4 = Sezon
+        if(!selectedSeasons.includes(seasonText)) return false;
+    }
+
+    // 3) Filtr po drużynie
+    const selectedTeams = $('#f-team').val();
+    if(selectedTeams && selectedTeams.length > 0){
+        const teamText = data[7].trim(); // kolumna 7 = Team
+        if(!selectedTeams.includes(teamText)) return false;
+    }
+
+    // 4) Filtr po producencie/brand
+    const selectedBrands = $('#f-brand').val();
+    if(selectedBrands && selectedBrands.length > 0){
+        const brandText = data[5].trim(); // kolumna 5 = Producent
+        if(!selectedBrands.includes(brandText)) return false;
+    }
+
+    // 5) Filtr po typie boxa
+    const selectedTypes = $('#f-type').val();
+    if(selectedTypes && selectedTypes.length > 0){
+        const typeText = data[6].trim(); // kolumna 6 = Typ
+        if(!selectedTypes.includes(typeText)) return false;
+    }
+
+    return true; // jeśli przeszło wszystkie filtry
+});
+
+// =====================
+// Wypełniamy filtry Select2 po załadowaniu tabeli
+// =====================
+fillFilterText(3, '#f-shop', false, true);   // Sklep
+fillFilterText(4, '#f-season', true);        // Sezon
+fillFilterText(7, '#f-team');                // Team
+fillFilterText(5, '#f-brand', true);         // Producent
+fillFilterText(6, '#f-type');                // Typ
 
     Papa.parse("config.csv", {
         download: true, header: false, delimiter: ";", complete: function(results) {
