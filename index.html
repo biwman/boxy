@@ -217,7 +217,8 @@ table.dataTable tbody td:hover {
         <div class="info-row">
             <strong>Socials:</strong> 
             <a id="link-tiktok" href="#" target="_blank">TikTok</a> | 
-            <a id="link-insta" href="#" target="_blank">Instagram</a>
+            <a id="link-insta" href="#" target="_blank">Instagram</a> |
+            <a id="link-vinted" href="#" target="_blank">Vinted</a> |
         </div>
         <div class="info-row">
             <strong id="ui-update-lbl">Aktualizacja:</strong> <span id="last-update">...</span>
@@ -352,6 +353,7 @@ $(document).ready(function() {
                 $("#link-tiktok, #link-logo, #modal-link").attr("href", config.TIKTOK_LINK); 
             }
             if(config.INSTAGRAM_LINK) $("#link-insta").attr("href", config.INSTAGRAM_LINK);
+	    if(config.VINTED_LINK) $("#link-vinted").attr("href", config.VINTED_LINK);
             
 if(config.OSTATNIE_URUCHOMIENIE) {
     // Wyświetlamy dokładnie to, co jest w CSV
