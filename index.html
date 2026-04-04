@@ -558,7 +558,7 @@ function fillFilter(columnIndex, selectId, desc = false) {
     const select = $(selectId);
 
 let uniqueData = table.column(columnIndex).nodes().to$().map(function() {
-    return $(this).text().trim();
+    return $(this).attr('data-shop');
 }).get();
 
     uniqueData = [...new Set(uniqueData)].sort();
