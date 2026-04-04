@@ -548,9 +548,9 @@
                 table.draw(false);
 
                 // Odśwież placeholdery Select2
-                $('select').each(function() {
-                    $(this).select2({ placeholder: d.placeholder });
-                });
+              $('select').each(function() {
+    $(this).data('select2').options.set('placeholder', d.placeholder);
+});
             }
 
             // ======================= Wypełnianie filtrów =======================
@@ -573,6 +573,7 @@ function fillFilter(columnIndex, selectId, desc = false) {
     uniqueData.forEach(item => {
         if(item) select.append(new Option(item, item));
     });
+	
 
     select.off('change').on('change', function() {
     let vals = $(this).val();
