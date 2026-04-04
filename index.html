@@ -528,24 +528,22 @@
 
                 const eurRate = parseFloat(config.EUR ? config.EUR.replace(',','.') : 1);
 
-                // Aktualizacja ostatniej kolumny w DataTables
-                table.rows().every(function(rowIdx) {
-                    const rowNode = this.node();
-                    const $td = $(rowNode).find('td:eq(8)');
-                    let pricePLN = parseFloat($td.attr('data-pln'));
-                    if(isNaN(pricePLN)) pricePLN = 0;
+   // Aktualizacja ostatniej kolumny (PLN ↔ EUR)
+const eurRate = parseFloat(config.EUR ? config.EUR.replace(',','.') : 1);
 
-                    if(lang === 'EN') {
-                        const priceEUR = pricePLN / eurRate;
-                        this.cell(rowIdx, 8).data(priceEUR.toFixed(2));
-                        $td.data('order', priceEUR);
-                    } else {
-                        this.cell(rowIdx, 8).data(pricePLN.toFixed(2));
-                        $td.data('order', pricePLN);
-                    }
-                });
+table.rows().every(function(rowIdx) {
+    const rowData = this.data();
+    const cenaPLN = parseFloat(rowData[9]);        // ukryta numeryczna wartość PLN
 
-                table.draw(false);
+    if (lang === 'EN') {
+        const priceEUR = cenaPLN / eurRate;
+        this.cell(rowIdx, 8).data(priceEUR.toFixed(2));
+    } else {
+        this.cell(rowIdx, 8).data(cenaPLN.toFixed(2));
+    }
+});
+
+table.draw(false);
 
                 // Odśwież placeholdery Select2
                 $('select').each(function() {
@@ -601,8 +599,7 @@
                 }
             });
 
-            // ======================= Wczytanie danych tabeli =======================
-  // ======================= Wczytanie danych tabeli =======================
+           // ======================= Wczytanie danych tabeli =======================
 let tableData = [];
 
 Papa.parse("export.csv", {
@@ -621,16 +618,16 @@ Papa.parse("export.csv", {
                 row.Produkt,
                 cenaOryginalna.toFixed(2),
                 row.Waluta || "",
-                row.Sklep || "",           // tylko czysta nazwa
+                row.Sklep || "",                    // czysta nazwa sklepu
                 row.Sezon || "",
                 row.Producent || "",
                 row["Typ boxa"] || "",
                 row.Team || "",
-                cenaPLN.toFixed(2)
+                cenaPLN.toFixed(2),                 // cena PLN jako string
+                cenaPLN                             // dodatkowa wartość numeryczna dla sortowania i przeliczania
             ]);
         });
 
-        // === Inicjalizacja DataTable ===
         table = $('#mainTable').DataTable({
             data: tableData,
             columns: [
@@ -644,20 +641,28 @@ Papa.parse("export.csv", {
                 { title: "Drużyna" },
                 { title: "Cena PLN", className: "col-pln" }
             ],
-columnDefs: [
-    {
-        targets: 3,   // kolumna Sklep
-        render: function(data, type, row) {
-            if (type === 'display') {
-                // To co widzimy na stronie (flaga + klikalny link)
-                const flag = getFlagForShop(data);
-                return flag + ' <a href="https://' + data + '" target="_blank" style="text-decoration:underline; color:inherit;">' + data + '</a>';
-            }
-            // Dla filtrowania, sortowania i wyszukiwania zwracamy TYLKO czystą nazwę sklepu
-            return data;
-        }
-    }
-],
+            columnDefs: [
+                {
+                    targets: 3,   // Sklep
+                    render: function(data, type, row) {
+                        if (type === 'display') {
+                            const flag = getFlagForShop(data);
+                            return flag + ' <a href="https://' + data + '" target="_blank" style="text-decoration:underline; color:inherit;">' + data + '</a>';
+                        }
+                        return data;
+                    }
+                },
+                {
+                    targets: 8,   // Cena PLN / EUR
+                    render: function(data, type, row) {
+                        const cenaPLN = parseFloat(row[9]);   // bierzemy numeryczną wartość z 10. kolumny (index 9)
+                        if (type === 'display') {
+                            return cenaPLN.toFixed(2);
+                        }
+                        return cenaPLN;   // do sortowania i filtrowania
+                    }
+                }
+            ],
             pageLength: 25,
             order: [[8, "asc"]],
             responsive: false
