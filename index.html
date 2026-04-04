@@ -575,7 +575,7 @@ let uniqueData = table.column(columnIndex).nodes().to$().map(function() {
         if(!vals || vals.length === 0) {
             table.column(columnIndex).search('').draw();
         } else {
-            let pattern = vals.map(v => '^' + $.fn.dataTable.util.escapeRegex(v) + '$').join('|');
+            let pattern = vals.map(v => $.fn.dataTable.util.escapeRegex(v)).join('|');
             table.column(columnIndex).search(pattern, true, false).draw();
         }
     });
