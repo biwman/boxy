@@ -310,7 +310,7 @@ function getFlagForShop(shop) {
 
     if(!key) return "";
 
-    const code = shopCountryMap[key];
+    let code = shopCountryMap[key].toLowerCase();  // zmiana na małe litery, potrzebne dla flagcdn
 
     return `<img src="https://flagcdn.com/20x15/${code}.png"
                 style="margin-right:6px; vertical-align:middle;">`;
