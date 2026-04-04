@@ -638,7 +638,7 @@ let shopUrl = row.Sklep.startsWith('http') ? row.Sklep : 'https://' + row.Sklep;
 
 <td data-shop="${row.Sklep.replace(/^www\./, '').trim()}">
   ${getFlagForShop(row.Sklep)}
-  <a href="${shopUrl}" target="_blank">${row.Sklep}</a>
+  <a href="${shopUrl}" target="_blank">${row.Sklep.replace(/^www\./, '')}</a>
 </td>
                                 <td>${row.Sezon}</td>
                                 <td>${row.Producent}</td>
