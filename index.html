@@ -580,7 +580,19 @@ function fillFilter(columnIndex, selectId, desc = false) {
             table.column(columnIndex).search('').draw();
         } else {
             let pattern = vals.map(v => '^' + $.fn.dataTable.util.escapeRegex(v) + '$').join('|');
-            table.column(columnIndex).search(pattern, true, false).draw();
+            $.fn.dataTable.ext.search = $.fn.dataTable.ext.search.filter(f => !f._shopFilter);
+
+if(vals && vals.length > 0) {
+    let filterFn = function(settings, data, dataIndex) {
+        let cell = table.cell(dataIndex, columnIndex).node();
+        let text = $(cell).text().replace(/^www\./, '').trim();
+        return vals.includes(text);
+    };
+    filterFn._shopFilter = true;
+    $.fn.dataTable.ext.search.push(filterFn);
+}
+
+table.draw();
         }
     });
 }
