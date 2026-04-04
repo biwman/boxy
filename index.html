@@ -574,27 +574,24 @@ function fillFilter(columnIndex, selectId, desc = false) {
         if(item) select.append(new Option(item, item));
     });
 
-    select.on('change', function() {
-        let vals = $(this).val();
-        if(!vals || vals.length === 0) {
-            table.column(columnIndex).search('').draw();
-        } else {
-            let pattern = vals.map(v => '^' + $.fn.dataTable.util.escapeRegex(v) + '$').join('|');
-            $.fn.dataTable.ext.search = $.fn.dataTable.ext.search.filter(f => !f._shopFilter);
+    select.off('change').on('change', function() {
+    let vals = $(this).val();
 
-if(vals && vals.length > 0) {
-    let filterFn = function(settings, data, dataIndex) {
-        let cell = table.cell(dataIndex, columnIndex).node();
-        let text = $(cell).text().replace(/^www\./, '').trim();
-        return vals.includes(text);
-    };
-    filterFn._shopFilter = true;
-    $.fn.dataTable.ext.search.push(filterFn);
-}
+    // usuń poprzedni filtr
+    $.fn.dataTable.ext.search = $.fn.dataTable.ext.search.filter(f => !f._shopFilter);
 
-table.draw();
-        }
-    });
+    if(vals && vals.length > 0) {
+        let filterFn = function(settings, data, dataIndex) {
+            let cell = table.cell(dataIndex, columnIndex).node();
+            let text = $(cell).text().replace(/^www\./, '').trim();
+            return vals.includes(text);
+        };
+        filterFn._shopFilter = true;
+        $.fn.dataTable.ext.search.push(filterFn);
+    }
+
+    table.draw();
+});
 }
 
 
