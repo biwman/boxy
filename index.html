@@ -367,22 +367,29 @@ function getFlagForShop(shop) {
     });
 }
 
-    function fillFilter(columnIndex, selectId, desc = false) {
-        const select = $(selectId);
-        let uniqueData = table.column(columnIndex).data().unique().sort().toArray();
-        if (desc) { uniqueData.reverse(); }
+function fillFilter(columnIndex, selectId, desc = false) {
+    const select = $(selectId);
+    let uniqueData = table.column(columnIndex).nodes().to$().map(function(){
+        return $(this).text().trim();
+    }).get();
 
-        select.empty();
-        uniqueData.forEach(item => { if(item) select.append(new Option(item, item)); });
-        select.on('change', function() {
-            let vals = $(this).val();
-            if(!vals || vals.length === 0) { table.column(columnIndex).search('').draw(); }
-            else {
-                let pattern = vals.map(v => '^' + $.fn.dataTable.util.escapeRegex(v) + '$').join('|');
-                table.column(columnIndex).search(pattern, true, false).draw();
-            }
-        });
-    }
+    // usuń puste i zduplikowane wartości
+    uniqueData = [...new Set(uniqueData.filter(v => v))];
+
+    if(desc) uniqueData.reverse();
+
+    select.empty();
+    uniqueData.forEach(item => select.append(new Option(item, item)));
+
+    select.on('change', function() {
+        let vals = $(this).val();
+        if(!vals || vals.length === 0) { table.column(columnIndex).search('').draw(); }
+        else {
+            let pattern = vals.map(v => '^' + $.fn.dataTable.util.escapeRegex(v) + '$').join('|');
+            table.column(columnIndex).search(pattern, true, false).draw();
+        }
+    });
+}
 
     Papa.parse("config.csv", {
         download: true, header: false, delimiter: ";", complete: function(results) {
