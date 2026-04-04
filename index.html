@@ -554,9 +554,6 @@
             }
 
             // ======================= Wypełnianie filtrów =======================
-            function fillFilter(columnIndex, selectId, desc = false) {
-                const select = $(selectId);
-
 function fillFilter(columnIndex, selectId, desc = false) {
     const select = $(selectId);
 
@@ -646,12 +643,14 @@ uniqueData = [...new Set(uniqueData)].sort();
                         let cenaOryginalna = parseFloat(row.Box ? row.Box.replace(',','.') : 0);
                         let cenaPLN = parseFloat(row.cena_box_PLN ? row.cena_box_PLN.replace(',','.') : 0);
 
+let shopUrl = row.Sklep.startsWith('http') ? row.Sklep : 'https://' + row.Sklep;
+
                         $('#mainTable tbody').append(`
                             <tr>
                                 <td>${row.Produkt}</td>
                                 <td class="col-price" data-order="${cenaOryginalna}">${cenaOryginalna.toFixed(2)}</td>
                                 <td>${row.Waluta}</td>
-                                let shopUrl = row.Sklep.startsWith('http') ? row.Sklep : 'https://' + row.Sklep;
+                                
 
 <td data-shop="${row.Sklep}">
   ${getFlagForShop(row.Sklep)}
