@@ -559,7 +559,7 @@ function fillFilter(columnIndex, selectId, desc = false) {
 
     let uniqueData = table.column(columnIndex).nodes().to$().map(function() {
         if(columnIndex === 3) {
-            return $(this).data('shop');
+            return $(this).data('shop').replace(/^www\./, '').trim();
         } else {
             return $(this).text().trim();
         }
@@ -636,7 +636,7 @@ let shopUrl = row.Sklep.startsWith('http') ? row.Sklep : 'https://' + row.Sklep;
                                 <td>${row.Waluta}</td>
                                 
 
-<td data-shop="${row.Sklep}">
+<td data-shop="${row.Sklep.replace(/^www\./, '').trim()}">
   ${getFlagForShop(row.Sklep)}
   <a href="${shopUrl}" target="_blank">${row.Sklep}</a>
 </td>
