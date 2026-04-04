@@ -190,6 +190,13 @@ table.dataTable tbody td:hover {
     box-shadow: 0 2px 6px rgba(0,0,0,0.2);
 }
 
+/* =======================
+   7) DODATKOWE FLAGI
+======================= */
+td img {
+    border-radius: 2px;
+    box-shadow: 0 0 2px rgba(0,0,0,0.3);
+}	
 
 </style>
 
@@ -264,7 +271,19 @@ table.dataTable tbody td:hover {
 $(document).ready(function() {
     let table;
     let config = {};
-
+    let shopCountryMap = {};
+Papa.parse("sklepy.csv", {
+    download: true,
+    header: true,
+    delimiter: ";",
+    complete: function(results) {
+        results.data.forEach(row => {
+            if(row.SKLEP && row.KRAJ) {
+                shopCountryMap[row.SKLEP.trim()] = row.KRAJ.trim().toLowerCase();
+            }
+        });
+    }
+});
     const langData = {
         PL: { 
             title: "📦 Porównanie cen boxów kart piłkarskich", shop: "Sklep:", season: "Sezon:", team: "Drużyna:", brand: "Marka:", type: "Typ:", placeholder: "Wszystkie", rates: "Kursy:", update: "Aktualizacja:",
@@ -275,6 +294,28 @@ $(document).ready(function() {
             h: ["Product", "Price", "CCY", "Shop", "Season", "Brand", "Type", "Team", "Price PLN"]
         }
     };
+
+function getFlagForShop(shop) {
+    if(!shop) return "";
+
+    const normalizedShop = shop
+        .replace(/^https?:\/\//, '')
+        .replace(/^www\./, '')
+        .trim();
+
+    const key = Object.keys(shopCountryMap).find(k => {
+        const normalizedKey = k.replace(/^www\./, '').trim();
+        return normalizedShop.includes(normalizedKey);
+    });
+
+    if(!key) return "";
+
+    const code = shopCountryMap[key];
+
+    return `<img src="https://flagcdn.com/20x15/${code}.png"
+                style="margin-right:6px; vertical-align:middle;">`;
+}
+
 
     function updateLanguage(lang) {
     const d = langData[lang];
@@ -380,7 +421,10 @@ if(config.OSTATNIE_URUCHOMIENIE) {
                         <td>${row.Produkt}</td>
                         <td class="col-price" data-order="${cenaOryginalna}">${cenaOryginalna.toFixed(2)}</td>
                         <td>${row.Waluta}</td>
-                        <td>${row.Sklep}</td>
+                        <td>
+    			${getFlagForShop(row.Sklep)}
+    			${row.Sklep}
+			</td>
                         <td>${row.Sezon}</td>
                         <td>${row.Producent}</td>
                         <td>${row["Typ boxa"]}</td>
