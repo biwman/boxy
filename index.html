@@ -557,13 +557,9 @@
 function fillFilter(columnIndex, selectId, desc = false) {
     const select = $(selectId);
 
-    let uniqueData = table.column(columnIndex).nodes().to$().map(function() {
-        if(columnIndex === 3) {
-            return $(this).data('shop');
-        } else {
-            return $(this).text().trim();
-        }
-    }).get();
+let uniqueData = table.column(columnIndex).nodes().to$().map(function() {
+    return $(this).text().trim();
+}).get();
 
     uniqueData = [...new Set(uniqueData)].sort();
 
