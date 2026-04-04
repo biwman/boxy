@@ -602,57 +602,86 @@
             });
 
             // ======================= Wczytanie danych tabeli =======================
-            Papa.parse("export.csv", {
-                download: true,
-                header: true,
-                delimiter: ";",
-                complete: function(results) {
-                    results.data.forEach(row => {
-                        if(!row.Produkt) return;
+  // ======================= Wczytanie danych tabeli =======================
+let tableData = [];
 
-                        let cenaOryginalna = parseFloat(row.Box ? row.Box.replace(',','.') : 0);
-                        let cenaPLN = parseFloat(row.cena_box_PLN ? row.cena_box_PLN.replace(',','.') : 0);
+Papa.parse("export.csv", {
+    download: true,
+    header: true,
+    delimiter: ";",
+    complete: function(results) {
 
-                        $('#mainTable tbody').append(`
-                            <tr>
-                                <td>${row.Produkt}</td>
-                                <td class="col-price" data-order="${cenaOryginalna}">${cenaOryginalna.toFixed(2)}</td>
-                                <td>${row.Waluta}</td>
-                                <td>${getFlagForShop(row.Sklep)} <a href="https://${row.Sklep}" target="_blank">${row.Sklep}</a></td>
-                                <td>${row.Sezon}</td>
-                                <td>${row.Producent}</td>
-                                <td>${row["Typ boxa"]}</td>
-                                <td>${row.Team}</td>
-                                <td class="col-pln" data-order="${cenaPLN}" data-pln="${cenaPLN}">${cenaPLN.toFixed(2)}</td>
-                            </tr>
-                        `);
-                    });
+        results.data.forEach(row => {
+            if (!row.Produkt || row.Produkt.trim() === "") return;
 
-                    table = $('#mainTable').DataTable({
-                        pageLength: 25,
-                        responsive: false,
-                        order: [[8, "asc"]]
-                    });
+            let cenaOryginalna = parseFloat(row.Box ? row.Box.replace(',', '.') : 0);
+            let cenaPLN = parseFloat(row.cena_box_PLN ? row.cena_box_PLN.replace(',', '.') : 0);
 
-                    updateLanguage('PL');
+            tableData.push([
+                row.Produkt,
+                cenaOryginalna.toFixed(2),
+                row.Waluta || "",
+                row.Sklep || "",           // tylko czysta nazwa
+                row.Sezon || "",
+                row.Producent || "",
+                row["Typ boxa"] || "",
+                row.Team || "",
+                cenaPLN.toFixed(2)
+            ]);
+        });
 
-                    $('select').select2({
-                        placeholder: "Wszystkie",
-                        allowClear: true,
-                        closeOnSelect: false,
-                        width: '100%'
-                    });
+        // === Inicjalizacja DataTable ===
+        table = $('#mainTable').DataTable({
+            data: tableData,
+            columns: [
+                { title: "Produkt" },
+                { title: "Cena", className: "col-price" },
+                { title: "Waluta" },
+                { title: "Sklep" },
+                { title: "Sezon" },
+                { title: "Marka" },
+                { title: "Typ" },
+                { title: "Drużyna" },
+                { title: "Cena PLN", className: "col-pln" }
+            ],
+columnDefs: [
+    {
+        targets: 3,   // kolumna Sklep
+        render: function(data, type, row) {
+            if (type === 'display') {
+                // To co widzimy na stronie (flaga + klikalny link)
+                const flag = getFlagForShop(data);
+                return flag + ' <a href="https://' + data + '" target="_blank" style="text-decoration:underline; color:inherit;">' + data + '</a>';
+            }
+            // Dla filtrowania, sortowania i wyszukiwania zwracamy TYLKO czystą nazwę sklepu
+            return data;
+        }
+    }
+],
+            pageLength: 25,
+            order: [[8, "asc"]],
+            responsive: false
+        });
 
-                    fillFilter(3, '#f-shop');
-                    fillFilter(4, '#f-season', true);
-                    fillFilter(7, '#f-team');
-                    fillFilter(5, '#f-brand', true);
-                    fillFilter(6, '#f-type');
+        updateLanguage('PL');
 
-                    $("#btn-pl").click(() => updateLanguage('PL'));
-                    $("#btn-en").click(() => updateLanguage('EN'));
-                }
-            });
+        $('select').select2({
+            placeholder: "Wszystkie",
+            allowClear: true,
+            closeOnSelect: false,
+            width: '100%'
+        });
+
+        fillFilter(3, '#f-shop');
+        fillFilter(4, '#f-season', true);
+        fillFilter(7, '#f-team');
+        fillFilter(5, '#f-brand', true);
+        fillFilter(6, '#f-type');
+
+        $("#btn-pl").click(() => updateLanguage('PL'));
+        $("#btn-en").click(() => updateLanguage('EN'));
+    }
+});
 
             // ======================= LOGIKA ZAMYKANIA MODALA =======================
             $(".modal-close, #welcomeModal").click(function(e) {
