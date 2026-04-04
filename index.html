@@ -423,6 +423,7 @@
 
     <!-- ======================= TABELA ======================= -->
     <div class="table-holder">
+	<div id="entries-label" style="margin-bottom:10px; font-weight:bold;"></div>
         <table id="mainTable" class="display nowrap" style="width:100%">
             <thead>
                 <tr>
@@ -551,6 +552,7 @@
                 $('select').each(function() {
                     $(this).select2({ placeholder: d.placeholder });
                 });
+		 $("#entries-label").text(lang === 'PL' ? 'Pokaż' : 'Show');
             }
 
             // ======================= Wypełnianie filtrów =======================
@@ -651,7 +653,12 @@ let shopUrl = row.Sklep.startsWith('http') ? row.Sklep : 'https://' + row.Sklep;
                     table = $('#mainTable').DataTable({
                         pageLength: 25,
                         responsive: false,
-                        order: [[8, "asc"]]
+                        order: [[8, "asc"]],
+			 language: {
+     			   lengthMenu: "_MENU_"
+			    }
+
+
                     });
 
                     updateLanguage('PL');
