@@ -446,268 +446,269 @@
         </table>
     </div>
 
-    <!-- ======================= JS ======================= -->
-    <script>
-        $(document).ready(function() {
+<script>
+$(document).ready(function() {
 
-            let table;
-            let config = {};
-            let shopCountryMap = {};
+    let table;
+    let config = {};
+    let shopCountryMap = {};
 
-            // ======================= Wczytywanie sklepów =======================
-            Papa.parse("sklepy.csv", {
-                download: true,
-                header: true,
-                delimiter: ";",
-                complete: function(results) {
-                    results.data.forEach(row => {
-                        if(row.SKLEP && row.KRAJ) {
-                            shopCountryMap[row.SKLEP.trim()] = row.KRAJ.trim().toLowerCase();
-                        }
-                    });
+    // ======================= HELPERY =======================
+    function parseNumber(val) {
+        return parseFloat(val ? val.replace(',', '.') : 0) || 0;
+    }
+
+    function getFlagForShop(shop) {
+        if(!shop) return "";
+
+        const normalizedShop = shop.replace(/^https?:\/\//, '').replace(/^www\./, '').trim();
+
+        for(const key in shopCountryMap) {
+            if(normalizedShop.includes(key)) {
+                return `<img src="https://flagcdn.com/20x15/${shopCountryMap[key]}.png" style="margin-right:6px; vertical-align:middle;">`;
+            }
+        }
+        return "";
+    }
+
+    // ======================= SKLEPY =======================
+    Papa.parse("sklepy.csv", {
+        download: true,
+        header: true,
+        delimiter: ";",
+        complete: function(results) {
+            results.data.forEach(row => {
+                if(row.SKLEP && row.KRAJ) {
+                    const key = row.SKLEP.replace(/^www\./, '').trim();
+                    shopCountryMap[key] = row.KRAJ.trim().toLowerCase();
                 }
             });
-
-            // ======================= Dane językowe =======================
-            const langData = {
-                PL: {
-                    title: "📦 Porównanie cen boxów kart piłkarskich",
-                    shop: "Sklep:",
-                    season: "Sezon:",
-                    team: "Drużyna/Liga:",
-                    brand: "Marka:",
-                    type: "Typ:",
-                    placeholder: "Wszystkie",
-                    rates: "Kursy:",
-                    update: "Aktualizacja:",
-                    visits: "Liczba odwiedzin:",
-                    h: ["Produkt", "Cena", "Waluta", "Sklep", "Sezon", "Marka", "Typ", "Drużyna/Liga", "Cena PLN"]
-                },
-                EN: {
-                    title: "📦 Soccer Box Price Comparison",
-                    shop: "Shop:",
-                    season: "Season:",
-                    team: "Team/League:",
-                    brand: "Brand:",
-                    type: "Type:",
-                    placeholder: "All",
-                    rates: "Rates:",
-                    update: "Update:",
-		    visits: "Visits:",
-                    h: ["Product", "Price", "CCY", "Shop", "Season", "Brand", "Type", "Team/League", "Price PLN"]
-                }
-            };
-
-            // ======================= Funkcja zwracająca flagę dla sklepu =======================
-            function getFlagForShop(shop) {
-                if(!shop) return "";
-                const normalizedShop = shop.replace(/^https?:\/\//, '').replace(/^www\./, '').trim();
-                const key = Object.keys(shopCountryMap).find(k => {
-                    const normalizedKey = k.replace(/^www\./, '').trim();
-                    return normalizedShop.includes(normalizedKey);
-                });
-                if(!key) return "";
-                let code = shopCountryMap[key].toLowerCase();
-                return `<img src="https://flagcdn.com/20x15/${code}.png" style="margin-right:6px; vertical-align:middle;">`;
-            }
-
-            // ======================= Aktualizacja języka =======================
-            function updateLanguage(lang) {
-                const d = langData[lang];
-                $("#ui-title").text(d.title);
-                $("#lbl-shop").text(d.shop);
-                $("#lbl-season").text(d.season);
-                $("#lbl-team").text(d.team);
-                $("#lbl-brand").text(d.brand);
-                $("#lbl-type").text(d.type);
-                $("#ui-rates-lbl").text(d.rates);
-                $("#ui-update-lbl").text(d.update);
-		$("#ui-visits-lbl").text(d.visits);
-                $("#ui-description").text(lang === 'PL' ? config.OPIS_PL : config.OPIS_EN);
-
-                // Zmieniamy nagłówki tabeli
-                $('#mainTable thead th').each(function(i) {
-                    if(i === 8) {
-                        $(this).text(lang === 'PL' ? 'Cena PLN' : 'Price_EUR');
-                    } else {
-                        $(this).text(d.h[i]);
-                    }
-                });
-
-                const eurRate = parseFloat(config.EUR ? config.EUR.replace(',','.') : 1);
-
-                // Aktualizacja ostatniej kolumny w DataTables
-                table.rows().every(function(rowIdx) {
-                    const rowNode = this.node();
-                    const $td = $(rowNode).find('td:eq(8)');
-                    let pricePLN = parseFloat($td.attr('data-pln'));
-                    if(isNaN(pricePLN)) pricePLN = 0;
-
-                    if(lang === 'EN') {
-                        const priceEUR = pricePLN / eurRate;
-                        this.cell(rowIdx, 8).data(priceEUR.toFixed(2));
-                        $td.data('order', priceEUR);
-                    } else {
-                        this.cell(rowIdx, 8).data(pricePLN.toFixed(2));
-                        $td.data('order', pricePLN);
-                    }
-                });
-
-                table.draw(false);
-
-                // Odśwież placeholdery Select2
-                $('select').each(function() {
-                    $(this).select2({ placeholder: d.placeholder });
-                });
-		 $("#entries-label").text(lang === 'PL' ? 'Pokaż' : 'Show');
-            }
-
-            // ======================= Wypełnianie filtrów =======================
-function fillFilter(columnIndex, selectId, desc = false) {
-    const select = $(selectId);
-
-let uniqueData = table.column(columnIndex).nodes().to$().map(function() {
-    if(columnIndex === 3) {
-        return $(this).attr('data-shop'); // tylko sklep
-    }
-    return $(this).text().trim(); // reszta kolumn
-}).get();
-
-    uniqueData = [...new Set(uniqueData)].sort();
-
-    if(desc) uniqueData.reverse();
-
-    select.empty();
-    uniqueData.forEach(item => {
-        if(item) select.append(new Option(item, item));
-    });
-
-    select.on('change', function() {
-        let vals = $(this).val();
-        if(!vals || vals.length === 0) {
-            table.column(columnIndex).search('').draw();
-        } else {
-            let pattern = vals.map(v => $.fn.dataTable.util.escapeRegex(v)).join('|');
-            table.column(columnIndex).search(pattern, true, false).draw();
         }
     });
-}
 
+    // ======================= LANG =======================
+    const langData = {
+        PL: {
+            title: "📦 Porównanie cen boxów kart piłkarskich",
+            shop: "Sklep:",
+            season: "Sezon:",
+            team: "Drużyna/Liga:",
+            brand: "Marka:",
+            type: "Typ:",
+            placeholder: "Wszystkie",
+            rates: "Kursy:",
+            update: "Aktualizacja:",
+            visits: "Liczba odwiedzin:",
+            h: ["Produkt", "Cena", "Waluta", "Sklep", "Sezon", "Marka", "Typ", "Drużyna/Liga", "Cena PLN"]
+        },
+        EN: {
+            title: "📦 Soccer Box Price Comparison",
+            shop: "Shop:",
+            season: "Season:",
+            team: "Team/League:",
+            brand: "Brand:",
+            type: "Type:",
+            placeholder: "All",
+            rates: "Rates:",
+            update: "Update:",
+            visits: "Visits:",
+            h: ["Product", "Price", "CCY", "Shop", "Season", "Brand", "Type", "Team/League", "Price PLN"]
+        }
+    };
 
-            
+    function updateLanguage(lang) {
+        const d = langData[lang];
 
-            // ======================= Wczytanie konfiguracji =======================
-            Papa.parse("config.csv", {
-                download: true,
-                header: false,
-                delimiter: ";",
-                complete: function(results) {
-                    results.data.forEach(row => {
-                        if(row[0]) config[row[0].trim()] = row[1].trim();
-                    });
+        $("#ui-title").text(d.title);
+        $("#lbl-shop").text(d.shop);
+        $("#lbl-season").text(d.season);
+        $("#lbl-team").text(d.team);
+        $("#lbl-brand").text(d.brand);
+        $("#lbl-type").text(d.type);
+        $("#ui-rates-lbl").text(d.rates);
+        $("#ui-update-lbl").text(d.update);
+        $("#ui-visits-lbl").text(d.visits);
+        $("#ui-description").text(lang === 'PL' ? config.OPIS_PL : config.OPIS_EN);
 
-                    $("#eurpln").text(config.EUR || "---");
-                    $("#usdpln").text(config.USD || "---");
-                    if(config.GB_Tax) $("#gbptax").text((parseFloat(config.GB_Tax.replace(',','.')) * 100).toFixed(0) + "%");
+        $('#mainTable thead th').each(function(i) {
+            if(i === 8) {
+                $(this).text(lang === 'PL' ? 'Cena PLN' : 'Price EUR');
+            } else {
+                $(this).text(d.h[i]);
+            }
+        });
 
-                    if(config.TIKTOK_LINK) $("#link-tiktok, #link-logo, #modal-link").attr("href", config.TIKTOK_LINK);
-                    if(config.INSTAGRAM_LINK) $("#link-insta").attr("href", config.INSTAGRAM_LINK);
-                    if(config.VINTED_LINK) $("#link-vinted").attr("href", config.VINTED_LINK);
+        const eurRate = parseNumber(config.EUR) || 1;
 
-                    if(config.OSTATNIE_URUCHOMIENIE) {
-                        $("#last-update").text(config.OSTATNIE_URUCHOMIENIE);
-                    }
+        table.column(8).nodes().each(function(td, i) {
+            const $td = $(td);
+            let pricePLN = parseFloat($td.attr('data-pln')) || 0;
 
-                    // Pokazujemy modal po załadowaniu konfiguracji
-                    $("#welcomeModal").css("display", "flex");
+            if(lang === 'EN') {
+                let priceEUR = pricePLN / eurRate;
+                table.cell(i, 8).data(priceEUR.toFixed(2));
+                $td.data('order', priceEUR);
+            } else {
+                table.cell(i, 8).data(pricePLN.toFixed(2));
+                $td.data('order', pricePLN);
+            }
+        });
+
+        table.draw(false);
+
+        // zmiana placeholder bez reinicjalizacji
+        $('select').each(function() {
+            const select2 = $(this).data('select2');
+            if(select2) {
+                select2.options.options.placeholder = d.placeholder;
+            }
+        });
+
+        $("#entries-label").text(lang === 'PL' ? 'Pokaż' : 'Show');
+    }
+
+    // ======================= FILTER =======================
+    function fillFilter(columnIndex, selectId, desc = false) {
+        const select = $(selectId);
+
+        let uniqueData = table.column(columnIndex).nodes().to$().map(function() {
+            if(columnIndex === 3) {
+                return $(this).attr('data-shop');
+            }
+            return $(this).text().trim();
+        }).get();
+
+        uniqueData = [...new Set(uniqueData)].sort();
+        if(desc) uniqueData.reverse();
+
+        select.empty();
+        uniqueData.forEach(item => {
+            if(item) select.append(new Option(item, item));
+        });
+
+        select.on('change', function() {
+            let vals = $(this).val();
+            if(!vals || vals.length === 0) {
+                table.column(columnIndex).search('').draw();
+            } else {
+                let pattern = vals.map(v => $.fn.dataTable.util.escapeRegex(v)).join('|');
+                table.column(columnIndex).search(pattern, true, false).draw();
+            }
+        });
+    }
+
+    // ======================= CONFIG =======================
+    Papa.parse("config.csv", {
+        download: true,
+        delimiter: ";",
+        complete: function(results) {
+            results.data.forEach(row => {
+                if(row[0]) config[row[0].trim()] = row[1].trim();
+            });
+
+            $("#eurpln").text(config.EUR || "---");
+            $("#usdpln").text(config.USD || "---");
+
+            if(config.GB_Tax) {
+                $("#gbptax").text((parseNumber(config.GB_Tax) * 100).toFixed(0) + "%");
+            }
+
+            if(config.TIKTOK_LINK) $("#link-tiktok, #link-logo, #modal-link").attr("href", config.TIKTOK_LINK);
+            if(config.INSTAGRAM_LINK) $("#link-insta").attr("href", config.INSTAGRAM_LINK);
+            if(config.VINTED_LINK) $("#link-vinted").attr("href", config.VINTED_LINK);
+
+            if(config.OSTATNIE_URUCHOMIENIE) {
+                $("#last-update").text(config.OSTATNIE_URUCHOMIENIE);
+            }
+
+            $("#welcomeModal").css("display", "flex");
+        }
+    });
+
+    // ======================= DATA =======================
+    Papa.parse("export.csv", {
+        download: true,
+        header: true,
+        delimiter: ";",
+        complete: function(results) {
+
+            let rowsHtml = "";
+
+            results.data.forEach(row => {
+                if(!row.Produkt) return;
+
+                let cenaOryginalna = parseNumber(row.Box);
+                let cenaPLN = parseNumber(row.cena_box_PLN);
+                let shopUrl = row.Sklep.startsWith('http') ? row.Sklep : 'https://' + row.Sklep;
+
+                rowsHtml += `
+                    <tr>
+                        <td>${row.Produkt}</td>
+                        <td class="col-price" data-order="${cenaOryginalna}">${cenaOryginalna.toFixed(2)}</td>
+                        <td>${row.Waluta}</td>
+                        <td data-shop="${row.Sklep}">
+                            ${getFlagForShop(row.Sklep)}
+                            <a href="${shopUrl}" target="_blank">${row.Sklep}</a>
+                        </td>
+                        <td>${row.Sezon}</td>
+                        <td>${row.Producent}</td>
+                        <td>${row["Typ boxa"]}</td>
+                        <td>${row.Team}</td>
+                        <td class="col-pln" data-order="${cenaPLN}" data-pln="${cenaPLN}">${cenaPLN.toFixed(2)}</td>
+                    </tr>
+                `;
+            });
+
+            $('#mainTable tbody').html(rowsHtml);
+
+            table = $('#mainTable').DataTable({
+                pageLength: 25,
+                order: [[8, "asc"]],
+                language: {
+                    lengthMenu: "_MENU_"
                 }
             });
 
-            // ======================= Wczytanie danych tabeli =======================
-            Papa.parse("export.csv", {
-                download: true,
-                header: true,
-                delimiter: ";",
-                complete: function(results) {
-                    results.data.forEach(row => {
-                        if(!row.Produkt) return;
+            updateLanguage('PL');
 
-                        let cenaOryginalna = parseFloat(row.Box ? row.Box.replace(',','.') : 0);
-                        let cenaPLN = parseFloat(row.cena_box_PLN ? row.cena_box_PLN.replace(',','.') : 0);
-
-let shopUrl = row.Sklep.startsWith('http') ? row.Sklep : 'https://' + row.Sklep;
-
-                        $('#mainTable tbody').append(`
-                            <tr>
-                                <td>${row.Produkt}</td>
-                                <td class="col-price" data-order="${cenaOryginalna}">${cenaOryginalna.toFixed(2)}</td>
-                                <td>${row.Waluta}</td>
-                                
-
-<td data-shop="${row.Sklep}">
-  ${getFlagForShop(row.Sklep)}
-  <a href="${shopUrl}" target="_blank">${row.Sklep}</a>
-</td>
-                                <td>${row.Sezon}</td>
-                                <td>${row.Producent}</td>
-                                <td>${row["Typ boxa"]}</td>
-                                <td>${row.Team}</td>
-                                <td class="col-pln" data-order="${cenaPLN}" data-pln="${cenaPLN}">${cenaPLN.toFixed(2)}</td>
-                            </tr>
-                        `);
-                    });
-
-                    table = $('#mainTable').DataTable({
-                        pageLength: 25,
-                        responsive: false,
-                        order: [[8, "asc"]],
-			 language: {
-     			   lengthMenu: "_MENU_"
-			    }
-
-
-                    });
-
-                    updateLanguage('PL');
-
-                    $('select').select2({
-                        placeholder: "Wszystkie",
-                        allowClear: true,
-                        closeOnSelect: false,
-                        width: '100%'
-                    });
-
-                    fillFilter(3, '#f-shop');
-                    fillFilter(4, '#f-season', true);
-                    fillFilter(7, '#f-team');
-                    fillFilter(5, '#f-brand', true);
-                    fillFilter(6, '#f-type');
-
-                    $("#btn-pl").click(() => updateLanguage('PL'));
-                    $("#btn-en").click(() => updateLanguage('EN'));
-                }
+            $('select').select2({
+                placeholder: "Wszystkie",
+                allowClear: true,
+                closeOnSelect: false,
+                width: '100%'
             });
 
-            // ======================= LOGIKA ZAMYKANIA MODALA =======================
-            $(".modal-close, #welcomeModal").click(function(e) {
-                if (e.target !== this && !$(e.target).hasClass('modal-close')) return;
-                $("#welcomeModal").fadeOut(200);
-            });
-        });
+            fillFilter(3, '#f-shop');
+            fillFilter(4, '#f-season', true);
+            fillFilter(7, '#f-team');
+            fillFilter(5, '#f-brand', true);
+            fillFilter(6, '#f-type');
 
-        // ======================= LICZNIK ODWIEDZIN =======================
-        window.addEventListener('load', function() {
-            fetch('https://api.counterapi.dev/v1/boxy-cennik/visits/up')
-                .then(res => res.json())
-                .then(data => {
-                    document.getElementById('visit-count').innerText = data.count;
-                })
-                .catch(err => {
-                    console.log("Błąd licznika:", err);
-                    document.getElementById('visit-count').innerText = "N/A";
-                });
+            $("#btn-pl").on('click', () => updateLanguage('PL'));
+            $("#btn-en").on('click', () => updateLanguage('EN'));
+        }
+    });
+
+    // ======================= MODAL =======================
+    $(".modal-close, #welcomeModal").on('click', function(e) {
+        if (e.target !== this && !$(e.target).hasClass('modal-close')) return;
+        $("#welcomeModal").fadeOut(200);
+    });
+
+});
+
+// ======================= LICZNIK =======================
+window.addEventListener('load', function() {
+    fetch('https://api.counterapi.dev/v1/boxy-cennik/visits/up')
+        .then(res => res.json())
+        .then(data => {
+            document.getElementById('visit-count').innerText = data.count;
+        })
+        .catch(() => {
+            document.getElementById('visit-count').innerText = "N/A";
         });
-    </script>
+});
+</script>
 
 </body>
 </html>
