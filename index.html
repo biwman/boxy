@@ -394,6 +394,32 @@
             </div>
         </div>
 
+	<div id="video-preview" style="flex:1; text-align:center; cursor:pointer;">
+        <div style="position:relative; display:inline-block;">
+            <img src="https://www.tiktok.com/api/img/?itemId=7597785132443127043&location=0&aid=1988"
+                 style="width:220px; border-radius:12px;">
+
+            <div style="
+                position:absolute;
+                top:50%;
+                left:50%;
+                transform:translate(-50%, -50%);
+                background:rgba(0,0,0,0.6);
+                border-radius:50%;
+                width:60px;
+                height:60px;
+                display:flex;
+                align-items:center;
+                justify-content:center;
+                color:white;
+                font-size:28px;
+            ">
+                ▶
+            </div>
+        </div>
+    </div>
+
+
         <div class="top-right">
             <a id="link-logo" href="#" target="_blank">
                 <img src="logo_biwekson.jpg" alt="Logo">
@@ -708,7 +734,52 @@ window.addEventListener('load', function() {
             document.getElementById('visit-count').innerText = "N/A";
         });
 });
-</script>
 
+// klik miniatury
+$("#video-preview").on("click", function() {
+    $("#video-frame").attr("src", "https://www.tiktok.com/embed/7597785132443127043");
+    $("#videoModal").fadeIn(200);
+});
+
+// zamykanie
+$("#video-close, #videoModal").on("click", function(e) {
+    if (e.target !== this && e.target.id !== "video-close") return;
+
+    $("#videoModal").fadeOut(200);
+    $("#video-frame").attr("src", ""); // reset = stop video
+});
+
+</script>
+<div id="videoModal" style="
+    display:none;
+    position:fixed;
+    top:0;
+    left:0;
+    width:100%;
+    height:100%;
+    background:rgba(0,0,0,0.9);
+    z-index:99999;
+    justify-content:center;
+    align-items:center;
+">
+
+    <div style="position:relative;">
+        <span id="video-close" style="
+            position:absolute;
+            top:-40px;
+            right:0;
+            font-size:30px;
+            color:white;
+            cursor:pointer;
+        ">✕</span>
+
+        <iframe id="video-frame"
+            width="350"
+            height="620"
+            style="border:none; border-radius:12px;"
+            allow="autoplay">
+        </iframe>
+    </div>
+</div>
 </body>
 </html>
