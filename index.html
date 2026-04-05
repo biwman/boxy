@@ -384,7 +384,7 @@
                 <span id="last-update">...</span>
             </div>
             <div class="info-row">
-                <strong>Liczba odwiedzin:</strong>
+                <strong id="ui-visits-lbl">Liczba odwiedzin:</strong>
                 <span id="visit-count">...</span>
             </div>
             <div id="ui-description">...</div>
@@ -480,6 +480,7 @@
                     placeholder: "Wszystkie",
                     rates: "Kursy:",
                     update: "Aktualizacja:",
+                    visits: "Liczba odwiedzin:",
                     h: ["Produkt", "Cena", "Waluta", "Sklep", "Sezon", "Marka", "Typ", "Drużyna/Liga", "Cena PLN"]
                 },
                 EN: {
@@ -492,6 +493,7 @@
                     placeholder: "All",
                     rates: "Rates:",
                     update: "Update:",
+		    visits: "Visits:",
                     h: ["Product", "Price", "CCY", "Shop", "Season", "Brand", "Type", "Team/League", "Price PLN"]
                 }
             };
@@ -520,6 +522,7 @@
                 $("#lbl-type").text(d.type);
                 $("#ui-rates-lbl").text(d.rates);
                 $("#ui-update-lbl").text(d.update);
+		$("#ui-visits-lbl").text(d.visits);
                 $("#ui-description").text(lang === 'PL' ? config.OPIS_PL : config.OPIS_EN);
 
                 // Zmieniamy nagłówki tabeli
