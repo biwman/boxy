@@ -531,7 +531,21 @@ $(document).ready(function() {
             h: ["Product", "Price", "CCY", "Shop", "Season", "Brand", "Type", "Team/League", "Price PLN"]
         }
     };
+function getTikTokId() {
+    //  priorytet: jawne ID z configa
+    if (config.TIKTOK_VIDEO_ID) {
+        return config.TIKTOK_VIDEO_ID;
+    }
 
+    //  fallback: wyciągnięcie ID z linka
+    if (config.TIKTOK_LINK) {
+        const match = config.TIKTOK_LINK.match(/video\/(\d+)/);
+        if (match) return match[1];
+    }
+
+    //  ostateczny fallback (żeby nic nie wybuchło)
+    return null;
+}
     function updateLanguage(lang) {
         const d = langData[lang];
 
@@ -710,7 +724,11 @@ $(document).ready(function() {
         if (e.target !== this && !$(e.target).hasClass('modal-close')) return;
         $("#welcomeModal").fadeOut(200);
 	$("#video-container").fadeIn(300);
-	$("#video-frame").attr("src", "https://www.tiktok.com/embed/7597785132443127043");
+	const tiktokId = getTikTokId();
+
+if (tiktokId) {
+    $("#video-frame").attr("src", `https://www.tiktok.com/embed/${tiktokId}`);
+}
     });
 
 });
