@@ -346,6 +346,11 @@
 	.dataTables_length select {
    	 min-width: 80px;
 	}
+
+#video-preview:hover {
+    transform: scale(1.05);
+    transition: 0.2s;
+}
     </style>
 </head>
 
@@ -394,30 +399,15 @@
             </div>
         </div>
 
-	<div id="video-preview" style="flex:1; text-align:center; cursor:pointer;">
-        <div style="position:relative; display:inline-block;">
-            <img src="https://www.tiktok.com/api/img/?itemId=7597785132443127043&location=0&aid=1988"
-                 style="width:220px; border-radius:12px;">
-
-            <div style="
-                position:absolute;
-                top:50%;
-                left:50%;
-                transform:translate(-50%, -50%);
-                background:rgba(0,0,0,0.6);
-                border-radius:50%;
-                width:60px;
-                height:60px;
-                display:flex;
-                align-items:center;
-                justify-content:center;
-                color:white;
-                font-size:28px;
-            ">
-                ▶
-            </div>
-        </div>
-    </div>
+<div id="video-container" style="flex:1; text-align:center; display:none;">
+    <iframe 
+        id="video-frame"
+        width="260"
+        height="460"
+        style="border:none; border-radius:12px;"
+        allow="autoplay">
+    </iframe>
+</div>
 
 
         <div class="top-right">
@@ -719,6 +709,8 @@ $(document).ready(function() {
     $(".modal-close, #welcomeModal").on('click', function(e) {
         if (e.target !== this && !$(e.target).hasClass('modal-close')) return;
         $("#welcomeModal").fadeOut(200);
+	$("#video-container").fadeIn(300);
+	$("#video-frame").attr("src", "https://www.tiktok.com/embed/7597785132443127043");
     });
 
 });
@@ -748,6 +740,22 @@ $("#video-close, #videoModal").on("click", function(e) {
     $("#videoModal").fadeOut(200);
     $("#video-frame").attr("src", ""); // reset = stop video
 });
+
+$("#video-close, #videoModal").on("click", function(e) {
+    if (e.target !== this && e.target.id !== "video-close") return;
+
+    $("#videoModal").fadeOut(200);
+    $("#video-frame").attr("src", "");
+});
+
+// 🔥 ESC zamyka video
+$(document).on("keydown", function(e) {
+    if (e.key === "Escape") {
+        $("#videoModal").fadeOut(200);
+        $("#video-frame").attr("src", "");
+    }
+});
+
 
 </script>
 <div id="videoModal" style="
